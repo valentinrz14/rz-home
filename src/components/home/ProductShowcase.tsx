@@ -13,7 +13,7 @@ const products = [
     badge: "Más vendido",
     title: "Standing Desk Completo",
     description:
-      "Estructura doble motor DERSITE + tapa MDF premium 36mm. Elegí medida, color de tapa y color de estructura.",
+      "Estructura doble motor rz room + tapa MDF premium 36mm. Elegí medida, color de tapa y color de estructura.",
     price: BUNDLE_PRICES["120x60"],
     priceLabel: "desde",
     href: "/productos?tipo=completo",
@@ -24,7 +24,7 @@ const products = [
       tableColorHex: "#9C6B3C",
     },
     specs: [
-      "Estructura DERSITE doble motor",
+      "Estructura rz room doble motor",
       "Tapa MDF 36mm con melamina",
       "4 medidas · 6 colores de tapa",
       "Estructura blanca o negra",
@@ -36,7 +36,7 @@ const products = [
     badge: "Solo estructura",
     title: "Estructura Doble Motor",
     description:
-      "Estructura DERSITE regulable 71–119 cm con panel de control, 3 memorias, sensor anticolisión y bandeja pasacables.",
+      "Estructura rz room regulable 71–119 cm con panel de control, 3 memorias, sensor anticolisión y bandeja pasacables.",
     price: STRUCTURE_PRICE,
     priceLabel: "",
     href: "/productos?tipo=estructura",

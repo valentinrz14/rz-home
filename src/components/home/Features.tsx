@@ -91,7 +91,7 @@ export function Features() {
             Todo lo que necesitás
           </h2>
           <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">
-            Tecnología DERSITE de doble motor con tapas MDF de alta densidad.
+            Sistema de doble motor propio con tapas MDF de alta densidad.
           </p>
         </div>
 

@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     "standing desk precio argentina",
     "escritorio MDF",
     "rz room",
-    "DERSITE dual motor",
+    "standing desk doble motor",
   ],
   authors: [{ name: "rz room" }],
   creator: "rz room",

@@ -101,7 +101,7 @@ function ProductViewer({
         </div>
       )}
 
-      {/* Ilustración SVG del DERSITE */}
+      {/* Ilustración SVG de la estructura */}
       <DersiteIllustration
         structureColor={structureColor}
         withTabletop={view === "completo"}
@@ -126,7 +126,7 @@ function ProductViewer({
             {TABLE_COLORS.find((c) => c.id === tableColor)?.name}
           </span>
         )}
-        <span>Ilustración basada en DERSITE B0DL58KZWN</span>
+        <span>Ilustración rz room</span>
       </div>
     </div>
   );
@@ -164,14 +164,14 @@ function ProductsContent() {
         <div>
           <h1 className="font-display text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">
             {tipo === "completo" && "Standing Desk Completo"}
-            {tipo === "estructura" && "Estructura DERSITE Doble Motor"}
+            {tipo === "estructura" && "Estructura Doble Motor rz room"}
             {tipo === "tabla" && "Tapa de Escritorio Premium"}
           </h1>
           <p className="mt-2 text-lg text-zinc-500 dark:text-zinc-400">
             {tipo === "completo" &&
-              "Personalizá tu escritorio ideal: estructura DERSITE doble motor + tapa MDF 36mm. Elegí medida, colores y listo."}
+              "Personalizá tu escritorio ideal: estructura doble motor rz room + tapa MDF 36mm. Elegí medida, colores y listo."}
             {tipo === "estructura" &&
-              "Estructura regulable con doble motor silencioso DERSITE. Controlador con 3 memorias, sensor anticolisión y bandeja pasacables."}
+              "Estructura regulable con doble motor silencioso. Controlador con 3 memorias, sensor anticolisión y bandeja pasacables."}
             {tipo === "tabla" &&
               "Tapa MDF alta densidad 36mm con melamina y tapacanto profesional en los 4 bordes."}
           </p>
@@ -192,7 +192,7 @@ function ProductsContent() {
           Especificaciones técnicas
         </h2>
         <p className="mt-1 text-base text-zinc-500 dark:text-zinc-400">
-          DERSITE Dual Motor Standing Desk Frame — Amazon ASIN B0DL58KZWN
+          Estructura eléctrica doble motor rz room — Especificaciones completas
         </p>
 
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -219,7 +219,7 @@ function ProductsContent() {
         <div>
           <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-zinc-900 dark:text-white">
             <Cable size={24} className="text-brand-600 dark:text-brand-400" />
-            Estructura DERSITE
+            Nuestra estructura
           </h3>
           <ul className="mt-4 space-y-2">
             {DERSITE_FEATURES.map((feat, i) => (

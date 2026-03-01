@@ -1,4 +1,4 @@
-// ─── Imágenes del producto DERSITE Dual Motor Standing Desk Frame ─────────
+// ─── Imágenes del producto rz room — Estructura Doble Motor ───────────────
 //
 // ⚠️  CÓMO AGREGAR LAS FOTOS REALES DEL PRODUCTO:
 //
@@ -24,7 +24,7 @@ export const PRODUCT_IMAGES = {
   // Imagen del hero (1920x1080 ideal)
   hero: "https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=1920&q=90",
 
-  // Galería estructura DERSITE B0DL58KZWN
+  // Galería estructura rz room
   // Reemplazar con: /images/products/estructura-xxx.jpg
   structure: {
     main:      "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=85",

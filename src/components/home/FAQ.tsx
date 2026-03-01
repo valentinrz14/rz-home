@@ -10,7 +10,7 @@ const faqs = [
   },
   {
     q: "¿Cuál es el rango de altura?",
-    a: "La estructura DERSITE se ajusta entre 71 cm y 119 cm. Compatible con personas de cualquier altura, sentado o de pie. Podés configurar altura mínima y máxima según tu preferencia.",
+    a: "Nuestra estructura se ajusta entre 71 cm y 119 cm. Compatible con personas de cualquier altura, sentado o de pie. Podés configurar altura mínima y máxima según tu preferencia.",
   },
   {
     q: "¿Qué significa 'doble motor'?",
@@ -18,7 +18,7 @@ const faqs = [
   },
   {
     q: "¿Puedo comprar solo la tapa o solo la estructura?",
-    a: "Sí. Vendemos los componentes por separado. Si ya tenés una estructura compatible, comprá solo la tapa. O si tenés tu propia madera, comprá solo la estructura DERSITE.",
+    a: "Sí. Vendemos los componentes por separado. Si ya tenés una estructura compatible, comprá solo la tapa. O si tenés tu propia madera, comprá solo la estructura.",
   },
   {
     q: "¿Cómo es el envío?",
@@ -30,7 +30,7 @@ const faqs = [
   },
   {
     q: "¿Qué garantía tiene?",
-    a: "La estructura eléctrica DERSITE tiene 12 meses de garantía. Las tapas MDF están garantizadas contra defectos de fabricación.",
+    a: "La estructura eléctrica tiene 12 meses de garantía. Las tapas MDF están garantizadas contra defectos de fabricación.",
   },
   {
     q: "¿Qué incluye la estructura?",

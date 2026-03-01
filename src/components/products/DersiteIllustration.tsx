@@ -7,9 +7,8 @@ interface Props {
 }
 
 /**
- * Ilustración vectorial del DERSITE Dual Motor Standing Desk Frame
- * basada en Amazon ASIN B0DL58KZWN.
- * Reproduce fielmente: base en T, columnas duales 3 etapas,
+ * Ilustración vectorial de la estructura doble motor rz room.
+ * Reproduce: base en T, columnas duales 3 etapas,
  * travesaño central, panel de control, bandeja pasacables y gancho.
  */
 export function DersiteIllustration({
@@ -36,7 +35,7 @@ export function DersiteIllustration({
       viewBox="0 0 520 560"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label="DERSITE Dual Motor Standing Desk Frame"
+      aria-label="Estructura Doble Motor rz room"
     >
       {/* ── Sombra suelo ────────────────────────────────────── */}
       <ellipse cx="260" cy="548" rx="180" ry="12" fill={shadow} />
@@ -194,12 +193,12 @@ export function DersiteIllustration({
       )}
 
       {/* ════════════════════════════════════════════════════════
-          ETIQUETA DERSITE
+          ETIQUETA MARCA
       ════════════════════════════════════════════════════════ */}
       <rect x="104" y="380" width="52" height="14" rx="3"
             fill={panelBg} opacity="0.7" />
       <text x="130" y="391" textAnchor="middle" fontSize="6.5" fontWeight="bold"
-            fill={displayText} fontFamily="monospace" opacity="0.9">DERSITE</text>
+            fill={displayText} fontFamily="monospace" opacity="0.9">rz room</text>
     </svg>
   );
 }
