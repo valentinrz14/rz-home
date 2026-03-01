@@ -1,22 +1,25 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PRODUCT_IMAGES } from "@/lib/images";
+import { DersiteIllustration } from "@/components/products/DersiteIllustration";
 
 export function Hero() {
   return (
     <section className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden bg-zinc-950 px-4 text-center">
-      {/* Background image con overlay */}
-      <div className="absolute inset-0">
-        <Image
-          src={PRODUCT_IMAGES.hero}
-          alt="Standing desk en uso"
-          fill
-          className="object-cover opacity-20"
-          priority
+      {/* Fondo gradiente */}
+      <div className="absolute inset-0 bg-gradient-to-br from-zinc-950 via-zinc-950 to-zinc-900" />
+      {/* Glow de marca */}
+      <div className="absolute right-0 top-0 h-[500px] w-[500px] rounded-full bg-brand-600/10 blur-3xl" />
+      <div className="absolute -bottom-20 left-0 h-[400px] w-[400px] rounded-full bg-brand-800/8 blur-3xl" />
+
+      {/* Ilustración decorativa — solo desktop */}
+      <div className="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 xl:block" style={{ width: "340px", opacity: 0.18 }}>
+        <DersiteIllustration
+          withTabletop
+          structureColor="negro"
+          tableColorHex="#9C6B3C"
+          className="w-full"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/60 via-zinc-950/80 to-zinc-950" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-4xl">
@@ -26,7 +29,7 @@ export function Hero() {
 
         <h1 className="font-display text-6xl font-bold leading-[1.1] tracking-tight text-white sm:text-7xl lg:text-8xl">
           Tu escritorio,{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 to-brand-500">
+          <span className="bg-gradient-to-r from-brand-300 to-brand-500 bg-clip-text text-transparent">
             a tu altura
           </span>
         </h1>
@@ -43,7 +46,12 @@ export function Hero() {
               <ArrowRight size={20} />
             </Link>
           </Button>
-          <Button size="xl" variant="outline" asChild className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-900 hover:text-white">
+          <Button
+            size="xl"
+            variant="outline"
+            asChild
+            className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-900 hover:text-white"
+          >
             <Link href="/#como-funciona">Ver cómo funciona</Link>
           </Button>
         </div>
@@ -66,7 +74,7 @@ export function Hero() {
 
       <a
         href="#productos-destacados"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-zinc-600 hover:text-zinc-400 transition-colors"
+        className="absolute bottom-6 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1 text-zinc-600 transition-colors hover:text-zinc-400"
       >
         <span className="text-xs uppercase tracking-widest">Scroll</span>
         <ChevronDown size={18} className="animate-bounce" />

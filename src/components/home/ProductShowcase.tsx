@@ -1,11 +1,11 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BUNDLE_PRICES, STRUCTURE_PRICE, TABLE_PRICES } from "@/lib/products";
-import { PRODUCT_IMAGES } from "@/lib/images";
 import { formatPrice } from "@/lib/utils";
+import { DersiteIllustration } from "@/components/products/DersiteIllustration";
+import type { StructureColor } from "@/types";
 
 const products = [
   {
@@ -18,7 +18,11 @@ const products = [
     priceLabel: "desde",
     href: "/productos?tipo=completo",
     highlight: true,
-    image: PRODUCT_IMAGES.complete.main,
+    illustration: {
+      structureColor: "negro" as StructureColor,
+      withTabletop: true,
+      tableColorHex: "#9C6B3C",
+    },
     specs: [
       "Estructura DERSITE doble motor",
       "Tapa MDF 36mm con melamina",
@@ -37,7 +41,11 @@ const products = [
     priceLabel: "",
     href: "/productos?tipo=estructura",
     highlight: false,
-    image: PRODUCT_IMAGES.structure.main,
+    illustration: {
+      structureColor: "negro" as StructureColor,
+      withTabletop: false,
+      tableColorHex: "#9C6B3C",
+    },
     specs: [
       "Doble motor silencioso (<50 dB)",
       "Altura: 71 – 119 cm",
@@ -56,7 +64,11 @@ const products = [
     priceLabel: "desde",
     href: "/productos?tipo=tabla",
     highlight: false,
-    image: PRODUCT_IMAGES.tabletop.main,
+    illustration: {
+      structureColor: "blanco" as StructureColor,
+      withTabletop: true,
+      tableColorHex: "#9C6B3C",
+    },
     specs: [
       "MDF alta densidad 36mm",
       "4 medidas disponibles",
@@ -93,18 +105,24 @@ export function ProductShowcase() {
                   : "border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
               }`}
             >
-              {/* Image */}
-              <div className="relative h-48 w-full overflow-hidden">
-                <Image
-                  src={product.image}
-                  alt={product.title}
-                  fill
-                  className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
-                    product.highlight ? "opacity-40" : "opacity-80 dark:opacity-60"
-                  }`}
-                />
-                <div className={`absolute inset-0 ${product.highlight ? "bg-gradient-to-t from-zinc-900 via-zinc-900/70 to-transparent" : "bg-gradient-to-t from-white via-white/80 to-transparent dark:from-zinc-900 dark:via-zinc-900/80"}`} />
-                <div className="absolute bottom-3 left-4">
+              {/* Ilustración */}
+              <div
+                className={`relative flex items-end justify-center overflow-hidden pt-4 ${
+                  product.highlight
+                    ? "bg-zinc-800/60"
+                    : "bg-zinc-100/80 dark:bg-zinc-800/40"
+                }`}
+                style={{ height: "200px" }}
+              >
+                <div className="w-36">
+                  <DersiteIllustration
+                    structureColor={product.illustration.structureColor}
+                    withTabletop={product.illustration.withTabletop}
+                    tableColorHex={product.illustration.tableColorHex}
+                    className="w-full"
+                  />
+                </div>
+                <div className="absolute top-3 left-4">
                   <Badge
                     variant={product.highlight ? "brand" : "secondary"}
                     className={`text-sm ${product.highlight ? "bg-brand-500 text-white" : "dark:bg-zinc-700 dark:text-zinc-200"}`}
@@ -115,21 +133,37 @@ export function ProductShowcase() {
               </div>
 
               <div className="flex flex-1 flex-col p-5">
-                <h3 className={`font-display text-2xl font-bold ${product.highlight ? "text-white" : "text-zinc-900 dark:text-white"}`}>
+                <h3
+                  className={`font-display text-2xl font-bold ${
+                    product.highlight ? "text-white" : "text-zinc-900 dark:text-white"
+                  }`}
+                >
                   {product.title}
                 </h3>
 
-                <p className={`mt-2 text-base leading-relaxed ${product.highlight ? "text-zinc-400" : "text-zinc-500 dark:text-zinc-400"}`}>
+                <p
+                  className={`mt-2 text-base leading-relaxed ${
+                    product.highlight ? "text-zinc-400" : "text-zinc-500 dark:text-zinc-400"
+                  }`}
+                >
                   {product.description}
                 </p>
 
                 <div className="mt-4">
                   {product.priceLabel && (
-                    <span className={`text-sm uppercase tracking-wide ${product.highlight ? "text-zinc-500" : "text-zinc-400"}`}>
+                    <span
+                      className={`text-sm uppercase tracking-wide ${
+                        product.highlight ? "text-zinc-500" : "text-zinc-400"
+                      }`}
+                    >
                       {product.priceLabel}{" "}
                     </span>
                   )}
-                  <span className={`font-display text-4xl font-bold ${product.highlight ? "text-white" : "text-zinc-900 dark:text-white"}`}>
+                  <span
+                    className={`font-display text-4xl font-bold ${
+                      product.highlight ? "text-white" : "text-zinc-900 dark:text-white"
+                    }`}
+                  >
                     {formatPrice(product.price)}
                   </span>
                 </div>
@@ -138,9 +172,15 @@ export function ProductShowcase() {
                   {product.specs.map((spec) => (
                     <li
                       key={spec}
-                      className={`flex items-center gap-2 text-base ${product.highlight ? "text-zinc-300" : "text-zinc-600 dark:text-zinc-400"}`}
+                      className={`flex items-center gap-2 text-base ${
+                        product.highlight ? "text-zinc-300" : "text-zinc-600 dark:text-zinc-400"
+                      }`}
                     >
-                      <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${product.highlight ? "bg-brand-400" : "bg-zinc-400 dark:bg-zinc-600"}`} />
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                          product.highlight ? "bg-brand-400" : "bg-zinc-400 dark:bg-zinc-600"
+                        }`}
+                      />
                       {spec}
                     </li>
                   ))}

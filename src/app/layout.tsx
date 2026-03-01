@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -140,6 +141,7 @@ export default function RootLayout({
           <CartDrawer />
           <main>{children}</main>
           <Footer />
+          <WhatsAppButton />
         </ThemeProvider>
       </body>
     </html>
