@@ -1,18 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rzroom.com.ar";
@@ -36,6 +39,7 @@ export const metadata: Metadata = {
     "standing desk precio argentina",
     "escritorio MDF",
     "rz room",
+    "DERSITE dual motor",
   ],
   authors: [{ name: "rz room" }],
   creator: "rz room",
@@ -84,7 +88,10 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ffffff",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0c10" },
+  ],
 };
 
 export default function RootLayout({
@@ -93,9 +100,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es-AR" className="scroll-smooth">
+    <html lang="es-AR" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        {/* Schema.org JSON-LD para SEO estructurado */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -107,10 +113,7 @@ export default function RootLayout({
                 "Tienda de standing desks premium con doble motor y tapas MDF en Argentina",
               url: SITE_URL,
               logo: `${SITE_URL}/logo.png`,
-              address: {
-                "@type": "PostalAddress",
-                addressCountry: "AR",
-              },
+              address: { "@type": "PostalAddress", addressCountry: "AR" },
               sameAs: ["https://instagram.com/rzroom.ar"],
               hasOfferCatalog: {
                 "@type": "OfferCatalog",
@@ -130,12 +133,14 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased`}
+        className={`${inter.variable} ${spaceGrotesk.variable} font-sans min-h-screen antialiased`}
       >
-        <Header />
-        <CartDrawer />
-        <main>{children}</main>
-        <Footer />
+        <ThemeProvider>
+          <Header />
+          <CartDrawer />
+          <main>{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

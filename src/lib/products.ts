@@ -108,9 +108,10 @@ export const STRUCTURE_COLORS: StructureColorOption[] = [
 ];
 
 // ─── Specs del standing desk ──────────────────────────────────────────────────
+// Basado en DERSITE Dual Motor Standing Desk Frame (Amazon B0DL58KZWN)
 export const DESK_SPECS = {
-  heightRange: { min: 70, max: 121 },
-  weightCapacity: 125,
+  heightRange: { min: 71, max: 119 },
+  weightCapacity: 120,
   motors: 2,
   noiseLevel: 50,
   memoryPresets: 3,
@@ -118,6 +119,18 @@ export const DESK_SPECS = {
   speed: 38,
   warranty: 12,
   tableThickness: 36,
+  compatibleWidth: { min: 110, max: 183 },
+  voltage: "100V – 240V",
+  assemblyTime: 20,
+  brand: "DERSITE",
+  includes: [
+    "Estructura doble motor",
+    "Controlador con display y 3 memorias",
+    "Bandeja pasacables",
+    "Gancho para auriculares",
+    "Tornillería completa + llave Allen",
+    "Manual de instalación",
+  ],
 } as const;
 
 // ─── Features para marketing ──────────────────────────────────────────────────

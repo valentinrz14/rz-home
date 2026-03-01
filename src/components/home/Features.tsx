@@ -5,6 +5,9 @@ import {
   Layers,
   Truck,
   Package,
+  Volume2,
+  Ruler,
+  Plug,
 } from "lucide-react";
 
 const iconMap = {
@@ -14,81 +17,99 @@ const iconMap = {
   layers: Layers,
   truck: Truck,
   package: Package,
+  volume: Volume2,
+  ruler: Ruler,
+  plug: Plug,
 } as const;
 
 const features = [
   {
-    icon: "zap",
+    icon: "zap" as const,
     title: "Doble motor silencioso",
     description:
-      "Dos motores sincrónicos independientes. Movimiento suave, estable y silencioso (<50 dB).",
+      "Sistema de elevación dual motor eléctrico. Ajuste suave, uniforme y rápido. Casi inaudible (<50 dB).",
   },
   {
-    icon: "shield",
+    icon: "shield" as const,
     title: "Sensor anticolisión",
     description:
-      "Detección inteligente de obstáculos. Si detecta algo, se detiene y retrocede automáticamente.",
+      "Detección inteligente de obstáculos con sensibilidad configurable. Se detiene y retrocede automáticamente.",
   },
   {
-    icon: "settings",
-    title: "3 memorias programables",
+    icon: "settings" as const,
+    title: "3 memorias + display",
     description:
-      "Guardá tus alturas favoritas y cambiá de posición con un solo toque.",
+      "Controlador con 3 memorias programables. Cambiá entre cm y pulgadas. Configurable según espesor de tapa.",
   },
   {
-    icon: "layers",
+    icon: "layers" as const,
     title: "Tapa MDF premium 36mm",
     description:
-      "Superficie de 36mm de espesor con tapacanto profesional. Resistente, elegante y duradera.",
+      "MDF alta densidad con melamina y tapacanto profesional en los 4 bordes. Resistente y duradera.",
   },
   {
-    icon: "truck",
-    title: "Andreani a todo el país",
+    icon: "ruler" as const,
+    title: "Altura 71 – 119 cm",
     description:
-      "Enviamos a cualquier punto de Argentina. El costo de envío lo cotizás al momento del checkout.",
+      "Rango ajustable de 71 a 119 cm. Compatible con tapas de 110 cm a 180 cm de ancho.",
   },
   {
-    icon: "package",
-    title: "Armado y probado",
+    icon: "plug" as const,
+    title: "100V – 240V universal",
     description:
-      "Cada escritorio sale armado, probado y con su manual de instalación incluido.",
+      "Funciona con cualquier voltaje. Bandeja pasacables incluida + gancho para auriculares.",
+  },
+  {
+    icon: "truck" as const,
+    title: "Envío Andreani a todo el país",
+    description:
+      "Enviamos a cualquier punto de Argentina. El costo de envío se cotiza en el checkout.",
+  },
+  {
+    icon: "package" as const,
+    title: "Armado fácil y probado",
+    description:
+      "Armado en ~20 min con instrucciones claras. Agujeros pre-perforados. Sale probado con manual incluido.",
+  },
+  {
+    icon: "volume" as const,
+    title: "Ultra silencioso",
+    description:
+      "No interrumpe videollamadas ni reuniones. Cambio de altura completo en segundos sin ruidos mecánicos.",
   },
 ] as const;
 
 export function Features() {
   return (
-    <section id="como-funciona" className="bg-white px-4 py-24">
+    <section id="como-funciona" className="bg-white px-4 py-14 dark:bg-zinc-950">
       <div className="mx-auto max-w-7xl">
-        {/* Encabezado */}
-        <div className="mx-auto mb-16 max-w-2xl text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-600">
-            Por qué elegirnos
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
+            Características
           </p>
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
-            Todo lo que necesitás en un escritorio
+          <h2 className="font-display text-4xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-5xl">
+            Todo lo que necesitás
           </h2>
-          <p className="mt-4 text-zinc-500">
-            Combinamos tecnología de doble motor con tapas MDF de alta densidad
-            para darte el standing desk más completo del mercado argentino.
+          <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">
+            Tecnología DERSITE de doble motor con tapas MDF de alta densidad.
           </p>
         </div>
 
-        {/* Grid de features */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => {
             const Icon = iconMap[feature.icon];
             return (
               <div
                 key={feature.title}
-                className="group rounded-2xl border border-zinc-100 bg-zinc-50 p-6 transition-all hover:border-zinc-200 hover:bg-white hover:shadow-md"
+                className="group rounded-2xl border border-zinc-100 bg-zinc-50/50 p-5 transition-all hover:border-zinc-200 hover:bg-white hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
               >
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-900 text-white transition-colors group-hover:bg-brand-600">
-                  <Icon size={20} />
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-900 text-white transition-colors group-hover:bg-brand-600 dark:bg-zinc-800 dark:group-hover:bg-brand-600">
+                  <Icon size={24} />
                 </div>
-                <h3 className="mb-2 text-base font-semibold text-zinc-900">
+                <h3 className="mb-1.5 text-lg font-semibold text-zinc-900 dark:text-white">
                   {feature.title}
                 </h3>
-                <p className="text-sm leading-relaxed text-zinc-500">
+                <p className="text-base leading-relaxed text-zinc-500 dark:text-zinc-400">
                   {feature.description}
                 </p>
               </div>

@@ -1,65 +1,67 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BUNDLE_PRICES, STRUCTURE_PRICE, TABLE_PRICES } from "@/lib/products";
+import { PRODUCT_IMAGES } from "@/lib/images";
 import { formatPrice } from "@/lib/utils";
 
 const products = [
   {
     id: "completo",
     badge: "Más vendido",
-    badgeVariant: "default" as const,
     title: "Standing Desk Completo",
     description:
-      "Estructura doble motor + tapa MDF premium de 36mm. Elegí tu medida, color de tapa y color de estructura.",
+      "Estructura doble motor DERSITE + tapa MDF premium 36mm. Elegí medida, color de tapa y color de estructura.",
     price: BUNDLE_PRICES["120x60"],
     priceLabel: "desde",
     href: "/productos?tipo=completo",
     highlight: true,
+    image: PRODUCT_IMAGES.complete.main,
     specs: [
-      "Estructura doble motor",
-      "Tapa MDF 36mm",
-      "4 medidas disponibles",
-      "6 colores de tapa",
+      "Estructura DERSITE doble motor",
+      "Tapa MDF 36mm con melamina",
+      "4 medidas · 6 colores de tapa",
       "Estructura blanca o negra",
+      "3 memorias + anticolisión",
     ],
   },
   {
     id: "estructura",
     badge: "Solo estructura",
-    badgeVariant: "secondary" as const,
     title: "Estructura Doble Motor",
     description:
-      "Estructura regulable en altura con doble motor, panel de control con 3 memorias y sensor anticolisión. Para combinar con tu propia tapa.",
+      "Estructura DERSITE regulable 71–119 cm con panel de control, 3 memorias, sensor anticolisión y bandeja pasacables.",
     price: STRUCTURE_PRICE,
     priceLabel: "",
     href: "/productos?tipo=estructura",
     highlight: false,
+    image: PRODUCT_IMAGES.structure.main,
     specs: [
-      "Doble motor silencioso",
-      "Altura: 70 – 121 cm",
-      "Capacidad 125 kg",
-      "3 memorias programables",
-      "Color blanco o negro",
+      "Doble motor silencioso (<50 dB)",
+      "Altura: 71 – 119 cm",
+      "Capacidad 120 kg",
+      "3 memorias + display cm/in",
+      "Bandeja pasacables + gancho",
     ],
   },
   {
     id: "tabla",
     badge: "Solo tapa",
-    badgeVariant: "secondary" as const,
-    title: "Tapa de Escritorio Premium",
+    title: "Tapa de Escritorio",
     description:
-      "Tapa MDF de 36mm de espesor con tapacanto profesional. Disponible en 4 medidas y hasta 6 colores.",
+      "Tapa MDF alta densidad 36mm con terminación melamina y tapacanto profesional en todos los bordes.",
     price: TABLE_PRICES["120x60"],
     priceLabel: "desde",
     href: "/productos?tipo=tabla",
     highlight: false,
+    image: PRODUCT_IMAGES.tabletop.main,
     specs: [
       "MDF alta densidad 36mm",
       "4 medidas disponibles",
-      "6 colores disponibles",
-      "Tapacanto profesional",
+      "6 colores de melamina",
+      "Tapacanto profesional 4 lados",
       "Lista para instalar",
     ],
   },
@@ -67,115 +69,99 @@ const products = [
 
 export function ProductShowcase() {
   return (
-    <section
-      id="productos-destacados"
-      className="bg-zinc-50 px-4 py-24"
-    >
+    <section id="productos-destacados" className="bg-zinc-50 px-4 py-14 dark:bg-zinc-900/50">
       <div className="mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="mx-auto mb-16 max-w-2xl text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-600">
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
             Nuestros productos
           </p>
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
-            Configurá tu workspace ideal
+          <h2 className="font-display text-4xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-5xl">
+            Configurá tu workspace
           </h2>
-          <p className="mt-4 text-zinc-500">
-            Armá tu escritorio de la manera que más se adapte a vos. Podés comprar
-            el conjunto completo o los componentes por separado.
+          <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">
+            Escritorio completo o componentes por separado. Vos elegís.
           </p>
         </div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
           {products.map((product) => (
             <div
               key={product.id}
-              className={`relative flex flex-col rounded-2xl border p-6 transition-all ${
+              className={`relative flex flex-col overflow-hidden rounded-2xl border transition-all ${
                 product.highlight
-                  ? "border-zinc-900 bg-zinc-900 text-white shadow-xl"
-                  : "border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-md"
+                  ? "border-zinc-900 bg-zinc-900 text-white shadow-xl dark:border-zinc-600 dark:bg-zinc-800"
+                  : "border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
               }`}
             >
-              <Badge
-                variant={
-                  product.highlight ? "brand" : product.badgeVariant
-                }
-                className={`w-fit ${product.highlight ? "bg-brand-500 text-white" : ""}`}
-              >
-                {product.badge}
-              </Badge>
-
-              <h3
-                className={`mt-4 text-xl font-bold ${
-                  product.highlight ? "text-white" : "text-zinc-900"
-                }`}
-              >
-                {product.title}
-              </h3>
-
-              <p
-                className={`mt-2 text-sm leading-relaxed ${
-                  product.highlight ? "text-zinc-400" : "text-zinc-500"
-                }`}
-              >
-                {product.description}
-              </p>
-
-              {/* Precio */}
-              <div className="mt-6">
-                {product.priceLabel && (
-                  <span
-                    className={`text-xs uppercase tracking-wide ${
-                      product.highlight ? "text-zinc-500" : "text-zinc-400"
-                    }`}
-                  >
-                    {product.priceLabel}{" "}
-                  </span>
-                )}
-                <span
-                  className={`text-3xl font-bold ${
-                    product.highlight ? "text-white" : "text-zinc-900"
+              {/* Image */}
+              <div className="relative h-48 w-full overflow-hidden">
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  fill
+                  className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
+                    product.highlight ? "opacity-40" : "opacity-80 dark:opacity-60"
                   }`}
-                >
-                  {formatPrice(product.price)}
-                </span>
+                />
+                <div className={`absolute inset-0 ${product.highlight ? "bg-gradient-to-t from-zinc-900 via-zinc-900/70 to-transparent" : "bg-gradient-to-t from-white via-white/80 to-transparent dark:from-zinc-900 dark:via-zinc-900/80"}`} />
+                <div className="absolute bottom-3 left-4">
+                  <Badge
+                    variant={product.highlight ? "brand" : "secondary"}
+                    className={`text-sm ${product.highlight ? "bg-brand-500 text-white" : "dark:bg-zinc-700 dark:text-zinc-200"}`}
+                  >
+                    {product.badge}
+                  </Badge>
+                </div>
               </div>
 
-              {/* Specs */}
-              <ul className="mt-6 flex-1 space-y-2">
-                {product.specs.map((spec) => (
-                  <li
-                    key={spec}
-                    className={`flex items-center gap-2 text-sm ${
-                      product.highlight ? "text-zinc-300" : "text-zinc-600"
-                    }`}
-                  >
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full shrink-0 ${
-                        product.highlight ? "bg-brand-400" : "bg-zinc-400"
-                      }`}
-                    />
-                    {spec}
-                  </li>
-                ))}
-              </ul>
+              <div className="flex flex-1 flex-col p-5">
+                <h3 className={`font-display text-2xl font-bold ${product.highlight ? "text-white" : "text-zinc-900 dark:text-white"}`}>
+                  {product.title}
+                </h3>
 
-              {/* CTA */}
-              <Button
-                asChild
-                className={`mt-8 w-full gap-2 ${
-                  product.highlight
-                    ? "bg-white text-zinc-900 hover:bg-zinc-100"
-                    : ""
-                }`}
-                variant={product.highlight ? "outline" : "default"}
-              >
-                <Link href={product.href}>
-                  Configurar
-                  <ArrowRight size={16} />
-                </Link>
-              </Button>
+                <p className={`mt-2 text-base leading-relaxed ${product.highlight ? "text-zinc-400" : "text-zinc-500 dark:text-zinc-400"}`}>
+                  {product.description}
+                </p>
+
+                <div className="mt-4">
+                  {product.priceLabel && (
+                    <span className={`text-sm uppercase tracking-wide ${product.highlight ? "text-zinc-500" : "text-zinc-400"}`}>
+                      {product.priceLabel}{" "}
+                    </span>
+                  )}
+                  <span className={`font-display text-4xl font-bold ${product.highlight ? "text-white" : "text-zinc-900 dark:text-white"}`}>
+                    {formatPrice(product.price)}
+                  </span>
+                </div>
+
+                <ul className="mt-4 flex-1 space-y-1.5">
+                  {product.specs.map((spec) => (
+                    <li
+                      key={spec}
+                      className={`flex items-center gap-2 text-base ${product.highlight ? "text-zinc-300" : "text-zinc-600 dark:text-zinc-400"}`}
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${product.highlight ? "bg-brand-400" : "bg-zinc-400 dark:bg-zinc-600"}`} />
+                      {spec}
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  asChild
+                  className={`mt-5 w-full gap-2 text-base ${
+                    product.highlight
+                      ? "bg-white text-zinc-900 hover:bg-zinc-100"
+                      : "dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                  }`}
+                  variant={product.highlight ? "outline" : "default"}
+                  size="lg"
+                >
+                  <Link href={product.href}>
+                    Configurar
+                    <ArrowRight size={18} />
+                  </Link>
+                </Button>
+              </div>
             </div>
           ))}
         </div>

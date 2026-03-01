@@ -1,99 +1,225 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import {
+  Zap,
+  Shield,
+  Ruler,
+  Weight,
+  Settings,
+  Volume2,
+  Gauge,
+  Plug,
+  Package,
+  Wrench,
+  Cable,
+  Headphones,
+  CheckCircle2,
+} from "lucide-react";
 import { ProductConfigurator } from "@/components/products/ProductConfigurator";
-import { DeskVisualizer } from "@/components/products/DeskVisualizer";
-import { DESK_SPECS } from "@/lib/products";
-import type { ProductType, TableColor, StructureColor, TableSize } from "@/types";
+import { ProductImageGallery } from "@/components/products/ProductImageGallery";
+import { PRODUCT_IMAGES } from "@/lib/images";
+import type { ProductType } from "@/types";
+
+const DERSITE_SPECS = [
+  { icon: Zap, label: "Motor", value: "Doble motor eléctrico independiente" },
+  { icon: Ruler, label: "Rango de altura", value: "71 – 119 cm (ajustable)" },
+  { icon: Weight, label: "Capacidad de carga", value: "120 kg (265 lbs)" },
+  { icon: Gauge, label: "Velocidad", value: "38 mm/seg" },
+  { icon: Volume2, label: "Nivel de ruido", value: "< 50 dB (ultra silencioso)" },
+  { icon: Settings, label: "Memorias", value: "3 posiciones programables" },
+  { icon: Shield, label: "Anticolisión", value: "Sí, sensibilidad configurable" },
+  { icon: Plug, label: "Voltaje", value: "100V – 240V universal" },
+  { icon: Ruler, label: "Ancho compatible de tapa", value: "110 – 183 cm" },
+  { icon: Ruler, label: "Dimensiones estructura", value: "45 × 183 × 119 cm (max)" },
+  { icon: Wrench, label: "Tiempo de armado", value: "~20 minutos" },
+  { icon: Package, label: "Garantía", value: "12 meses estructura eléctrica" },
+];
+
+const DERSITE_FEATURES = [
+  "Sistema de elevación doble motor eléctrico: ajuste de altura suave, uniforme y rápido",
+  "Operación ultra silenciosa — no interrumpe videollamadas ni reuniones",
+  "Controlador con display digital: 3 memorias, switch cm/pulgadas",
+  "Altura mín/máx configurable según preferencia personal",
+  "Configurable según espesor de tu tapa para lectura de altura precisa",
+  "Sensor anticolisión con niveles de sensibilidad ajustables",
+  "Cambio de altura completo en segundos sin movimientos bruscos",
+  "Doble motor = mayor capacidad de carga y mayor vida útil",
+  "Compatible con tapas de 110 cm a 183 cm de ancho",
+  "Incluye bandeja pasacables para organización",
+  "Incluye gancho para auriculares",
+  "Agujeros pre-perforados — armado fácil con herramientas incluidas",
+  "Tornillería completa + llave Allen incluidas",
+  "Instrucciones claras con piezas etiquetadas",
+];
+
+const TABLE_FEATURES = [
+  "MDF alta densidad con 36mm de espesor total (doble capa)",
+  "Terminación melamina premium resistente a rayones y humedad",
+  "Tapacanto profesional de 0.45mm en los 4 bordes",
+  "6 colores disponibles: Hickory, Roble Claro, Blanco, Gris Cemento, Nogal, Negro",
+  "4 medidas: 120×60 · 140×70 · 150×70 · 160×80 cm",
+  "Cortes a medida precisos con acabado de fábrica",
+  "Lista para instalar sobre la estructura",
+];
+
+function getImagesForType(tipo: ProductType) {
+  if (tipo === "estructura") {
+    return [
+      { src: PRODUCT_IMAGES.structure.main, alt: "Estructura DERSITE doble motor" },
+      { src: PRODUCT_IMAGES.structure.detail1, alt: "Detalle del motor" },
+      { src: PRODUCT_IMAGES.structure.detail2, alt: "Escritorio en uso" },
+      { src: PRODUCT_IMAGES.structure.lifestyle, alt: "Home office setup" },
+    ];
+  }
+  if (tipo === "tabla") {
+    return [
+      { src: PRODUCT_IMAGES.tabletop.main, alt: "Tapa MDF premium" },
+      { src: PRODUCT_IMAGES.tabletop.texture, alt: "Textura de la madera" },
+    ];
+  }
+  return [
+    { src: PRODUCT_IMAGES.complete.main, alt: "Standing Desk Completo rz room" },
+    { src: PRODUCT_IMAGES.complete.angle, alt: "Vista lateral del escritorio" },
+    { src: PRODUCT_IMAGES.complete.workspace, alt: "Workspace completo" },
+    { src: PRODUCT_IMAGES.complete.closeup, alt: "Detalle de la tapa" },
+  ];
+}
 
 function ProductsContent() {
   const searchParams = useSearchParams();
   const tipo = (searchParams.get("tipo") ?? "completo") as ProductType;
-
-  const [tableColor, setTableColor] = useState<TableColor>("hickory");
-  const [structureColor, setStructureColor] = useState<StructureColor>("negro");
-  const [tableSize, setTableSize] = useState<TableSize>("140x70");
-  const [productType, setProductType] = useState<ProductType>(tipo);
+  const images = getImagesForType(tipo);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
-      <nav className="mb-8 text-sm text-zinc-500">
-        <a href="/" className="hover:text-zinc-900">Inicio</a>
+      <nav className="mb-6 text-base text-zinc-500 dark:text-zinc-400">
+        <a href="/" className="hover:text-zinc-900 dark:hover:text-white">Inicio</a>
         <span className="mx-2">/</span>
-        <span className="text-zinc-900">Productos</span>
+        <span className="text-zinc-900 dark:text-white">Productos</span>
       </nav>
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-        {/* Columna izquierda: visualizador */}
-        <div className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-2xl bg-zinc-50 p-8">
-            <DeskVisualizer
-              tableColor={tableColor}
-              structureColor={structureColor}
-              tableSize={tableSize}
-              showTable={productType !== "estructura"}
-              showStructure={productType !== "tabla"}
-            />
-            <div className="mt-4 text-center text-xs text-zinc-400">
-              Vista previa ilustrativa
-            </div>
-          </div>
-
-          {/* Especificaciones técnicas */}
-          <div className="mt-6 rounded-2xl border border-zinc-100 bg-white p-6">
-            <h3 className="mb-4 text-sm font-semibold text-zinc-900">
-              Especificaciones técnicas
-            </h3>
-            <dl className="space-y-2.5">
-              {[
-                {
-                  label: "Rango de altura",
-                  value: `${DESK_SPECS.heightRange.min} – ${DESK_SPECS.heightRange.max} cm`,
-                },
-                { label: "Capacidad de carga", value: `${DESK_SPECS.weightCapacity} kg` },
-                { label: "Motores", value: `${DESK_SPECS.motors} motores independientes` },
-                { label: "Nivel de ruido", value: `< ${DESK_SPECS.noiseLevel} dB` },
-                { label: "Memorias", value: `${DESK_SPECS.memoryPresets} posiciones` },
-                { label: "Anticolisión", value: "Sí, detección automática" },
-                { label: "Velocidad", value: `${DESK_SPECS.speed} mm/seg` },
-                {
-                  label: "Espesor de tapa",
-                  value: `${DESK_SPECS.tableThickness} mm MDF alta densidad`,
-                },
-                { label: "Garantía estructura", value: `${DESK_SPECS.warranty} meses` },
-              ].map((spec) => (
-                <div key={spec.label} className="flex justify-between">
-                  <dt className="text-xs text-zinc-500">{spec.label}</dt>
-                  <dd className="text-xs font-medium text-zinc-900">{spec.value}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        {/* Columna izquierda: galería de imágenes */}
+        <div className="lg:sticky lg:top-20 lg:self-start">
+          <ProductImageGallery images={images} />
         </div>
 
-        {/* Columna derecha: configurador */}
+        {/* Columna derecha: título + configurador */}
         <div>
-          <h1 className="mb-2 text-3xl font-bold tracking-tight text-zinc-900">
-            {productType === "completo" && "Standing Desk Completo"}
-            {productType === "estructura" && "Estructura Doble Motor"}
-            {productType === "tabla" && "Tapa de Escritorio Premium"}
+          <h1 className="font-display text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">
+            {tipo === "completo" && "Standing Desk Completo"}
+            {tipo === "estructura" && "Estructura DERSITE Doble Motor"}
+            {tipo === "tabla" && "Tapa de Escritorio Premium"}
           </h1>
-          <p className="mb-8 text-zinc-500">
-            {productType === "completo" &&
-              "Personalizá tu escritorio ideal: elegí medida, color de tapa y color de estructura."}
-            {productType === "estructura" &&
-              "Estructura regulable con doble motor silencioso. Compatible con tapas de 120 cm a 220 cm de ancho."}
-            {productType === "tabla" &&
-              "Tapa de MDF alta densidad 36mm con tapacanto profesional. Disponible en 4 medidas y 6 colores."}
+          <p className="mt-2 text-lg text-zinc-500 dark:text-zinc-400">
+            {tipo === "completo" &&
+              "Personalizá tu escritorio ideal: estructura DERSITE doble motor + tapa MDF 36mm. Elegí medida, colores y listo."}
+            {tipo === "estructura" &&
+              "Estructura regulable con doble motor silencioso DERSITE. Controlador con 3 memorias, sensor anticolisión y bandeja pasacables."}
+            {tipo === "tabla" &&
+              "Tapa MDF alta densidad 36mm con melamina y tapacanto profesional en los 4 bordes."}
           </p>
 
-          <ProductConfigurator
-            defaultType={productType}
-          />
+          <div className="mt-6">
+            <ProductConfigurator defaultType={tipo} />
+          </div>
         </div>
       </div>
+
+      {/* ─── Especificaciones técnicas completas ───────────────────────── */}
+      <section className="mt-14 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+        <h2 className="font-display text-3xl font-bold text-zinc-900 dark:text-white">
+          Especificaciones técnicas
+        </h2>
+        <p className="mt-2 text-base text-zinc-500 dark:text-zinc-400">
+          Estructura DERSITE Dual Motor Standing Desk Frame — importada desde EEUU.
+        </p>
+
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {DERSITE_SPECS.map((spec) => {
+            const Icon = spec.icon;
+            return (
+              <div
+                key={spec.label}
+                className="flex items-start gap-3 rounded-xl border border-zinc-100 bg-zinc-50/50 p-4 dark:border-zinc-800 dark:bg-zinc-900/50"
+              >
+                <Icon size={22} className="mt-0.5 shrink-0 text-brand-600 dark:text-brand-400" />
+                <div>
+                  <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                    {spec.label}
+                  </p>
+                  <p className="text-base font-semibold text-zinc-900 dark:text-white">
+                    {spec.value}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ─── Características detalladas ────────────────────────────────── */}
+      <section className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
+        {/* Estructura */}
+        <div>
+          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-zinc-900 dark:text-white">
+            <Cable size={24} className="text-brand-600 dark:text-brand-400" />
+            Estructura DERSITE
+          </h3>
+          <ul className="mt-4 space-y-2">
+            {DERSITE_FEATURES.map((feat, i) => (
+              <li key={i} className="flex items-start gap-2.5 text-base text-zinc-600 dark:text-zinc-400">
+                <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-green-500" />
+                {feat}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Tapa */}
+        <div>
+          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-zinc-900 dark:text-white">
+            <Package size={24} className="text-brand-600 dark:text-brand-400" />
+            Tapa MDF Premium
+          </h3>
+          <ul className="mt-4 space-y-2">
+            {TABLE_FEATURES.map((feat, i) => (
+              <li key={i} className="flex items-start gap-2.5 text-base text-zinc-600 dark:text-zinc-400">
+                <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-green-500" />
+                {feat}
+              </li>
+            ))}
+          </ul>
+
+          {/* Lo que incluye */}
+          <div className="mt-6 rounded-xl bg-zinc-50 p-5 dark:bg-zinc-900">
+            <h4 className="text-lg font-semibold text-zinc-900 dark:text-white">
+              ¿Qué incluye el paquete?
+            </h4>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {[
+                { icon: Zap, text: "Estructura doble motor" },
+                { icon: Settings, text: "Controlador con display" },
+                { icon: Cable, text: "Bandeja pasacables" },
+                { icon: Headphones, text: "Gancho para auriculares" },
+                { icon: Wrench, text: "Tornillería + llave Allen" },
+                { icon: Package, text: "Manual de instalación" },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.text} className="flex items-center gap-2 text-base text-zinc-700 dark:text-zinc-300">
+                    <Icon size={18} className="shrink-0 text-zinc-400 dark:text-zinc-500" />
+                    {item.text}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -103,7 +229,7 @@ export default function ProductosPage() {
     <Suspense
       fallback={
         <div className="flex min-h-96 items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900" />
+          <div className="h-10 w-10 animate-spin rounded-full border-3 border-zinc-300 border-t-zinc-900 dark:border-zinc-700 dark:border-t-white" />
         </div>
       }
     >
