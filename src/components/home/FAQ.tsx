@@ -42,10 +42,10 @@ export function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="bg-zinc-50 px-4 py-14 dark:bg-zinc-900/50">
+    <section id="faq" className="bg-zinc-50 px-4 py-20 dark:bg-zinc-900/50">
       <div className="mx-auto max-w-3xl">
-        <div className="mb-8 text-center">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
+        <div className="mb-12 text-center">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
             FAQ
           </p>
           <h2 className="font-display text-4xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-5xl">
@@ -53,7 +53,7 @@ export function FAQ() {
           </h2>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           {faqs.map((faq, i) => (
             <div
               key={i}
@@ -61,7 +61,7 @@ export function FAQ() {
             >
               <button
                 onClick={() => setOpen(open === i ? null : i)}
-                className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                className="flex w-full items-center justify-between px-6 py-5 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800"
               >
                 <span className="text-base font-medium text-zinc-900 dark:text-white">
                   {faq.q}
@@ -75,7 +75,7 @@ export function FAQ() {
                   open === i ? "max-h-48" : "max-h-0"
                 }`}
               >
-                <p className="px-5 pb-4 text-base leading-relaxed text-zinc-500 dark:text-zinc-400">
+                <p className="px-6 pb-5 text-base leading-relaxed text-zinc-500 dark:text-zinc-400">
                   {faq.a}
                 </p>
               </div>
