@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
+import { getAdminPassword } from "@/lib/env";
 
 export async function POST(request: Request) {
   const { password } = await request.json();
-  const adminPassword = process.env.ADMIN_PASSWORD;
 
-  if (!adminPassword) {
+  let adminPassword: string;
+  try {
+    adminPassword = getAdminPassword();
+  } catch {
     return NextResponse.json(
       { error: "ADMIN_PASSWORD no está configurado en el servidor." },
       { status: 500 }

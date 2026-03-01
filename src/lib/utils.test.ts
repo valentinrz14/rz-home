@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import type { TableSize } from "@/types";
 import {
   formatPrice,
   getProductPrice,
@@ -88,7 +89,7 @@ describe("getCartTotal", () => {
       },
       {
         id: "2",
-        config: { type: "tabla" as const, tableSize: "120x60" },
+        config: { type: "tabla" as const, tableSize: "120x60" as TableSize },
         unitPrice: 149_000,
         quantity: 2,
         name: "Tapa",
@@ -105,7 +106,7 @@ describe("getCartTotal", () => {
     const items = [
       {
         id: "1",
-        config: { type: "completo" as const, tableSize: "160x80" },
+        config: { type: "completo" as const, tableSize: "160x80" as TableSize },
         unitPrice: 899_000,
         quantity: 3,
         name: "Completo",
@@ -124,7 +125,7 @@ describe("generateCartItemId", () => {
   });
 
   it("genera el mismo id para la misma configuración", () => {
-    const config = { type: "completo" as const, tableSize: "160x80", structureColor: "negro" as const };
+    const config = { type: "completo" as const, tableSize: "160x80" as TableSize, structureColor: "negro" as const };
     expect(generateCartItemId(config)).toBe(generateCartItemId(config));
   });
 

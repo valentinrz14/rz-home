@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Preference } from "mercadopago";
 import { getMercadoPagoClient } from "@/lib/mercadopago";
+import { SITE_URL } from "@/lib/env";
 import type { MercadoPagoItem } from "@/types";
 
 interface CreatePreferenceBody {
@@ -33,9 +34,6 @@ export async function POST(req: NextRequest) {
     const client = getMercadoPagoClient();
     const preference = new Preference(client);
 
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ?? "https://rzroom.com.ar";
-
     const result = await preference.create({
       body: {
         items: items.map((item) => ({
@@ -51,9 +49,9 @@ export async function POST(req: NextRequest) {
           excluded_payment_types: [{ id: "ticket" }, { id: "atm" }],
         },
         back_urls: {
-          success: `${siteUrl}/checkout/success`,
-          failure: `${siteUrl}/checkout/failure`,
-          pending: `${siteUrl}/checkout/pending`,
+          success: `${SITE_URL}/checkout/success`,
+          failure: `${SITE_URL}/checkout/failure`,
+          pending: `${SITE_URL}/checkout/pending`,
         },
         auto_return: "approved",
         statement_descriptor: "RZ ROOM",
@@ -64,7 +62,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ preferenceId: result.id, initPoint: result.init_point });
+    return NextResponse.json({
+      preferenceId: result.id,
+      initPoint: result.init_point,
+    });
   } catch (err) {
     console.error("[MercadoPago preference error]", err);
     return NextResponse.json(
