@@ -22,9 +22,15 @@ import type {
 
 interface Props {
   defaultType?: ProductType;
+  onStructureColorChange?: (c: StructureColor) => void;
+  onTableColorChange?: (c: TableColor) => void;
 }
 
-export function ProductConfigurator({ defaultType = "completo" }: Props) {
+export function ProductConfigurator({
+  defaultType = "completo",
+  onStructureColorChange,
+  onTableColorChange,
+}: Props) {
   const [productType, setProductType] = useState<ProductType>(defaultType);
   const [tableSize, setTableSize] = useState<TableSize>("140x70");
   const [tableColor, setTableColor] = useState<TableColor>("hickory");
@@ -94,7 +100,10 @@ export function ProductConfigurator({ defaultType = "completo" }: Props) {
             {STRUCTURE_COLORS.map((color) => (
               <button
                 key={color.id}
-                onClick={() => setStructureColor(color.id)}
+                onClick={() => {
+                  setStructureColor(color.id);
+                  onStructureColorChange?.(color.id);
+                }}
                 title={color.name}
                 className={`relative flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all ${
                   structureColor === color.id
@@ -154,7 +163,10 @@ export function ProductConfigurator({ defaultType = "completo" }: Props) {
             {TABLE_COLORS.map((color) => (
               <button
                 key={color.id}
-                onClick={() => setTableColor(color.id)}
+                onClick={() => {
+                  setTableColor(color.id);
+                  onTableColorChange?.(color.id);
+                }}
                 title={color.name}
                 className={`relative h-10 w-10 rounded-full border-2 transition-all ${
                   tableColor === color.id

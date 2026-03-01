@@ -22,7 +22,7 @@ const faqs = [
   },
   {
     q: "¿Cómo es el envío?",
-    a: "Enviamos a todo el país por Andreani. El costo se cotiza en el checkout según tu código postal. Tiempo estimado: 3 a 7 días hábiles.",
+    a: "Enviamos a todo el país por Andreani. El costo se cotiza en el checkout según tu código postal. Tiempo estimado: 10 a 15 días hábiles.",
   },
   {
     q: "¿Cuántas cuotas puedo elegir?",

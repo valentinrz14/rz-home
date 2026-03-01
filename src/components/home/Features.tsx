@@ -63,7 +63,7 @@ const features = [
     icon: "truck" as const,
     title: "Envío Andreani a todo el país",
     description:
-      "Enviamos a cualquier punto de Argentina. El costo de envío se cotiza en el checkout.",
+      "Enviamos por Andreani a cualquier punto del país. Tiempo estimado: 10 a 15 días hábiles.",
   },
   {
     icon: "package" as const,

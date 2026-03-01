@@ -18,7 +18,7 @@ export function HowItWorks() {
     {
       number: "04",
       title: "Recibís en casa",
-      description: "Envío Andreani a todo el país. Llega probado y con manual.",
+      description: "Envío Andreani a todo el país en 10 a 15 días. Llega probado y con manual.",
     },
   ];
 
