@@ -10,8 +10,7 @@ function requireServer(name: string): string {
   const value = process.env[name];
   if (!value) {
     throw new Error(
-      `Variable de entorno faltante: ${name}\n` +
-        `Revisá tu .env.local. Instrucciones en .env.example.`
+      `Variable de entorno faltante: ${name}\n Revisá tu .env Instrucciones en .env.example.`
     );
   }
   return value;

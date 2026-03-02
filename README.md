@@ -26,9 +26,9 @@ Tienda online de standing desks premium para el mercado argentino. Construida co
 npm install
 
 # 2. Copiar variables de entorno
-cp .env.example .env.local
+cp .env.example .env.prod
 
-# 3. Completar variables en .env.local:
+# 3. Completar variables en .env:
 #    - MERCADOPAGO_ACCESS_TOKEN
 #    - NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY
 #    - NEXT_PUBLIC_SITE_URL

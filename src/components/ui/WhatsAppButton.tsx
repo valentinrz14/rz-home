@@ -1,7 +1,7 @@
 export function WhatsAppButton() {
   return (
     <a
-      href="https://wa.me/54911XXXXXXXX?text=Hola!%20Quiero%20consultar%20sobre%20los%20standing%20desks%20de%20rz%20room"
+      href="https://wa.me/5491159774027?text=Hola!%20Quiero%20consultar%20sobre%20los%20standing%20desks%20de%20rz%20room"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"

@@ -26,6 +26,7 @@ export function CartDrawer() {
             Tu carrito {items.length > 0 && <span className="text-zinc-400">({items.length})</span>}
           </h2>
           <button
+            type="button"
             onClick={closeCart}
             aria-label="Cerrar carrito"
             className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
@@ -57,6 +58,7 @@ export function CartDrawer() {
                       </p>
                     </div>
                     <button
+                      type="button"
                       onClick={() => removeItem(item.id)}
                       aria-label="Eliminar producto"
                       className="text-zinc-400 hover:text-red-500 transition-colors"
@@ -67,6 +69,7 @@ export function CartDrawer() {
 
                   <div className="mt-3 flex items-center gap-3">
                     <button
+                      type="button"
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
                       className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500"
                     >
@@ -76,6 +79,7 @@ export function CartDrawer() {
                       {item.quantity}
                     </span>
                     <button
+                      type="button"
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500"
                     >
