@@ -27,25 +27,25 @@ export const PRODUCT_IMAGES = {
   // Galería estructura rz room
   // Reemplazar con: /images/products/estructura-xxx.jpg
   structure: {
-    main:      "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=85",
-    panel:     "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=85",
-    base:      "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=85",
+    main: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=85",
+    panel: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=85",
+    base: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=85",
     lifestyle: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=85",
   },
 
   // Galería escritorio completo (estructura + tapa)
   // Reemplazar con: /images/products/escritorio-xxx.jpg
   complete: {
-    main:      "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=85",
-    angle:     "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=85",
+    main: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=85",
+    angle: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=85",
     workspace: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=85",
-    closeup:   "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=85",
+    closeup: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=85",
   },
 
   // Galería tapa sola
   // Reemplazar con: /images/products/tapa-xxx.jpg
   tabletop: {
-    main:    "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=85",
+    main: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=85",
     texture: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&q=85",
   },
 } as const;

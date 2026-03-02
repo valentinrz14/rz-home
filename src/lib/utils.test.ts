@@ -1,11 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import type { TableSize } from "@/types";
 import {
   formatPrice,
-  getProductPrice,
-  getProductName,
-  getCartTotal,
   generateCartItemId,
+  getCartTotal,
+  getProductName,
+  getProductPrice,
 } from "./utils";
 
 // ─── formatPrice ──────────────────────────────────────────────────────────────
@@ -125,7 +125,11 @@ describe("generateCartItemId", () => {
   });
 
   it("genera el mismo id para la misma configuración", () => {
-    const config = { type: "completo" as const, tableSize: "160x80" as TableSize, structureColor: "negro" as const };
+    const config = {
+      type: "completo" as const,
+      tableSize: "160x80" as TableSize,
+      structureColor: "negro" as const,
+    };
     expect(generateCartItemId(config)).toBe(generateCartItemId(config));
   });
 

@@ -5,14 +5,14 @@ import { BUNDLE_PRICES } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 
 const rows = [
-  { feature: "Doble motor independiente",       rzroom: true,  comp: true  },
-  { feature: "Altura 71–119 cm",                rzroom: true,  comp: true  },
-  { feature: "Panel con 3 memorias + display",  rzroom: true,  comp: true  },
-  { feature: "Sensor anticolisión",             rzroom: true,  comp: true  },
-  { feature: "Tapa MDF 36mm de doble capa",     rzroom: true,  comp: false },
-  { feature: "6 colores de tapa disponibles",   rzroom: true,  comp: false },
-  { feature: "4 medidas de tapa disponibles",   rzroom: true,  comp: false },
-  { feature: "Tapacanto profesional 4 lados",   rzroom: true,  comp: false },
+  { feature: "Doble motor independiente", rzroom: true, comp: true },
+  { feature: "Altura 71–119 cm", rzroom: true, comp: true },
+  { feature: "Panel con 3 memorias + display", rzroom: true, comp: true },
+  { feature: "Sensor anticolisión", rzroom: true, comp: true },
+  { feature: "Tapa MDF 36mm de doble capa", rzroom: true, comp: false },
+  { feature: "6 colores de tapa disponibles", rzroom: true, comp: false },
+  { feature: "4 medidas de tapa disponibles", rzroom: true, comp: false },
+  { feature: "Tapacanto profesional 4 lados", rzroom: true, comp: false },
   {
     feature: "Envío Andreani incluido",
     rzroom: false,
@@ -64,7 +64,9 @@ export function PriceComparison() {
               <span className="mt-1.5 font-display text-2xl font-bold text-zinc-400 line-through dark:text-zinc-600">
                 {formatPrice(competitorPrice)}
               </span>
-              <span className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-600">precio referencia</span>
+              <span className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-600">
+                precio referencia
+              </span>
             </div>
           </div>
 
@@ -79,7 +81,9 @@ export function PriceComparison() {
               <div className="p-5 text-sm text-zinc-700 dark:text-zinc-300">
                 {row.feature}
                 {row.note && (
-                  <span className="mt-0.5 block text-xs text-zinc-400 dark:text-zinc-500">{row.note}</span>
+                  <span className="mt-0.5 block text-xs text-zinc-400 dark:text-zinc-500">
+                    {row.note}
+                  </span>
                 )}
               </div>
               <div className="flex items-center justify-center border-l border-zinc-100 bg-zinc-900/5 p-5 dark:border-zinc-800/60 dark:bg-zinc-800/20">

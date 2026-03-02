@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
 import { Preference } from "mercadopago";
-import { getMercadoPagoClient } from "@/lib/mercadopago";
+import { type NextRequest, NextResponse } from "next/server";
 import { SITE_URL } from "@/lib/env";
+import { getMercadoPagoClient } from "@/lib/mercadopago";
 import type { MercadoPagoItem } from "@/types";
 
 const IS_LOCAL = SITE_URL.includes("localhost");
@@ -27,10 +27,7 @@ export async function POST(req: NextRequest) {
     const { items, payer } = body;
 
     if (!items || items.length === 0) {
-      return NextResponse.json(
-        { error: "No hay items en el pedido." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "No hay items en el pedido." }, { status: 400 });
     }
 
     const client = getMercadoPagoClient();
@@ -74,11 +71,7 @@ export async function POST(req: NextRequest) {
       preferenceId: result.id,
       initPoint: checkoutUrl,
     });
-  } catch (err) {
-    console.error("[MercadoPago preference error]", err);
-    return NextResponse.json(
-      { error: "Error al crear la preferencia de pago." },
-      { status: 500 }
-    );
+  } catch (_err) {
+    return NextResponse.json({ error: "Error al crear la preferencia de pago." }, { status: 500 });
   }
 }

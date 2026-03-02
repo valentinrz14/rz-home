@@ -1,10 +1,10 @@
 "use client";
 
+import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from "lucide-react";
-import { useCartStore } from "@/store/cartStore";
-import { formatPrice, getCartTotal } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { formatPrice, getCartTotal } from "@/lib/utils";
+import { useCartStore } from "@/store/cartStore";
 
 export default function CarritoPage() {
   const { items, removeItem, updateQuantity } = useCartStore();
@@ -41,13 +41,18 @@ export default function CarritoPage() {
         <div className="lg:col-span-2">
           <ul className="space-y-3">
             {items.map((item) => (
-              <li key={item.id} className="flex items-start gap-4 rounded-xl border border-zinc-100 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+              <li
+                key={item.id}
+                className="flex items-start gap-4 rounded-xl border border-zinc-100 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+              >
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
                   <ShoppingBag size={26} className="text-zinc-400 dark:text-zinc-500" />
                 </div>
                 <div className="flex-1">
                   <p className="text-base font-medium text-zinc-900 dark:text-white">{item.name}</p>
-                  <p className="mt-1 text-xl font-bold text-zinc-900 dark:text-white">{formatPrice(item.unitPrice)}</p>
+                  <p className="mt-1 text-xl font-bold text-zinc-900 dark:text-white">
+                    {formatPrice(item.unitPrice)}
+                  </p>
                   <div className="mt-2 flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <button
@@ -56,7 +61,9 @@ export default function CarritoPage() {
                       >
                         <Minus size={14} />
                       </button>
-                      <span className="min-w-[1.5rem] text-center text-base font-medium dark:text-white">{item.quantity}</span>
+                      <span className="min-w-[1.5rem] text-center text-base font-medium dark:text-white">
+                        {item.quantity}
+                      </span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-400"
@@ -65,9 +72,16 @@ export default function CarritoPage() {
                       </button>
                     </div>
                     <span className="text-base text-zinc-500 dark:text-zinc-400">
-                      Subtotal: <span className="font-semibold text-zinc-900 dark:text-white">{formatPrice(item.unitPrice * item.quantity)}</span>
+                      Subtotal:{" "}
+                      <span className="font-semibold text-zinc-900 dark:text-white">
+                        {formatPrice(item.unitPrice * item.quantity)}
+                      </span>
                     </span>
-                    <button onClick={() => removeItem(item.id)} className="ml-auto text-zinc-400 transition-colors hover:text-red-500" aria-label="Eliminar">
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="ml-auto text-zinc-400 transition-colors hover:text-red-500"
+                      aria-label="Eliminar"
+                    >
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -76,7 +90,10 @@ export default function CarritoPage() {
             ))}
           </ul>
           <div className="mt-4">
-            <Link href="/productos" className="inline-flex items-center gap-2 text-base text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
+            <Link
+              href="/productos"
+              className="inline-flex items-center gap-2 text-base text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+            >
               <ArrowLeft size={16} /> Seguir comprando
             </Link>
           </div>
@@ -88,8 +105,12 @@ export default function CarritoPage() {
             <div className="space-y-2 text-base">
               {items.map((item) => (
                 <div key={item.id} className="flex justify-between">
-                  <span className="text-zinc-600 line-clamp-1 flex-1 pr-2 dark:text-zinc-400">{item.name} x{item.quantity}</span>
-                  <span className="font-medium text-zinc-900 shrink-0 dark:text-white">{formatPrice(item.unitPrice * item.quantity)}</span>
+                  <span className="text-zinc-600 line-clamp-1 flex-1 pr-2 dark:text-zinc-400">
+                    {item.name} x{item.quantity}
+                  </span>
+                  <span className="font-medium text-zinc-900 shrink-0 dark:text-white">
+                    {formatPrice(item.unitPrice * item.quantity)}
+                  </span>
                 </div>
               ))}
             </div>
@@ -101,14 +122,19 @@ export default function CarritoPage() {
             <div className="my-3 border-t border-zinc-100 dark:border-zinc-800" />
             <div className="flex justify-between">
               <span className="text-lg font-semibold text-zinc-900 dark:text-white">Total</span>
-              <span className="font-display text-2xl font-bold text-zinc-900 dark:text-white">{formatPrice(total)}</span>
+              <span className="font-display text-2xl font-bold text-zinc-900 dark:text-white">
+                {formatPrice(total)}
+              </span>
             </div>
             <Button size="lg" className="mt-5 w-full text-base" asChild>
               <Link href="/checkout">Finalizar compra</Link>
             </Button>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               {["Visa", "Mastercard", "Amex", "Naranja"].map((card) => (
-                <span key={card} className="rounded-md border border-zinc-100 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+                <span
+                  key={card}
+                  className="rounded-md border border-zinc-100 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                >
                   {card}
                 </span>
               ))}

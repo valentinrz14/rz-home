@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
+import { CheckCircle, Mail, Package } from "lucide-react";
 import Link from "next/link";
-import { CheckCircle, Package, Mail } from "lucide-react";
-import { useCartStore } from "@/store/cartStore";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/store/cartStore";
 
 export default function CheckoutSuccessPage() {
   const { clearCart } = useCartStore();
-  useEffect(() => { clearCart(); }, [clearCart]);
+  useEffect(() => {
+    clearCart();
+  }, [clearCart]);
 
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center gap-5 px-4 text-center">
@@ -16,7 +18,9 @@ export default function CheckoutSuccessPage() {
         <CheckCircle size={44} className="text-green-600 dark:text-green-400" />
       </div>
       <div>
-        <h1 className="font-display text-4xl font-bold text-zinc-900 dark:text-white">¡Pago exitoso!</h1>
+        <h1 className="font-display text-4xl font-bold text-zinc-900 dark:text-white">
+          ¡Pago exitoso!
+        </h1>
         <p className="mt-2 text-lg text-zinc-500 dark:text-zinc-400">
           Gracias por tu compra. Te enviamos un email de confirmación.
         </p>
@@ -33,7 +37,9 @@ export default function CheckoutSuccessPage() {
           <p className="text-sm text-zinc-500 dark:text-zinc-400">Te avisamos cuando se despache</p>
         </div>
       </div>
-      <Button asChild size="lg"><Link href="/">Volver al inicio</Link></Button>
+      <Button asChild size="lg">
+        <Link href="/">Volver al inicio</Link>
+      </Button>
     </div>
   );
 }

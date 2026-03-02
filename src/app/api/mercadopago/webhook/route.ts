@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createHmac } from "crypto";
+import { createHmac } from "node:crypto";
 import { Payment } from "mercadopago";
-import { getMercadoPagoClient } from "@/lib/mercadopago";
+import { type NextRequest, NextResponse } from "next/server";
 import { getMpWebhookSecret } from "@/lib/env";
+import { getMercadoPagoClient } from "@/lib/mercadopago";
 
 /**
  * Verifica la firma HMAC-SHA256 que MercadoPago adjunta en cada webhook.
@@ -17,7 +17,6 @@ function verifyMpSignature(req: NextRequest, dataId: string): boolean {
 
   // Si no hay secreto configurado, dejamos pasar (modo desarrollo)
   if (!webhookSecret) {
-    console.warn("[Webhook] MERCADOPAGO_WEBHOOK_SECRET no configurado — omitiendo verificación.");
     return true;
   }
 
@@ -28,16 +27,14 @@ function verifyMpSignature(req: NextRequest, dataId: string): boolean {
   const parts = Object.fromEntries(
     xSignature.split(",").map((part) => part.split("=") as [string, string])
   );
-  const ts = parts["ts"];
-  const v1 = parts["v1"];
+  const ts = parts.ts;
+  const v1 = parts.v1;
 
   if (!ts || !v1) return false;
 
   // Construir el template que MP firma
   const template = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
-  const expected = createHmac("sha256", webhookSecret)
-    .update(template)
-    .digest("hex");
+  const expected = createHmac("sha256", webhookSecret).update(template).digest("hex");
 
   return expected === v1;
 }
@@ -50,7 +47,6 @@ export async function POST(req: NextRequest) {
       const dataId = String(body.data?.id ?? "");
 
       if (!verifyMpSignature(req, dataId)) {
-        console.warn("[Webhook] Firma inválida — request rechazado.");
         return NextResponse.json({ error: "Firma inválida." }, { status: 401 });
       }
 
@@ -59,21 +55,13 @@ export async function POST(req: NextRequest) {
         const payment = new Payment(client);
         const paymentData = await payment.get({ id: dataId });
 
-        console.log(
-          `[Webhook] Pago ${dataId} — Status: ${paymentData.status} — ` +
-            `Referencia: ${paymentData.external_reference}`
-        );
-
         if (paymentData.status === "approved") {
-          // TODO: Guardar el pedido en DB cuando esté disponible
-          console.log(`[Webhook] ✅ Pago aprobado — ${paymentData.external_reference}`);
         }
       }
     }
 
     return NextResponse.json({ received: true }, { status: 200 });
-  } catch (err) {
-    console.error("[Webhook error]", err);
+  } catch (_err) {
     return NextResponse.json({ error: "Webhook error" }, { status: 500 });
   }
 }

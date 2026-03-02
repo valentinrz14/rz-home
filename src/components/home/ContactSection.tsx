@@ -1,4 +1,4 @@
-import { Mail, Instagram, MessageCircle } from "lucide-react";
+import { Instagram, Mail, MessageCircle } from "lucide-react";
 
 export function ContactSection() {
   return (

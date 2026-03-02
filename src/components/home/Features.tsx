@@ -1,14 +1,4 @@
-import {
-  Zap,
-  Shield,
-  Settings,
-  Layers,
-  Truck,
-  Package,
-  Volume2,
-  Ruler,
-  Plug,
-} from "lucide-react";
+import { Layers, Package, Plug, Ruler, Settings, Shield, Truck, Volume2, Zap } from "lucide-react";
 
 const iconMap = {
   zap: Zap,

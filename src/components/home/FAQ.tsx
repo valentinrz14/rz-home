@@ -1,7 +1,7 @@
 "use client";
 
+import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
-import { Plus, Minus } from "lucide-react";
 
 const faqs = [
   {
@@ -63,9 +63,7 @@ export function FAQ() {
                 onClick={() => setOpen(open === i ? null : i)}
                 className="flex w-full items-center justify-between px-6 py-5 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800"
               >
-                <span className="text-base font-medium text-zinc-900 dark:text-white">
-                  {faq.q}
-                </span>
+                <span className="text-base font-medium text-zinc-900 dark:text-white">{faq.q}</span>
                 <span className="ml-4 shrink-0 text-zinc-400">
                   {open === i ? <Minus size={20} /> : <Plus size={20} />}
                 </span>

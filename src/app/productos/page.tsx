@@ -1,29 +1,40 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import {
-  Zap, Shield, Ruler, Weight, Settings, Volume2,
-  Gauge, Plug, Package, Wrench, Cable, Headphones, CheckCircle2,
+  Cable,
+  CheckCircle2,
+  Gauge,
+  Headphones,
+  Package,
+  Plug,
+  Ruler,
+  Settings,
+  Shield,
+  Volume2,
+  Weight,
+  Wrench,
+  Zap,
 } from "lucide-react";
-import { ProductConfigurator } from "@/components/products/ProductConfigurator";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { DersiteIllustration } from "@/components/products/DersiteIllustration";
-import { TABLE_COLORS, STRUCTURE_COLORS } from "@/lib/products";
-import type { ProductType, TableColor, StructureColor } from "@/types";
+import { ProductConfigurator } from "@/components/products/ProductConfigurator";
+import { STRUCTURE_COLORS, TABLE_COLORS } from "@/lib/products";
+import type { ProductType, StructureColor, TableColor } from "@/types";
 
 const DERSITE_SPECS = [
-  { icon: Zap,     label: "Motor",                    value: "Doble motor eléctrico independiente" },
-  { icon: Ruler,   label: "Rango de altura",           value: "71 – 119 cm (ajustable)" },
-  { icon: Weight,  label: "Capacidad de carga",        value: "120 kg (265 lbs)" },
-  { icon: Gauge,   label: "Velocidad",                 value: "38 mm/seg" },
-  { icon: Volume2, label: "Nivel de ruido",            value: "< 50 dB (ultra silencioso)" },
-  { icon: Settings,label: "Memorias",                  value: "3 posiciones programables" },
-  { icon: Shield,  label: "Anticolisión",              value: "Sí, sensibilidad configurable" },
-  { icon: Plug,    label: "Voltaje",                   value: "100V – 240V universal" },
-  { icon: Ruler,   label: "Ancho compatible de tapa",  value: "110 – 183 cm" },
-  { icon: Ruler,   label: "Dimensiones estructura",    value: "45 × 183 × 119 cm (max)" },
-  { icon: Wrench,  label: "Tiempo de armado",          value: "~20 minutos" },
-  { icon: Package, label: "Garantía",                  value: "12 meses estructura eléctrica" },
+  { icon: Zap, label: "Motor", value: "Doble motor eléctrico independiente" },
+  { icon: Ruler, label: "Rango de altura", value: "71 – 119 cm (ajustable)" },
+  { icon: Weight, label: "Capacidad de carga", value: "120 kg (265 lbs)" },
+  { icon: Gauge, label: "Velocidad", value: "38 mm/seg" },
+  { icon: Volume2, label: "Nivel de ruido", value: "< 50 dB (ultra silencioso)" },
+  { icon: Settings, label: "Memorias", value: "3 posiciones programables" },
+  { icon: Shield, label: "Anticolisión", value: "Sí, sensibilidad configurable" },
+  { icon: Plug, label: "Voltaje", value: "100V – 240V universal" },
+  { icon: Ruler, label: "Ancho compatible de tapa", value: "110 – 183 cm" },
+  { icon: Ruler, label: "Dimensiones estructura", value: "45 × 183 × 119 cm (max)" },
+  { icon: Wrench, label: "Tiempo de armado", value: "~20 minutos" },
+  { icon: Package, label: "Garantía", value: "12 meses estructura eléctrica" },
 ];
 
 const DERSITE_FEATURES = [
@@ -67,8 +78,7 @@ function ProductViewer({
     tipo === "tabla" ? "completo" : tipo === "estructura" ? "estructura" : "completo"
   );
 
-  const tableColorHex =
-    TABLE_COLORS.find((c) => c.id === tableColor)?.hex ?? "#9C6B3C";
+  const tableColorHex = TABLE_COLORS.find((c) => c.id === tableColor)?.hex ?? "#9C6B3C";
 
   const tabs =
     tipo === "completo"
@@ -113,8 +123,7 @@ function ProductViewer({
       <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-zinc-400 dark:text-zinc-500">
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-brand-500" />
-          Estructura:{" "}
-          {STRUCTURE_COLORS.find((c) => c.id === structureColor)?.name}
+          Estructura: {STRUCTURE_COLORS.find((c) => c.id === structureColor)?.name}
         </span>
         {view === "completo" && (
           <span className="flex items-center gap-1.5">
@@ -122,8 +131,7 @@ function ProductViewer({
               className="h-2.5 w-2.5 rounded-full border border-zinc-200 dark:border-zinc-700"
               style={{ backgroundColor: tableColorHex }}
             />
-            Tapa:{" "}
-            {TABLE_COLORS.find((c) => c.id === tableColor)?.name}
+            Tapa: {TABLE_COLORS.find((c) => c.id === tableColor)?.name}
           </span>
         )}
         <span>Ilustración rz room</span>
@@ -139,13 +147,15 @@ function ProductsContent() {
 
   // Estado compartido entre el viewer y el configurador
   const [structureColor, setStructureColor] = useState<StructureColor>("negro");
-  const [tableColor, setTableColor]         = useState<TableColor>("hickory");
+  const [tableColor, setTableColor] = useState<TableColor>("hickory");
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
       <nav className="mb-6 text-base text-zinc-500 dark:text-zinc-400">
-        <a href="/" className="hover:text-zinc-900 dark:hover:text-white">Inicio</a>
+        <a href="/" className="hover:text-zinc-900 dark:hover:text-white">
+          Inicio
+        </a>
         <span className="mx-2">/</span>
         <span className="text-zinc-900 dark:text-white">Productos</span>
       </nav>
@@ -153,11 +163,7 @@ function ProductsContent() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* Columna izquierda: visualizador interactivo */}
         <div className="lg:sticky lg:top-20 lg:self-start">
-          <ProductViewer
-            tipo={tipo}
-            structureColor={structureColor}
-            tableColor={tableColor}
-          />
+          <ProductViewer tipo={tipo} structureColor={structureColor} tableColor={tableColor} />
         </div>
 
         {/* Columna derecha: título + configurador */}
@@ -205,8 +211,12 @@ function ProductsContent() {
               >
                 <Icon size={22} className="mt-0.5 shrink-0 text-brand-600 dark:text-brand-400" />
                 <div>
-                  <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">{spec.label}</p>
-                  <p className="text-base font-semibold text-zinc-900 dark:text-white">{spec.value}</p>
+                  <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                    {spec.label}
+                  </p>
+                  <p className="text-base font-semibold text-zinc-900 dark:text-white">
+                    {spec.value}
+                  </p>
                 </div>
               </div>
             );
@@ -223,7 +233,10 @@ function ProductsContent() {
           </h3>
           <ul className="mt-4 space-y-2">
             {DERSITE_FEATURES.map((feat, i) => (
-              <li key={i} className="flex items-start gap-2.5 text-base text-zinc-600 dark:text-zinc-400">
+              <li
+                key={i}
+                className="flex items-start gap-2.5 text-base text-zinc-600 dark:text-zinc-400"
+              >
                 <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-green-500" />
                 {feat}
               </li>
@@ -238,7 +251,10 @@ function ProductsContent() {
           </h3>
           <ul className="mt-4 space-y-2">
             {TABLE_FEATURES.map((feat, i) => (
-              <li key={i} className="flex items-start gap-2.5 text-base text-zinc-600 dark:text-zinc-400">
+              <li
+                key={i}
+                className="flex items-start gap-2.5 text-base text-zinc-600 dark:text-zinc-400"
+              >
                 <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-green-500" />
                 {feat}
               </li>
@@ -251,16 +267,19 @@ function ProductsContent() {
             </h4>
             <div className="mt-3 grid grid-cols-2 gap-2">
               {[
-                { icon: Zap,        text: "Estructura doble motor" },
-                { icon: Settings,   text: "Controlador con display" },
-                { icon: Cable,      text: "Bandeja pasacables" },
+                { icon: Zap, text: "Estructura doble motor" },
+                { icon: Settings, text: "Controlador con display" },
+                { icon: Cable, text: "Bandeja pasacables" },
                 { icon: Headphones, text: "Gancho para auriculares" },
-                { icon: Wrench,     text: "Tornillería + llave Allen" },
-                { icon: Package,    text: "Manual de instalación" },
+                { icon: Wrench, text: "Tornillería + llave Allen" },
+                { icon: Package, text: "Manual de instalación" },
               ].map((item) => {
                 const Icon = item.icon;
                 return (
-                  <div key={item.text} className="flex items-center gap-2 text-base text-zinc-700 dark:text-zinc-300">
+                  <div
+                    key={item.text}
+                    className="flex items-center gap-2 text-base text-zinc-700 dark:text-zinc-300"
+                  >
                     <Icon size={18} className="shrink-0 text-zinc-400 dark:text-zinc-500" />
                     {item.text}
                   </div>

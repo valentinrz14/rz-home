@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { Footer } from "@/components/layout/Footer";
+import { Header } from "@/components/layout/Header";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 
@@ -45,6 +45,14 @@ export const metadata: Metadata = {
   authors: [{ name: "rz room" }],
   creator: "rz room",
   publisher: "rz room",
+  icons: {
+    icon: [
+      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: { url: "/logo.svg", type: "image/svg+xml" },
+    shortcut: "/logo.svg",
+  },
   openGraph: {
     type: "website",
     locale: "es_AR",
@@ -95,11 +103,7 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es-AR" className="scroll-smooth" suppressHydrationWarning>
       <head>

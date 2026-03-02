@@ -1,7 +1,7 @@
 "use client";
 
-import type { TableColor, StructureColor, TableSize } from "@/types";
-import { TABLE_COLORS, STRUCTURE_COLORS } from "@/lib/products";
+import { STRUCTURE_COLORS, TABLE_COLORS } from "@/lib/products";
+import type { StructureColor, TableColor, TableSize } from "@/types";
 
 interface Props {
   tableColor: TableColor;
@@ -18,10 +18,8 @@ export function DeskVisualizer({
   showTable,
   showStructure,
 }: Props) {
-  const tColorHex =
-    TABLE_COLORS.find((c) => c.id === tableColor)?.hex ?? "#9C6B3C";
-  const sColorHex =
-    STRUCTURE_COLORS.find((c) => c.id === structureColor)?.hex ?? "#1A1A1A";
+  const tColorHex = TABLE_COLORS.find((c) => c.id === tableColor)?.hex ?? "#9C6B3C";
+  const sColorHex = STRUCTURE_COLORS.find((c) => c.id === structureColor)?.hex ?? "#1A1A1A";
 
   // Ancho proporcional al tamaño elegido
   const sizeWidths: Record<TableSize, number> = {
@@ -57,15 +55,7 @@ export function DeskVisualizer({
         {showStructure && (
           <>
             {/* Pie izquierdo */}
-            <rect
-              x={40}
-              y={180}
-              width={20}
-              height={80}
-              rx={3}
-              fill={sColorHex}
-              opacity={0.9}
-            />
+            <rect x={40} y={180} width={20} height={80} rx={3} fill={sColorHex} opacity={0.9} />
             {/* Pie derecho */}
             <rect
               x={tableWidth + 20}
@@ -87,15 +77,7 @@ export function DeskVisualizer({
               opacity={0.8}
             />
             {/* Columnas verticales */}
-            <rect
-              x={47}
-              y={145}
-              width={12}
-              height={40}
-              rx={2}
-              fill={sColorHex}
-              opacity={0.75}
-            />
+            <rect x={47} y={145} width={12} height={40} rx={2} fill={sColorHex} opacity={0.75} />
             <rect
               x={tableWidth + 21}
               y={145}

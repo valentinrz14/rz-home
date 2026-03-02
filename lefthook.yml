@@ -1,0 +1,39 @@
+# Lefthook — git hooks para rz room
+# Documentación: https://lefthook.dev/configuration/
+
+pre-commit:
+  parallel: true
+  commands:
+    typecheck:
+      name: TypeScript check
+      run: npx tsc --noEmit
+      fail_text: "TypeScript: errores de tipos encontrados. Corregí antes de commitear."
+
+    lint:
+      name: Biome lint
+      glob: "*.{js,ts,jsx,tsx,json}"
+      run: npx biome check --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      fail_text: "Biome: errores de linting. Corregí o ejecutá `npx biome check --write .`"
+
+    test:
+      name: Unit & integration tests
+      run: npm run test
+      fail_text: "Tests fallando. Corregí antes de commitear."
+
+commit-msg:
+  commands:
+    commitlint:
+      name: Commitlint
+      run: npx commitlint --edit {1}
+      fail_text: |
+        Mensaje de commit inválido.
+        Formato esperado: <type>(<scope>): <subject>
+        Tipos válidos: feat, fix, docs, style, refactor, test, chore, perf, ci, build, revert
+        Ejemplo: feat(cart): agregar persistencia en localStorage
+
+pre-push:
+  commands:
+    test:
+      name: Tests antes de push
+      run: npm run test
+      fail_text: "Tests fallando. No se puede hacer push."

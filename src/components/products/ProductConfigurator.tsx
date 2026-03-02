@@ -1,24 +1,19 @@
 "use client";
 
+import { Check, ShoppingCart } from "lucide-react";
 import { useState } from "react";
-import { ShoppingCart, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  TABLE_COLORS,
-  TABLE_SIZES,
+  BUNDLE_PRICES,
   STRUCTURE_COLORS,
   STRUCTURE_PRICE,
+  TABLE_COLORS,
   TABLE_PRICES,
-  BUNDLE_PRICES,
+  TABLE_SIZES,
 } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
-import { Button } from "@/components/ui/button";
-import type {
-  ProductType,
-  TableSize,
-  TableColor,
-  StructureColor,
-} from "@/types";
+import type { ProductType, StructureColor, TableColor, TableSize } from "@/types";
 
 interface Props {
   defaultType?: ProductType;
@@ -113,7 +108,10 @@ export function ProductConfigurator({
                 style={{ backgroundColor: color.hex }}
               >
                 {structureColor === color.id && (
-                  <Check size={16} className={color.id === "blanco" ? "text-zinc-900" : "text-white"} />
+                  <Check
+                    size={16}
+                    className={color.id === "blanco" ? "text-zinc-900" : "text-white"}
+                  />
                 )}
               </button>
             ))}
@@ -143,7 +141,9 @@ export function ProductConfigurator({
               >
                 <span className="font-semibold">{size.label}</span>
                 {productType === "tabla" && (
-                  <span className={`mt-0.5 text-xs ${tableSize === size.id ? "text-zinc-400 dark:text-zinc-500" : "text-zinc-500 dark:text-zinc-400"}`}>
+                  <span
+                    className={`mt-0.5 text-xs ${tableSize === size.id ? "text-zinc-400 dark:text-zinc-500" : "text-zinc-500 dark:text-zinc-400"}`}
+                  >
                     {formatPrice(size.price)}
                   </span>
                 )}
@@ -180,7 +180,9 @@ export function ProductConfigurator({
                     <Check
                       size={14}
                       className={
-                        ["blanco", "roble-claro", "gris-cemento"].includes(color.id) ? "text-zinc-900" : "text-white"
+                        ["blanco", "roble-claro", "gris-cemento"].includes(color.id)
+                          ? "text-zinc-900"
+                          : "text-white"
                       }
                     />
                   </span>

@@ -1,8 +1,4 @@
-import type {
-  TableColorOption,
-  TableSizeOption,
-  StructureColorOption,
-} from "@/types";
+import type { StructureColorOption, TableColorOption, TableSize, TableSizeOption } from "@/types";
 
 // ─── Precios ──────────────────────────────────────────────────────────────────
 //
@@ -14,14 +10,14 @@ import type {
 //
 export const STRUCTURE_PRICE = 699_000; // Solo estructura doble motor
 
-export const TABLE_PRICES: Record<string, number> = {
+export const TABLE_PRICES: Record<TableSize, number> = {
   "120x60": 149_000,
   "140x70": 179_000,
   "150x70": 199_000,
   "160x80": 249_000,
 };
 
-export const BUNDLE_PRICES: Record<string, number> = {
+export const BUNDLE_PRICES: Record<TableSize, number> = {
   "120x60": 799_000,
   "140x70": 829_000,
   "150x70": 849_000,
@@ -150,14 +146,12 @@ export const PRODUCT_FEATURES = [
   {
     icon: "settings",
     title: "3 memorias programables",
-    description:
-      "Guardá tus alturas favoritas y cambiá de posición con un solo toque.",
+    description: "Guardá tus alturas favoritas y cambiá de posición con un solo toque.",
   },
   {
     icon: "layers",
     title: "Tapa MDF premium 36mm",
-    description:
-      "Superficie de 36mm de espesor con tapacanto profesional. Resistente y duradera.",
+    description: "Superficie de 36mm de espesor con tapacanto profesional. Resistente y duradera.",
   },
   {
     icon: "truck",
@@ -168,7 +162,6 @@ export const PRODUCT_FEATURES = [
   {
     icon: "package",
     title: "Armado y probado",
-    description:
-      "Cada escritorio sale armado, probado y con manual de instalación incluido.",
+    description: "Cada escritorio sale armado, probado y con manual de instalación incluido.",
   },
 ];

@@ -1,7 +1,7 @@
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { CartItem, CartItemConfig } from "@/types";
-import { STRUCTURE_PRICE, TABLE_PRICES, BUNDLE_PRICES } from "./products";
+import { BUNDLE_PRICES, STRUCTURE_PRICE, TABLE_PRICES } from "./products";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -39,15 +39,12 @@ export function getProductName(config: CartItemConfig): string {
     }
   } else if (config.type === "tabla") {
     parts.push("Tapa de Escritorio Premium");
-    if (config.tableSize) parts.push(config.tableSize + " cm");
+    if (config.tableSize) parts.push(`${config.tableSize} cm`);
   } else if (config.type === "completo") {
     parts.push("Standing Desk Completo");
-    if (config.tableSize) parts.push(config.tableSize + " cm");
+    if (config.tableSize) parts.push(`${config.tableSize} cm`);
     if (config.structureColor) {
-      parts.push(
-        "Estructura " +
-          (config.structureColor === "blanco" ? "Blanca" : "Negra")
-      );
+      parts.push(`Estructura ${config.structureColor === "blanco" ? "Blanca" : "Negra"}`);
     }
   }
 
@@ -59,12 +56,7 @@ export function getCartTotal(items: CartItem[]): number {
 }
 
 export function generateCartItemId(config: CartItemConfig): string {
-  return [
-    config.type,
-    config.structureColor ?? "",
-    config.tableSize ?? "",
-    config.tableColor ?? "",
-  ]
+  return [config.type, config.structureColor ?? "", config.tableSize ?? "", config.tableColor ?? ""]
     .filter(Boolean)
     .join("-");
 }

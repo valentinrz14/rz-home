@@ -1,6 +1,6 @@
-import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
+import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
@@ -10,16 +10,14 @@ const buttonVariants = cva(
       variant: {
         default:
           "bg-zinc-900 text-white shadow hover:bg-zinc-800 active:bg-zinc-950 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200",
-        destructive:
-          "bg-red-500 text-white shadow-sm hover:bg-red-500/90",
+        destructive: "bg-red-500 text-white shadow-sm hover:bg-red-500/90",
         outline:
           "border border-zinc-200 bg-white shadow-sm hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-700 dark:bg-transparent dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white",
         secondary:
           "bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",
         ghost: "hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-white",
         link: "text-zinc-900 underline-offset-4 hover:underline dark:text-zinc-100",
-        brand:
-          "bg-brand-600 text-white shadow hover:bg-brand-700 active:bg-brand-800",
+        brand: "bg-brand-600 text-white shadow hover:bg-brand-700 active:bg-brand-800",
       },
       size: {
         default: "h-10 px-5 py-2",
@@ -46,11 +44,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
+      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
     );
   }
 );

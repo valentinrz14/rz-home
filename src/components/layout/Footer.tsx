@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Instagram, Mail, MapPin } from "lucide-react";
+import Link from "next/link";
 
 export function Footer() {
   return (
@@ -42,7 +42,10 @@ export function Footer() {
                 { href: "/productos?tipo=tabla", label: "Solo Tapa" },
               ].map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-base text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
+                  <Link
+                    href={item.href}
+                    className="text-base text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                  >
                     {item.label}
                   </Link>
                 </li>
@@ -59,7 +62,10 @@ export function Footer() {
                 { href: "/#contacto", label: "Contacto" },
               ].map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-base text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
+                  <Link
+                    href={item.href}
+                    className="text-base text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                  >
                     {item.label}
                   </Link>
                 </li>
@@ -72,7 +78,10 @@ export function Footer() {
             <ul className="mt-4 space-y-4">
               <li className="flex items-start gap-2.5 text-base text-zinc-500 dark:text-zinc-400">
                 <Mail size={18} className="mt-0.5 shrink-0" />
-                <a href="mailto:hola@rzroom.com.ar" className="hover:text-zinc-900 dark:hover:text-white">
+                <a
+                  href="mailto:hola@rzroom.com.ar"
+                  className="hover:text-zinc-900 dark:hover:text-white"
+                >
                   hola@rzroom.com.ar
                 </a>
               </li>

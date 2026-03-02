@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { XCircle } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function CheckoutFailurePage() {
@@ -9,14 +9,20 @@ export default function CheckoutFailurePage() {
         <XCircle size={44} className="text-red-500 dark:text-red-400" />
       </div>
       <div>
-        <h1 className="font-display text-4xl font-bold text-zinc-900 dark:text-white">Pago no procesado</h1>
+        <h1 className="font-display text-4xl font-bold text-zinc-900 dark:text-white">
+          Pago no procesado
+        </h1>
         <p className="mt-2 text-lg text-zinc-500 dark:text-zinc-400">
           Revisá los datos de tu tarjeta e intentá nuevamente.
         </p>
       </div>
       <div className="flex gap-3">
-        <Button asChild variant="outline"><Link href="/checkout">Reintentar</Link></Button>
-        <Button asChild><Link href="/#contacto">Contactar soporte</Link></Button>
+        <Button asChild variant="outline">
+          <Link href="/checkout">Reintentar</Link>
+        </Button>
+        <Button asChild>
+          <Link href="/#contacto">Contactar soporte</Link>
+        </Button>
       </div>
     </div>
   );
