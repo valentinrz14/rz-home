@@ -42,3 +42,15 @@ export const SITE_URL = optional("NEXT_PUBLIC_SITE_URL", "http://localhost:3000"
 export function getAdminPassword() {
   return requireServer("ADMIN_PASSWORD");
 }
+
+/** Credenciales de Andreani para cotización de envío */
+export function getAndreaniCredentials() {
+  return {
+    usuario: requireServer("ANDREANI_USUARIO"),
+    clave: requireServer("ANDREANI_CLAVE"),
+    contrato: requireServer("ANDREANI_CONTRATO"),
+  };
+}
+
+/** Código postal de origen para Andreani (depósito/local) */
+export const ANDREANI_CP_ORIGEN = optional("ANDREANI_CP_ORIGEN", "1043");

@@ -55,6 +55,11 @@ export interface CheckoutFormData {
   notes: string;
 }
 
+export interface ShippingQuote {
+  costo: number;
+  plazo: number | null;
+}
+
 export interface MercadoPagoItem {
   id: string;
   title: string;
