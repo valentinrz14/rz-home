@@ -43,6 +43,21 @@ export async function POST(req: NextRequest) {
           currency_id: "ARS",
         })),
         payer,
+        // metadata: persiste en el pago y lo usamos en el webhook para reconstruir el email.
+        metadata: {
+          items: JSON.stringify(
+            items.map((item) => ({
+              title: item.title,
+              quantity: item.quantity,
+              unit_price: item.unit_price,
+            }))
+          ),
+          buyer_first_name: payer.name,
+          buyer_last_name: payer.surname,
+          buyer_phone: `${payer.phone.area_code} ${payer.phone.number}`,
+          buyer_address: payer.address.street_name,
+          buyer_zip: payer.address.zip_code,
+        },
         payment_methods: {
           installments: 12,
           excluded_payment_types: [{ id: "ticket" }, { id: "atm" }],

@@ -1,19 +1,43 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getAndreaniCredentials, ANDREANI_CP_ORIGEN } from "@/lib/env";
+import { getAndreaniCredentials } from "@/lib/env";
 import type { ProductType, TableSize } from "@/types";
 
 // ── Peso y dimensiones estimadas por tipo/tamaño de producto ─────────────────
 
-type BultoSpec = { kilos: number; largoCm: number; anchoCm: number; altoCm: number };
-
-const ESTRUCTURA_SPEC: BultoSpec = { kilos: 35, largoCm: 125, anchoCm: 65, altoCm: 25 };
-
-const TABLA_SPECS: Record<TableSize, BultoSpec> = {
-  "120x60": { kilos: 18, largoCm: 125, anchoCm: 65, altoCm: 8 },
-  "140x70": { kilos: 22, largoCm: 145, anchoCm: 75, altoCm: 8 },
-  "150x70": { kilos: 25, largoCm: 155, anchoCm: 75, altoCm: 8 },
-  "160x80": { kilos: 30, largoCm: 165, anchoCm: 85, altoCm: 8 },
+type BultoSpec = {
+  kilos: number;
+  largoCm: number;
+  anchoCm: number;
+  altoCm: number;
+  volumenCm: number; // largoCm * anchoCm * altoCm
+  valorDeclaradoConImpuestos: number;
 };
+
+function makeBulto(
+  kilos: number,
+  largo: number,
+  ancho: number,
+  alto: number,
+  valorDeclarado: number
+): BultoSpec {
+  return {
+    kilos,
+    largoCm: largo,
+    anchoCm: ancho,
+    altoCm: alto,
+    volumenCm: largo * ancho * alto,
+    valorDeclaradoConImpuestos: valorDeclarado,
+  };
+}
+
+const ESTRUCTURA_SPEC_BASE = { kilos: 35, largo: 125, ancho: 65, alto: 25 };
+const TABLA_DIMS: Record<TableSize, { kilos: number; largo: number; ancho: number; alto: number }> =
+  {
+    "120x60": { kilos: 18, largo: 125, ancho: 65, alto: 8 },
+    "140x70": { kilos: 22, largo: 145, ancho: 75, alto: 8 },
+    "150x70": { kilos: 25, largo: 155, ancho: 75, alto: 8 },
+    "160x80": { kilos: 30, largo: 165, ancho: 85, alto: 8 },
+  };
 
 interface CartItemInput {
   type: ProductType;
@@ -22,22 +46,24 @@ interface CartItemInput {
   unitPrice: number;
 }
 
-function buildBultos(items: CartItemInput[]) {
+function buildBultos(items: CartItemInput[]): BultoSpec[] {
   return items.flatMap((item) => {
     const size = item.size ?? "140x70";
-    const bultos: Array<BultoSpec & { valorDeclarado: number }> = [];
+    const bultos: BultoSpec[] = [];
 
     for (let i = 0; i < item.quantity; i++) {
       if (item.type === "estructura" || item.type === "completo") {
         const declared =
           item.type === "completo" ? Math.round(item.unitPrice * 0.55) : item.unitPrice;
-        bultos.push({ ...ESTRUCTURA_SPEC, valorDeclarado: declared });
+        const { kilos, largo, ancho, alto } = ESTRUCTURA_SPEC_BASE;
+        bultos.push(makeBulto(kilos, largo, ancho, alto, declared));
       }
 
       if (item.type === "tabla" || item.type === "completo") {
         const declared =
           item.type === "completo" ? Math.round(item.unitPrice * 0.45) : item.unitPrice;
-        bultos.push({ ...TABLA_SPECS[size], valorDeclarado: declared });
+        const { kilos, largo, ancho, alto } = TABLA_DIMS[size];
+        bultos.push(makeBulto(kilos, largo, ancho, alto, declared));
       }
     }
 
@@ -47,29 +73,57 @@ function buildBultos(items: CartItemInput[]) {
 
 // ── Andreani API ──────────────────────────────────────────────────────────────
 
-const ANDREANI_BASE = "https://apis.andreani.com";
+function getAndreaniBase() {
+  return process.env.ANDREANI_QA === "true"
+    ? "https://apisqa.andreani.com"
+    : "https://apis.andreani.com";
+}
 
+/**
+ * Login: GET /login con Authorization: Basic base64(user:pass)
+ * Token devuelto en header x-authorization-token.
+ */
 async function getAndreaniToken(usuario: string, clave: string): Promise<string> {
-  const res = await fetch(`${ANDREANI_BASE}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ usuario, clave }),
+  const credentials = Buffer.from(`${usuario}:${clave}`).toString("base64");
+
+  const res = await fetch(`${getAndreaniBase()}/login`, {
+    method: "GET",
+    headers: {
+      Authorization: `Basic ${credentials}`,
+      "Content-Type": "application/json",
+    },
   });
 
   if (!res.ok) {
-    throw new Error(`Andreani login failed: ${res.status}`);
+    throw new Error(`Andreani login failed: ${res.status} ${res.statusText}`);
   }
 
-  const token = res.headers.get("x-authorization-token");
+  const token =
+    res.headers.get("x-authorization-token") ?? res.headers.get("X-Authorization-token");
   if (!token) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(`Andreani login: token no encontrado en respuesta. ${JSON.stringify(data)}`);
+    throw new Error("Andreani login: token no encontrado en headers de respuesta.");
   }
 
   return token;
 }
 
+/**
+ * Serializa los bultos como query params estilo PHP:
+ * bultos[0][kilos]=35&bultos[0][largoCm]=125&...
+ */
+function serializeBultos(bultos: BultoSpec[]): string {
+  return bultos
+    .flatMap((bulto, i) =>
+      (Object.entries(bulto) as [string, number][]).map(
+        ([key, val]) => `${encodeURIComponent(`bultos[${i}][${key}]`)}=${encodeURIComponent(val)}`
+      )
+    )
+    .join("&");
+}
+
 interface AndreaniTarifaResponse {
+  tarifa?: number;
+  tarifaConImpuestos?: number;
   tarifaTotal?: number;
   total?: number;
   plazoEntrega?: number;
@@ -79,38 +133,40 @@ interface AndreaniTarifaResponse {
 async function fetchTarifa(
   token: string,
   contrato: string,
+  cliente: string,
   cpDestino: string,
-  cpOrigen: string,
-  bultos: Array<BultoSpec & { valorDeclarado: number }>
+  bultos: BultoSpec[]
 ): Promise<{ costo: number; plazo: number | null }> {
-  const res = await fetch(`${ANDREANI_BASE}/v2/tarifas`, {
-    method: "POST",
+  const baseParams = new URLSearchParams({ cpDestino, contrato, cliente });
+  const url = `${getAndreaniBase()}/v1/tarifas?${baseParams.toString()}&${serializeBultos(bultos)}`;
+
+  const res = await fetch(url, {
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "x-contrato": contrato,
+      "x-authorization-token": token,
     },
-    body: JSON.stringify({ cpDestino, cpOrigen, bultos }),
   });
 
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Andreani tarifas error ${res.status}: ${JSON.stringify(err)}`);
+    const err = await res.text().catch(() => "");
+    throw new Error(`Andreani tarifas error ${res.status}: ${err}`);
   }
 
   const data: AndreaniTarifaResponse | AndreaniTarifaResponse[] = await res.json();
+  const tarifa: AndreaniTarifaResponse = Array.isArray(data) ? (data[0] ?? {}) : data;
 
-  // La API puede devolver un objeto o un array con la primera tarifa
-  const tarifa: AndreaniTarifaResponse = Array.isArray(data)
-    ? (data[0] ?? {})
-    : data;
-  const costo = tarifa.tarifaTotal ?? tarifa.total;
+  const costo =
+    tarifa.tarifa ??
+    tarifa.tarifaConImpuestos ??
+    tarifa.tarifaTotal ??
+    tarifa.total;
 
   if (typeof costo !== "number") {
-    throw new Error(`Andreani: estructura de respuesta inesperada: ${JSON.stringify(data)}`);
+    throw new Error(`Andreani: respuesta inesperada: ${JSON.stringify(data)}`);
   }
 
-  return { costo, plazo: tarifa.plazoEntrega ?? null };
+  return { costo: Math.round(costo), plazo: tarifa.plazoEntrega ?? null };
 }
 
 // ── Handler ───────────────────────────────────────────────────────────────────
@@ -150,8 +206,8 @@ export async function POST(req: NextRequest) {
     const { costo, plazo } = await fetchTarifa(
       token,
       creds.contrato,
+      creds.cliente,
       codigoPostal,
-      ANDREANI_CP_ORIGEN,
       bultos
     );
 
