@@ -4,6 +4,8 @@ import { SITE_URL } from "@/lib/env";
 import { getMercadoPagoClient } from "@/lib/mercadopago";
 import type { MercadoPagoItem } from "@/types";
 
+const IS_LOCAL = SITE_URL.includes("localhost");
+
 interface CreatePreferenceBody {
   items: MercadoPagoItem[];
   payer: {
