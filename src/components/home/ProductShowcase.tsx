@@ -73,7 +73,6 @@ const products = [
       "MDF alta densidad 36mm",
       "4 medidas disponibles",
       "6 colores de melamina",
-      "Tapacanto profesional 4 lados",
       "Lista para instalar",
     ],
   },

@@ -12,7 +12,6 @@ const rows = [
   { feature: "Tapa MDF 36mm de doble capa", rzroom: true, comp: false },
   { feature: "6 colores de tapa disponibles", rzroom: true, comp: false },
   { feature: "4 medidas de tapa disponibles", rzroom: true, comp: false },
-  { feature: "Tapacanto profesional 4 lados", rzroom: true, comp: false },
   {
     feature: "Envío Andreani incluido",
     rzroom: false,
