@@ -1,15 +1,80 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
-  <!-- Background rounded square -->
-  <rect width="200" height="200" rx="36" fill="#18181b"/>
-  <!-- "rz" wordmark -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Background -->
+  <rect width="200" height="200" rx="30" fill="#252525"/>
+
+  <!-- ── Standing desk illustration (left half) ── -->
+
+  <!-- Desk surface -->
+  <rect x="12" y="84" width="84" height="7" rx="2.5" fill="white"/>
+
+  <!-- Left leg -->
+  <rect x="17" y="91" width="5" height="48" rx="2" fill="white"/>
+  <!-- Right leg -->
+  <rect x="86" y="91" width="5" height="48" rx="2" fill="white"/>
+
+  <!-- Left foot -->
+  <rect x="11" y="135" width="17" height="5" rx="2" fill="white"/>
+  <!-- Right foot -->
+  <rect x="80" y="135" width="17" height="5" rx="2" fill="white"/>
+
+  <!-- Monitor frame -->
+  <rect x="27" y="50" width="54" height="36" rx="3" fill="none" stroke="white" stroke-width="3.5"/>
+
+  <!-- Monitor stand stem -->
+  <rect x="51" y="86" width="6" height="7" fill="white"/>
+  <!-- Monitor stand base -->
+  <rect x="43" y="93" width="22" height="4.5" rx="2" fill="white"/>
+
+  <!-- Screen lines (content) -->
+  <line x1="34" y1="62" x2="52" y2="62" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/>
+  <line x1="34" y1="69" x2="63" y2="69" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/>
+  <line x1="34" y1="76" x2="58" y2="76" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- Height-adjust arrows (left) -->
+  <polyline points="9,82 17,71 25,82" fill="none" stroke="white" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- Height-adjust arrows (right) -->
+  <polyline points="83,82 91,71 99,82" fill="none" stroke="white" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- ── Wordmark (right half) ── -->
+
+  <!-- "rz" in white -->
+  <text
+    x="108"
+    y="107"
+    font-family="system-ui,-apple-system,'Segoe UI',Arial,sans-serif"
+    font-size="56"
+    font-weight="800"
+    fill="white"
+    letter-spacing="-2"
+  >rz</text>
+
+  <!-- "room" in brand gold -->
+  <text
+    x="109"
+    y="136"
+    font-family="system-ui,-apple-system,'Segoe UI',Arial,sans-serif"
+    font-size="29"
+    font-weight="700"
+    fill="#9c7f53"
+    letter-spacing="0.5"
+  >room</text>
+
+  <!-- Tagline -->
   <text
     x="100"
-    y="130"
-    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-    font-size="96"
-    font-weight="800"
+    y="162"
+    font-family="system-ui,-apple-system,'Segoe UI',Arial,sans-serif"
+    font-size="7"
+    font-weight="500"
+    fill="rgba(255,255,255,0.65)"
     text-anchor="middle"
+    letter-spacing="0.9"
+  >ESCRITORIOS AJUSTABLES &amp; MÁS</text>
+
+  <!-- 4-pointed star (bottom right) -->
+  <path
+    d="M181,170 L182.4,175.6 L188,177 L182.4,178.4 L181,184 L179.6,178.4 L174,177 L179.6,175.6 Z"
     fill="#9c7f53"
-    letter-spacing="-4"
-  >rz</text>
+    opacity="0.9"
+  />
 </svg>

@@ -45,12 +45,15 @@ export async function POST(req: NextRequest) {
           installments: 12,
           excluded_payment_types: [{ id: "ticket" }, { id: "atm" }],
         },
-        back_urls: {
-          success: `${SITE_URL}/checkout/success`,
-          failure: `${SITE_URL}/checkout/failure`,
-          pending: `${SITE_URL}/checkout/pending`,
-        },
-        auto_return: "approved",
+        // MercadoPago rejects localhost URLs — omit back_urls and auto_return in local dev.
+        ...(!IS_LOCAL && {
+          back_urls: {
+            success: `${SITE_URL}/checkout/success`,
+            failure: `${SITE_URL}/checkout/failure`,
+            pending: `${SITE_URL}/checkout/pending`,
+          },
+          auto_return: "approved" as const,
+        }),
         statement_descriptor: "RZ ROOM",
         external_reference: `rz-room-${Date.now()}`,
         shipments: {
@@ -65,7 +68,8 @@ export async function POST(req: NextRequest) {
       preferenceId: result.id,
       initPoint: result.init_point,
     });
-  } catch (_err) {
+  } catch (err) {
+    console.error("MercadoPago preference error:", err);
     return NextResponse.json({ error: "Error al crear la preferencia de pago." }, { status: 500 });
   }
 }
