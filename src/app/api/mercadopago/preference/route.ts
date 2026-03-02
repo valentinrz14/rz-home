@@ -4,6 +4,8 @@ import { getMercadoPagoClient } from "@/lib/mercadopago";
 import { SITE_URL } from "@/lib/env";
 import type { MercadoPagoItem } from "@/types";
 
+const IS_LOCAL = SITE_URL.includes("localhost");
+
 interface CreatePreferenceBody {
   items: MercadoPagoItem[];
   payer: {
@@ -62,9 +64,15 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // In local development, use sandbox_init_point so test credentials and
+    // test buyer accounts work correctly (avoids "una de las partes es de prueba").
+    const checkoutUrl = IS_LOCAL
+      ? (result.sandbox_init_point ?? result.init_point)
+      : result.init_point;
+
     return NextResponse.json({
       preferenceId: result.id,
-      initPoint: result.init_point,
+      initPoint: checkoutUrl,
     });
   } catch (err) {
     console.error("[MercadoPago preference error]", err);
