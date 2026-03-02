@@ -1,11 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+import type { TableSize } from "@/types";
 import {
-  TABLE_COLORS,
-  TABLE_SIZES,
-  STRUCTURE_COLORS,
   BUNDLE_PRICES,
-  TABLE_PRICES,
+  STRUCTURE_COLORS,
   STRUCTURE_PRICE,
+  TABLE_COLORS,
+  TABLE_PRICES,
+  TABLE_SIZES,
 } from "./products";
 
 // ─── Colores de tapa ──────────────────────────────────────────────────────────
@@ -47,7 +48,7 @@ describe("TABLE_SIZES", () => {
   it("tapas más grandes cuestan más", () => {
     const prices = TABLE_SIZES.map((s) => s.price);
     for (let i = 1; i < prices.length; i++) {
-      expect(prices[i]).toBeGreaterThan(prices[i - 1]);
+      expect(prices[i]!).toBeGreaterThan(prices[i - 1]!);
     }
   });
 
@@ -73,7 +74,7 @@ describe("STRUCTURE_COLORS", () => {
 describe("precios", () => {
   it("el bundle es más barato que comprar por separado", () => {
     Object.entries(TABLE_PRICES).forEach(([size, tablePrice]) => {
-      const bundlePrice = BUNDLE_PRICES[size];
+      const bundlePrice = BUNDLE_PRICES[size as TableSize];
       const precioPorSeparado = STRUCTURE_PRICE + tablePrice;
       expect(bundlePrice).toBeLessThan(precioPorSeparado);
     });

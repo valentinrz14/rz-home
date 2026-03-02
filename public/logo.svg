@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Background rounded square -->
+  <rect width="200" height="200" rx="36" fill="#18181b"/>
+  <!-- "rz" wordmark -->
+  <text
+    x="100"
+    y="130"
+    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="96"
+    font-weight="800"
+    text-anchor="middle"
+    fill="#9c7f53"
+    letter-spacing="-4"
+  >rz</text>
+</svg>

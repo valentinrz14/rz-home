@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
 import { Preference } from "mercadopago";
-import { getMercadoPagoClient } from "@/lib/mercadopago";
+import { type NextRequest, NextResponse } from "next/server";
 import { SITE_URL } from "@/lib/env";
+import { getMercadoPagoClient } from "@/lib/mercadopago";
 import type { MercadoPagoItem } from "@/types";
+
+const IS_LOCAL = SITE_URL.includes("localhost");
 
 interface CreatePreferenceBody {
   items: MercadoPagoItem[];
@@ -25,10 +27,7 @@ export async function POST(req: NextRequest) {
     const { items, payer } = body;
 
     if (!items || items.length === 0) {
-      return NextResponse.json(
-        { error: "No hay items en el pedido." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "No hay items en el pedido." }, { status: 400 });
     }
 
     const client = getMercadoPagoClient();
@@ -62,15 +61,17 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // In local development, use sandbox_init_point so test credentials and
+    // test buyer accounts work correctly (avoids "una de las partes es de prueba").
+    const checkoutUrl = IS_LOCAL
+      ? (result.sandbox_init_point ?? result.init_point)
+      : result.init_point;
+
     return NextResponse.json({
       preferenceId: result.id,
-      initPoint: result.init_point,
+      initPoint: checkoutUrl,
     });
-  } catch (err) {
-    console.error("[MercadoPago preference error]", err);
-    return NextResponse.json(
-      { error: "Error al crear la preferencia de pago." },
-      { status: 500 }
-    );
+  } catch (_err) {
+    return NextResponse.json({ error: "Error al crear la preferencia de pago." }, { status: 500 });
   }
 }

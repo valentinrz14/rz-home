@@ -1,23 +1,19 @@
 "use client";
 
+import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import Link from "next/link";
-import { X, ShoppingBag, Plus, Minus, Trash2 } from "lucide-react";
-import { useCartStore } from "@/store/cartStore";
-import { formatPrice, getCartTotal } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { formatPrice, getCartTotal } from "@/lib/utils";
+import { useCartStore } from "@/store/cartStore";
 
 export function CartDrawer() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity } =
-    useCartStore();
+  const { items, isOpen, closeCart, removeItem, updateQuantity } = useCartStore();
   const total = getCartTotal(items);
 
   return (
     <>
       {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
-          onClick={closeCart}
-        />
+        <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" onClick={closeCart} />
       )}
 
       <div
@@ -27,10 +23,7 @@ export function CartDrawer() {
       >
         <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
-            Tu carrito{" "}
-            {items.length > 0 && (
-              <span className="text-zinc-400">({items.length})</span>
-            )}
+            Tu carrito {items.length > 0 && <span className="text-zinc-400">({items.length})</span>}
           </h2>
           <button
             onClick={closeCart}

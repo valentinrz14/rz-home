@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
+import { useState } from "react";
 
 interface Props {
   images: { src: string; alt: string }[];
@@ -12,13 +12,16 @@ export function ProductImageGallery({ images }: Props) {
 
   if (images.length === 0) return null;
 
+  const activeImage = images[active] ?? images[0];
+  if (!activeImage) return null;
+
   return (
     <div>
       {/* Imagen principal */}
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800">
         <Image
-          src={images[active].src}
-          alt={images[active].alt}
+          src={activeImage.src}
+          alt={activeImage.alt}
           fill
           className="object-cover transition-all duration-300"
           priority={active === 0}
@@ -38,12 +41,7 @@ export function ProductImageGallery({ images }: Props) {
                   : "border-transparent opacity-60 hover:opacity-100"
               }`}
             >
-              <Image
-                src={img.src}
-                alt={img.alt}
-                fill
-                className="object-cover"
-              />
+              <Image src={img.src} alt={img.alt} fill className="object-cover" />
             </button>
           ))}
         </div>

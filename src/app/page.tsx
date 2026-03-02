@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Hero } from "@/components/home/Hero";
-import { Features } from "@/components/home/Features";
-import { ProductShowcase } from "@/components/home/ProductShowcase";
-import { PriceComparison } from "@/components/home/PriceComparison";
-import { HowItWorks } from "@/components/home/HowItWorks";
-import { FAQ } from "@/components/home/FAQ";
 import { ContactSection } from "@/components/home/ContactSection";
+import { FAQ } from "@/components/home/FAQ";
+import { Features } from "@/components/home/Features";
+import { Hero } from "@/components/home/Hero";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { PriceComparison } from "@/components/home/PriceComparison";
+import { ProductShowcase } from "@/components/home/ProductShowcase";
 
 export const metadata: Metadata = {
   title: "rz room — Standing Desks Premium en Argentina",

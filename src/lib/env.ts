@@ -34,15 +34,10 @@ export function getMpWebhookSecret() {
 }
 
 /** Clave pública de MP — disponible en cliente y servidor */
-export const MP_PUBLIC_KEY = optional(
-  "NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY"
-);
+export const MP_PUBLIC_KEY = optional("NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY");
 
 /** URL base del sitio (sin barra final) */
-export const SITE_URL = optional(
-  "NEXT_PUBLIC_SITE_URL",
-  "http://localhost:3000"
-);
+export const SITE_URL = optional("NEXT_PUBLIC_SITE_URL", "http://localhost:3000");
 
 /** Contraseña del panel admin */
 export function getAdminPassword() {

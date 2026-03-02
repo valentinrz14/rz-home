@@ -1,11 +1,12 @@
 "use client";
 
+import { Menu, ShoppingCart, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart, Menu, X } from "lucide-react";
 import { useState } from "react";
-import { useCartStore } from "@/store/cartStore";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
+import { useCartStore } from "@/store/cartStore";
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -22,7 +23,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-100 bg-white/90 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2.5">
+          <Image
+            src="/logo.svg"
+            alt="rz room logo"
+            width={36}
+            height={36}
+            className="rounded-lg"
+            priority
+          />
           <span className="font-display text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
             rz<span className="text-brand-500">room</span>
           </span>

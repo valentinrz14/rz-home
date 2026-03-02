@@ -1,12 +1,6 @@
 export type TableSize = "120x60" | "140x70" | "150x70" | "160x80";
 
-export type TableColor =
-  | "hickory"
-  | "roble-claro"
-  | "blanco"
-  | "gris-cemento"
-  | "nogal"
-  | "negro";
+export type TableColor = "hickory" | "roble-claro" | "blanco" | "gris-cemento" | "nogal" | "negro";
 
 export type StructureColor = "blanco" | "negro";
 

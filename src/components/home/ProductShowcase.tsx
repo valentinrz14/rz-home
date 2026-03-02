@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { DersiteIllustration } from "@/components/products/DersiteIllustration";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { BUNDLE_PRICES, STRUCTURE_PRICE, TABLE_PRICES } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
-import { DersiteIllustration } from "@/components/products/DersiteIllustration";
 import type { StructureColor } from "@/types";
 
 const products = [
@@ -108,9 +108,7 @@ export function ProductShowcase() {
               {/* Ilustración */}
               <div
                 className={`relative flex items-end justify-center overflow-hidden pt-6 ${
-                  product.highlight
-                    ? "bg-zinc-800/60"
-                    : "bg-zinc-100/80 dark:bg-zinc-800/40"
+                  product.highlight ? "bg-zinc-800/60" : "bg-zinc-100/80 dark:bg-zinc-800/40"
                 }`}
                 style={{ height: "220px" }}
               >

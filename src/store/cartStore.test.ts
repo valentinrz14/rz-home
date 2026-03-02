@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, expect } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { useCartStore } from "./cartStore";
 
 // ─── Reset store antes de cada test ──────────────────────────────────────────
@@ -15,14 +15,17 @@ describe("addItem", () => {
 
   it("asigna el precio correcto al agregar la estructura", () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
-    expect(useCartStore.getState().items[0].unitPrice).toBe(699_000);
+    expect(useCartStore.getState().items[0]?.unitPrice).toBe(699_000);
   });
 
   it("asigna el precio correcto al agregar un bundle", () => {
-    useCartStore
-      .getState()
-      .addItem({ type: "completo", tableSize: "160x80", structureColor: "negro", tableColor: "hickory" });
-    expect(useCartStore.getState().items[0].unitPrice).toBe(899_000);
+    useCartStore.getState().addItem({
+      type: "completo",
+      tableSize: "160x80",
+      structureColor: "negro",
+      tableColor: "hickory",
+    });
+    expect(useCartStore.getState().items[0]?.unitPrice).toBe(899_000);
   });
 
   it("incrementa la cantidad si se agrega el mismo ítem dos veces", () => {
@@ -30,14 +33,12 @@ describe("addItem", () => {
     useCartStore.getState().addItem(config);
     useCartStore.getState().addItem(config);
     expect(useCartStore.getState().items).toHaveLength(1);
-    expect(useCartStore.getState().items[0].quantity).toBe(2);
+    expect(useCartStore.getState().items[0]?.quantity).toBe(2);
   });
 
   it("agrega ítems distintos como entradas separadas", () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
-    useCartStore
-      .getState()
-      .addItem({ type: "tabla", tableSize: "120x60", tableColor: "hickory" });
+    useCartStore.getState().addItem({ type: "tabla", tableSize: "120x60", tableColor: "hickory" });
     expect(useCartStore.getState().items).toHaveLength(2);
   });
 
@@ -52,7 +53,7 @@ describe("removeItem", () => {
   it("elimina el ítem del carrito", () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
     const { items } = useCartStore.getState();
-    useCartStore.getState().removeItem(items[0].id);
+    useCartStore.getState().removeItem(items[0]!.id);
     expect(useCartStore.getState().items).toHaveLength(0);
   });
 
@@ -66,21 +67,21 @@ describe("updateQuantity", () => {
   it("actualiza la cantidad correctamente", () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
     const { items } = useCartStore.getState();
-    useCartStore.getState().updateQuantity(items[0].id, 5);
-    expect(useCartStore.getState().items[0].quantity).toBe(5);
+    useCartStore.getState().updateQuantity(items[0]!.id, 5);
+    expect(useCartStore.getState().items[0]!.quantity).toBe(5);
   });
 
   it("elimina el ítem si la cantidad es 0", () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
     const { items } = useCartStore.getState();
-    useCartStore.getState().updateQuantity(items[0].id, 0);
+    useCartStore.getState().updateQuantity(items[0]!.id, 0);
     expect(useCartStore.getState().items).toHaveLength(0);
   });
 
   it("elimina el ítem si la cantidad es negativa", () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
     const { items } = useCartStore.getState();
-    useCartStore.getState().updateQuantity(items[0].id, -1);
+    useCartStore.getState().updateQuantity(items[0]!.id, -1);
     expect(useCartStore.getState().items).toHaveLength(0);
   });
 });
@@ -89,9 +90,7 @@ describe("updateQuantity", () => {
 describe("clearCart", () => {
   it("vacía todos los ítems del carrito", () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
-    useCartStore
-      .getState()
-      .addItem({ type: "tabla", tableSize: "120x60", tableColor: "hickory" });
+    useCartStore.getState().addItem({ type: "tabla", tableSize: "120x60", tableColor: "hickory" });
     useCartStore.getState().clearCart();
     expect(useCartStore.getState().items).toHaveLength(0);
   });

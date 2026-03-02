@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { ArrowRight, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { DersiteIllustration } from "@/components/products/DersiteIllustration";
+import { Button } from "@/components/ui/button";
 
 export function Hero() {
   return (
@@ -13,7 +13,10 @@ export function Hero() {
       <div className="absolute -bottom-20 left-0 h-[400px] w-[400px] rounded-full bg-brand-800/8 blur-3xl" />
 
       {/* Ilustración decorativa — solo desktop */}
-      <div className="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 xl:block" style={{ width: "340px", opacity: 0.18 }}>
+      <div
+        className="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 xl:block"
+        style={{ width: "340px", opacity: 0.18 }}
+      >
         <DersiteIllustration
           withTabletop
           structureColor="negro"
@@ -35,8 +38,8 @@ export function Hero() {
         </h1>
 
         <p className="mx-auto mt-7 max-w-2xl text-xl leading-relaxed text-zinc-400">
-          Standing desks con doble motor silencioso, tapas MDF premium de 36mm
-          y envío a todo el país. Personalizá tu espacio de trabajo.
+          Standing desks con doble motor silencioso, tapas MDF premium de 36mm y envío a todo el
+          país. Personalizá tu espacio de trabajo.
         </p>
 
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -64,9 +67,7 @@ export function Hero() {
           ].map((stat) => (
             <div key={stat.label} className="text-center">
               <p className="font-display text-3xl font-bold text-white">{stat.value}</p>
-              <p className="mt-2 text-sm uppercase tracking-wider text-zinc-500">
-                {stat.label}
-              </p>
+              <p className="mt-2 text-sm uppercase tracking-wider text-zinc-500">{stat.label}</p>
             </div>
           ))}
         </div>
