@@ -1,21 +1,16 @@
-import { Resend } from "resend";
+import sgMail from "@sendgrid/mail";
 import { formatPrice } from "@/lib/utils";
 
-// ── Cliente Resend ─────────────────────────────────────────────────────────────
+// ── Cliente SendGrid ───────────────────────────────────────────────────────────
 
-let _resend: Resend | null = null;
-
-function getResend(): Resend {
-  if (!_resend) {
-    const key = process.env.RESEND_API_KEY;
-    if (!key) throw new Error("Variable de entorno faltante: RESEND_API_KEY");
-    _resend = new Resend(key);
-  }
-  return _resend;
+function initSendGrid(): void {
+  const key = process.env.SENDGRID_API_KEY;
+  if (!key) throw new Error("Variable de entorno faltante: SENDGRID_API_KEY");
+  sgMail.setApiKey(key);
 }
 
 function getEmailFrom(): string {
-  return process.env.EMAIL_FROM ?? "RZ ROOM <pedidos@rzroom.com.ar>";
+  return process.env.EMAIL_FROM ?? "pedidos@rzroom.com.ar";
 }
 
 function getEmailNotify(): string {
@@ -258,16 +253,19 @@ function ownerNotificationHtml(data: OrderEmailData): string {
 // ── Funciones públicas ─────────────────────────────────────────────────────────
 
 export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<void> {
-  const resend = getResend();
-  const { error } = await resend.emails.send({
-    from: getEmailFrom(),
-    to: data.buyerEmail,
-    subject: `✅ Pedido confirmado — RZ ROOM`,
-    html: buyerConfirmationHtml(data),
-  });
+  initSendGrid();
+  const [error] = await sgMail
+    .send({
+      from: getEmailFrom(),
+      to: data.buyerEmail,
+      subject: "Pedido confirmado — RZ ROOM",
+      html: buyerConfirmationHtml(data),
+    })
+    .then(() => [null])
+    .catch((e: unknown) => [e]);
 
   if (error) {
-    throw new Error(`Resend error (buyer): ${JSON.stringify(error)}`);
+    throw new Error(`SendGrid error (buyer): ${JSON.stringify(error)}`);
   }
 }
 
@@ -275,15 +273,18 @@ export async function sendNewOrderNotificationEmail(data: OrderEmailData): Promi
   const notifyEmail = getEmailNotify();
   if (!notifyEmail) return; // No configurado, skip silencioso
 
-  const resend = getResend();
-  const { error } = await resend.emails.send({
-    from: getEmailFrom(),
-    to: notifyEmail,
-    subject: `🛍️ Nuevo pedido — ${data.buyerName} ${data.buyerLastName} · ${formatPrice(data.totalAmount)}`,
-    html: ownerNotificationHtml(data),
-  });
+  initSendGrid();
+  const [error] = await sgMail
+    .send({
+      from: getEmailFrom(),
+      to: notifyEmail,
+      subject: `Nuevo pedido — ${data.buyerName} ${data.buyerLastName} · ${formatPrice(data.totalAmount)}`,
+      html: ownerNotificationHtml(data),
+    })
+    .then(() => [null])
+    .catch((e: unknown) => [e]);
 
   if (error) {
-    throw new Error(`Resend error (owner): ${JSON.stringify(error)}`);
+    throw new Error(`SendGrid error (owner): ${JSON.stringify(error)}`);
   }
 }

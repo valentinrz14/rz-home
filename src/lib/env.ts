@@ -56,13 +56,13 @@ export function getAndreaniCredentials() {
 /** Usar entorno QA de Andreani (apisqa.andreani.com) */
 export const ANDREANI_QA = optional("ANDREANI_QA", "false");
 
-/** API key de Resend para envío de emails transaccionales */
-export function getResendApiKey() {
-  return requireServer("RESEND_API_KEY");
+/** API key de SendGrid para envío de emails transaccionales */
+export function getSendGridApiKey() {
+  return requireServer("SENDGRID_API_KEY");
 }
 
-/** Dirección remitente de emails (ej: "RZ ROOM <pedidos@rzroom.com.ar>") */
-export const EMAIL_FROM = optional("EMAIL_FROM", "RZ ROOM <onboarding@resend.dev>");
+/** Dirección remitente de emails (ej: "pedidos@rzroom.com.ar") */
+export const EMAIL_FROM = optional("EMAIL_FROM", "pedidos@rzroom.com.ar");
 
 /** Email del vendedor para notificaciones de nuevos pedidos */
 export const EMAIL_NOTIFY = optional("EMAIL_NOTIFY", "");

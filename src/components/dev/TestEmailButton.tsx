@@ -32,7 +32,7 @@ export function TestEmailButton() {
         <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
         Dev · Test Email
       </p>
-      <p className="mb-3 text-xs text-zinc-500">Usá el email con el que te registraste en Resend</p>
+      <p className="mb-3 text-xs text-zinc-500">Usá tu email verificado como Sender en SendGrid</p>
 
       <div className="flex gap-2">
         <input
