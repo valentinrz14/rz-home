@@ -28,10 +28,11 @@ export function TestEmailButton() {
 
   return (
     <div className="fixed bottom-4 right-4 z-50 w-80 rounded-xl border border-amber-500/30 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur-sm">
-      <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-amber-400">
+      <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-amber-400">
         <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
         Dev · Test Email
       </p>
+      <p className="mb-3 text-xs text-zinc-500">Usá el email con el que te registraste en Resend</p>
 
       <div className="flex gap-2">
         <input

@@ -38,6 +38,9 @@ export async function POST(req: NextRequest) {
     paymentMethod: "visa",
   };
 
+  // Forzamos onboarding@resend.dev para no requerir dominio verificado en tests
+  process.env.EMAIL_FROM = "RZ ROOM <onboarding@resend.dev>";
+
   const [buyerResult, ownerResult] = await Promise.allSettled([
     sendOrderConfirmationEmail(sampleOrder),
     sendNewOrderNotificationEmail(sampleOrder),
