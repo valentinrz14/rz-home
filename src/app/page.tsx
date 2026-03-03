@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TestEmailButton } from "@/components/dev/TestEmailButton";
 import { ContactSection } from "@/components/home/ContactSection";
 import { FAQ } from "@/components/home/FAQ";
 import { Features } from "@/components/home/Features";
@@ -23,6 +24,7 @@ export default function HomePage() {
       <HowItWorks />
       <FAQ />
       <ContactSection />
+      {process.env.NODE_ENV === "development" && <TestEmailButton />}
     </>
   );
 }

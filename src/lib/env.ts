@@ -42,3 +42,27 @@ export const SITE_URL = optional("NEXT_PUBLIC_SITE_URL", "http://localhost:3000"
 export function getAdminPassword() {
   return requireServer("ADMIN_PASSWORD");
 }
+
+/** Credenciales de Andreani para cotización de envío */
+export function getAndreaniCredentials() {
+  return {
+    usuario: requireServer("ANDREANI_USUARIO"),
+    clave: requireServer("ANDREANI_CLAVE"),
+    contrato: requireServer("ANDREANI_CONTRATO"),
+    cliente: requireServer("ANDREANI_CLIENTE"),
+  };
+}
+
+/** Usar entorno QA de Andreani (apisqa.andreani.com) */
+export const ANDREANI_QA = optional("ANDREANI_QA", "false");
+
+/** API key de SendGrid para envío de emails transaccionales */
+export function getSendGridApiKey() {
+  return requireServer("SENDGRID_API_KEY");
+}
+
+/** Dirección remitente de emails (ej: "pedidos@rzroom.com.ar") */
+export const EMAIL_FROM = optional("EMAIL_FROM", "pedidos@rzroom.com.ar");
+
+/** Email del vendedor para notificaciones de nuevos pedidos */
+export const EMAIL_NOTIFY = optional("EMAIL_NOTIFY", "");
