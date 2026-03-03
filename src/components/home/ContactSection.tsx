@@ -19,8 +19,8 @@ export function ContactSection() {
             {
               icon: MessageCircle,
               label: "WhatsApp",
-              value: "+54 11 XXXX-XXXX",
-              href: "https://wa.me/54911XXXXXXXX",
+              value: "+541159774027",
+              href: "https://wa.me/5491159774027",
               description: "Lun a sáb, 9 a 18 hs",
             },
             {
