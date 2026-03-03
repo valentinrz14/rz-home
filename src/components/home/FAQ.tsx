@@ -6,7 +6,7 @@ import { useState } from "react";
 const faqs = [
   {
     q: "¿El escritorio viene armado?",
-    a: "Sí. Cada standing desk se envía probado. El armado es muy simple (~20 min): agujeros pre-perforados, instrucciones claras y llave Allen incluida. Solo necesitás un destornillador Phillips.",
+    a: "No. Pero el armado es muy simple (~20 min): agujeros pre-perforados, instrucciones claras y llave Allen incluida. Solo necesitás un destornillador Phillips. Aparte de esto cada standing desk se envía probado",
   },
   {
     q: "¿Cuál es el rango de altura?",

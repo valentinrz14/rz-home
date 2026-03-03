@@ -53,6 +53,7 @@ export function Header() {
           <ThemeToggle />
 
           <button
+            type="button"
             onClick={toggleCart}
             aria-label="Abrir carrito"
             className="relative flex h-10 w-10 items-center justify-center rounded-full text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
@@ -66,6 +67,7 @@ export function Header() {
           </button>
 
           <button
+            type="button"
             onClick={() => setMobileOpen((v) => !v)}
             className="flex h-10 w-10 items-center justify-center rounded-full text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 md:hidden"
             aria-label="Menú"

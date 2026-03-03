@@ -33,6 +33,7 @@ export function ProductImageGallery({ images }: Props) {
         <div className="mt-3 flex gap-2 overflow-x-auto">
           {images.map((img, i) => (
             <button
+              type="button"
               key={i}
               onClick={() => setActive(i)}
               className={`relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
