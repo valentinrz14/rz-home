@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { FAQ } from "@/components/home/FAQ";
 import { DersiteIllustration } from "@/components/products/DersiteIllustration";
 import { ProductConfigurator } from "@/components/products/ProductConfigurator";
 import { STRUCTURE_COLORS, TABLE_COLORS } from "@/lib/products";
@@ -327,6 +328,9 @@ function ProductsContent() {
           </div>
         </FeatureAccordion>
       </section>
+
+      {/* ─── Preguntas frecuentes ──────────────────────────────────── */}
+      <FAQ />
     </div>
   );
 }

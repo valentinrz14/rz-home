@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { TestEmailButton } from "@/components/dev/TestEmailButton";
 import { ContactSection } from "@/components/home/ContactSection";
-import { FAQ } from "@/components/home/FAQ";
 import { Features } from "@/components/home/Features";
 import { Hero } from "@/components/home/Hero";
 import { HowItWorks } from "@/components/home/HowItWorks";
@@ -22,7 +21,6 @@ export default function HomePage() {
       <Features />
       <PriceComparison />
       <HowItWorks />
-      <FAQ />
       <ContactSection />
       {process.env.NODE_ENV === "development" && <TestEmailButton />}
     </>
