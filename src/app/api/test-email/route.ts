@@ -10,12 +10,9 @@
 
 import { type NextRequest, NextResponse } from "next/server";
 import { sendNewOrderNotificationEmail, sendOrderConfirmationEmail } from "@/lib/email";
-import { SITE_URL } from "@/lib/env";
-
-const IS_LOCAL = SITE_URL.includes("localhost");
 
 export async function POST(req: NextRequest) {
-  if (!IS_LOCAL) {
+  if (process.env.NODE_ENV !== "development") {
     return NextResponse.json({ error: "Solo disponible en entorno local." }, { status: 403 });
   }
 
@@ -48,7 +45,10 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     buyer: buyerResult.status === "fulfilled" ? "ok" : String(buyerResult.reason),
-    owner: ownerResult.status === "fulfilled" ? "ok (o skip si EMAIL_NOTIFY no está seteado)" : String(ownerResult.reason),
+    owner:
+      ownerResult.status === "fulfilled"
+        ? "ok (o skip si EMAIL_NOTIFY no está seteado)"
+        : String(ownerResult.reason),
     sentTo: to,
   });
 }
