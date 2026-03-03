@@ -3,6 +3,7 @@
 import {
   Cable,
   CheckCircle2,
+  ChevronDown,
   Gauge,
   Headphones,
   Package,
@@ -64,6 +65,50 @@ const TABLE_FEATURES = [
   "Lista para instalar sobre la estructura",
 ];
 
+// ─── Acordeón para mobile ────────────────────────────────────────────────────
+function FeatureAccordion({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  title: string;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div>
+      {/* Header: botón en mobile, estático en desktop */}
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className="flex w-full items-center justify-between lg:pointer-events-none"
+      >
+        <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-zinc-900 dark:text-white">
+          <Icon size={24} className="text-brand-600 dark:text-brand-400" />
+          {title}
+        </h3>
+        <ChevronDown
+          size={22}
+          className={`shrink-0 text-zinc-400 transition-transform duration-200 lg:hidden ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {/* Contenido: colapsado en mobile, siempre visible en desktop */}
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-in-out lg:!grid-rows-[1fr] ${
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Vista interactiva del producto ───────────────────────────────────────────
 function ProductViewer({
   tipo,
@@ -97,6 +142,7 @@ function ProductViewer({
         <div className="mb-4 flex gap-2">
           {tabs.map((tab) => (
             <button
+              type="button"
               key={tab.id}
               onClick={() => setView(tab.id)}
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
@@ -226,15 +272,11 @@ function ProductsContent() {
 
       {/* ─── Características ─────────────────────────────────────────── */}
       <section className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div>
-          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-zinc-900 dark:text-white">
-            <Cable size={24} className="text-brand-600 dark:text-brand-400" />
-            Nuestra estructura
-          </h3>
+        <FeatureAccordion icon={Cable} title="Nuestra estructura">
           <ul className="mt-4 space-y-2">
-            {DERSITE_FEATURES.map((feat, i) => (
+            {DERSITE_FEATURES.map((feat) => (
               <li
-                key={i}
+                key={feat}
                 className="flex items-start gap-2.5 text-base text-zinc-600 dark:text-zinc-400"
               >
                 <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-green-500" />
@@ -242,17 +284,13 @@ function ProductsContent() {
               </li>
             ))}
           </ul>
-        </div>
+        </FeatureAccordion>
 
-        <div>
-          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-zinc-900 dark:text-white">
-            <Package size={24} className="text-brand-600 dark:text-brand-400" />
-            Tapa MDF Premium
-          </h3>
+        <FeatureAccordion icon={Package} title="Tapa MDF Premium">
           <ul className="mt-4 space-y-2">
-            {TABLE_FEATURES.map((feat, i) => (
+            {TABLE_FEATURES.map((feat) => (
               <li
-                key={i}
+                key={feat}
                 className="flex items-start gap-2.5 text-base text-zinc-600 dark:text-zinc-400"
               >
                 <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-green-500" />
@@ -287,7 +325,7 @@ function ProductsContent() {
               })}
             </div>
           </div>
-        </div>
+        </FeatureAccordion>
       </section>
     </div>
   );

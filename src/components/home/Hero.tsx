@@ -33,7 +33,7 @@ export function Hero() {
         <h1 className="font-display text-6xl font-bold leading-[1.1] tracking-tight text-white sm:text-7xl lg:text-8xl">
           Tu escritorio,{" "}
           <span className="bg-gradient-to-r from-brand-300 to-brand-500 bg-clip-text text-transparent">
-            a tu altura
+            hecho a tu medida
           </span>
         </h1>
 
@@ -75,7 +75,7 @@ export function Hero() {
 
       <a
         href="#productos-destacados"
-        className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1.5 text-zinc-600 transition-colors hover:text-zinc-400"
+        className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1.5 text-zinc-600 transition-colors hover:text-zinc-400 sm:flex"
       >
         <span className="text-xs uppercase tracking-widest">Scroll</span>
         <ChevronDown size={18} className="animate-bounce" />
