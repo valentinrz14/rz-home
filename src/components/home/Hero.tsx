@@ -25,7 +25,7 @@ export function Hero() {
         />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-4xl">
+      <div className="relative z-10 mx-auto max-w-4xl pt-16 sm:pt-0">
         <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-2 text-sm font-medium uppercase tracking-widest text-zinc-400">
           Standing Desk Premium · Argentina
         </p>

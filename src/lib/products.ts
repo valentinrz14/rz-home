@@ -2,19 +2,21 @@ import type { StructureColorOption, TableColorOption, TableSize, TableSizeOption
 
 // ─── Precios ──────────────────────────────────────────────────────────────────
 //
-// Costos de producción (ARS):
-//   Tabla 160x80: $153.800  |  Estructura doble motor: $376.000
+// Precios base (= precio transferencia, sin recargo MP):
+//   120x60: $365.000  |  150x70: $390.000  |  160x80: $400.000
 //
-// Estrategia: margen ~70-90% sobre costo, siempre más barato que competencia.
-// Competencia referencia: JUST.ERGONOMICS cobra $2.240.000 el bundle completo.
+// Recargos MercadoPago por cuotas (se aplican sobre el precio base):
+//   1 pago: +3.5%  |  3 cuotas: +15%  |  6 cuotas: +26%
+//
+// Descuento cripto: −10% (igual que transferencia)
 //
 export const STRUCTURE_PRICE = 699_000; // Solo estructura doble motor
 
 export const TABLE_PRICES: Record<TableSize, number> = {
-  "120x60": 149_000,
-  "140x70": 179_000,
-  "150x70": 199_000,
-  "160x80": 249_000,
+  "120x60": 365_000,
+  "140x70": 380_000, // estimado (interpolado entre 120x60 y 150x70)
+  "150x70": 390_000,
+  "160x80": 400_000,
 };
 
 export const BUNDLE_PRICES: Record<TableSize, number> = {
@@ -23,6 +25,13 @@ export const BUNDLE_PRICES: Record<TableSize, number> = {
   "150x70": 849_000,
   "160x80": 899_000,
 };
+
+/** Recargos de MercadoPago según plan de cuotas */
+export const MP_FEE = {
+  one_payment: 0.035, // 3.5%  — 1 pago con tarjeta
+  three_cuotas: 0.15, // 15%   — 3 cuotas
+  six_cuotas: 0.26, // 26%   — 6 cuotas
+} as const;
 
 // ─── Opciones de colores de tabla ─────────────────────────────────────────────
 export const TABLE_COLORS: TableColorOption[] = [

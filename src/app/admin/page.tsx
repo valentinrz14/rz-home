@@ -7,6 +7,7 @@ import {
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { getWhatsappNumber } from "@/lib/env";
 import {
   BUNDLE_PRICES,
   STRUCTURE_PRICE,
@@ -18,6 +19,7 @@ import { formatPrice } from "@/lib/utils";
 
 // ─── Componente de cierre de sesión (cliente) ─────────────────────────────────
 import { AdminLogoutButton } from "./LogoutButton";
+import { PendingOrders } from "./PendingOrders";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function EnvStatus({ label, varName }: { label: string; varName: string }) {
@@ -40,6 +42,7 @@ function EnvStatus({ label, varName }: { label: string; varName: string }) {
 
 // ─── Página principal ─────────────────────────────────────────────────────────
 export default function AdminPage() {
+  const whatsapp = getWhatsappNumber();
   return (
     <div className="min-h-screen bg-zinc-950 px-4 py-8 text-white">
       <div className="mx-auto max-w-5xl">
@@ -151,6 +154,9 @@ export default function AdminPage() {
           </div>
         </section>
 
+        {/* Órdenes pendientes (transferencia / cripto) */}
+        <PendingOrders whatsapp={whatsapp} />
+
         {/* Links útiles */}
         <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
@@ -163,14 +169,14 @@ export default function AdminPage() {
                   href: "https://www.mercadopago.com.ar/activities",
                 },
                 {
-                  label: "Configurar webhooks",
-                  desc: "URL: /api/mercadopago/webhook",
-                  href: "https://www.mercadopago.com.ar/developers/panel/app",
+                  label: "Monitor de Trafico",
+                  desc: "Base de datos",
+                  href: "https://console.upstash.com/redis/51d9d1b0-c8e6-4946-919d-5d08e2e905cc/monitor?teamid=0",
                 },
                 {
-                  label: "Credenciales de API",
-                  desc: "Access token y public key",
-                  href: "https://www.mercadopago.com.ar/developers/panel/credentials",
+                  label: "Monitor de Actividad",
+                  desc: "Actividad",
+                  href: "https://vercel.com/grafica-systems-projects/rz-home/logs",
                 },
               ].map((link) => (
                 <a
@@ -202,26 +208,10 @@ export default function AdminPage() {
               />
               <EnvStatus label="ADMIN_PASSWORD" varName="ADMIN_PASSWORD" />
               <EnvStatus label="NEXT_PUBLIC_SITE_URL" varName="NEXT_PUBLIC_SITE_URL" />
+              <EnvStatus label="UPSTASH_REDIS_REST_URL" varName="UPSTASH_REDIS_REST_URL" />
+              <EnvStatus label="WHATSAPP_NUMBER" varName="WHATSAPP_NUMBER" />
             </div>
           </div>
-        </section>
-
-        {/* Info órdenes */}
-        <section className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 text-center">
-          <ShoppingCart size={28} className="mx-auto mb-2 text-zinc-600" />
-          <p className="font-semibold text-zinc-300">Gestión de órdenes</p>
-          <p className="mt-1 text-sm text-zinc-500">
-            Las ventas se registran en MercadoPago. Para ver el historial de pagos, accedé al{" "}
-            <a
-              href="https://www.mercadopago.com.ar/activities"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-brand-400 underline underline-offset-2 hover:text-brand-300"
-            >
-              dashboard de MercadoPago
-            </a>
-            .
-          </p>
         </section>
       </div>
     </div>

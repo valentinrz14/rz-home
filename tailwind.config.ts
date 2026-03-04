@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { brand } from "./src/lib/colors";
 
 const config: Config = {
   darkMode: ["class"],
@@ -43,18 +44,7 @@ const config: Config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        brand: {
-          50: "#faf8f5",
-          100: "#f0ebe1",
-          200: "#ddd3c0",
-          300: "#c9b898",
-          400: "#b59d73",
-          500: "#9c7f53",
-          600: "#8b6f45",
-          700: "#745b3a",
-          800: "#5e4930",
-          900: "#4a3926",
-        },
+        brand,
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],

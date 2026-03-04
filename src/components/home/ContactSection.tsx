@@ -19,15 +19,15 @@ export function ContactSection() {
             {
               icon: MessageCircle,
               label: "WhatsApp",
-              value: "+54 11 XXXX-XXXX",
+              value: "+541159774027",
               href: "https://wa.me/54911XXXXXXXX",
               description: "Lun a sáb, 9 a 18 hs",
             },
             {
               icon: Mail,
               label: "Email",
-              value: "hola@rzroom.com.ar",
-              href: "mailto:hola@rzroom.com.ar",
+              value: "ecomerce.rzhome@gmail.com",
+              href: "mailto:ecomerce.rzhome@gmail.com",
               description: "Respondemos en 24 hs",
             },
             {

@@ -156,11 +156,7 @@ async function fetchTarifa(
   const data: AndreaniTarifaResponse | AndreaniTarifaResponse[] = await res.json();
   const tarifa: AndreaniTarifaResponse = Array.isArray(data) ? (data[0] ?? {}) : data;
 
-  const costo =
-    tarifa.tarifa ??
-    tarifa.tarifaConImpuestos ??
-    tarifa.tarifaTotal ??
-    tarifa.total;
+  const costo = tarifa.tarifa ?? tarifa.tarifaConImpuestos ?? tarifa.tarifaTotal ?? tarifa.total;
 
   if (typeof costo !== "number") {
     throw new Error(`Andreani: respuesta inesperada: ${JSON.stringify(data)}`);
@@ -212,8 +208,7 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({ costo, plazo });
-  } catch (err) {
-    console.error("Andreani cotizar error:", err);
+  } catch {
     return NextResponse.json(
       { error: "No se pudo calcular el costo de envío. Intentá nuevamente." },
       { status: 502 }

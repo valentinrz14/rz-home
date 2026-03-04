@@ -24,7 +24,7 @@ export function Footer() {
                 <Instagram size={20} />
               </a>
               <a
-                href="mailto:hola@rzroom.com.ar"
+                href="mailto:ecomerce.rzhome@gmail.com"
                 aria-label="Email"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-white"
               >
@@ -79,10 +79,10 @@ export function Footer() {
               <li className="flex items-start gap-2.5 text-base text-zinc-500 dark:text-zinc-400">
                 <Mail size={18} className="mt-0.5 shrink-0" />
                 <a
-                  href="mailto:hola@rzroom.com.ar"
+                  href="mailto:ecomerce.rzhome@gmail.com"
                   className="hover:text-zinc-900 dark:hover:text-white"
                 >
-                  hola@rzroom.com.ar
+                  ecomerce.rzhome@gmail.com
                 </a>
               </li>
               <li className="flex items-start gap-2.5 text-base text-zinc-500 dark:text-zinc-400">

@@ -85,8 +85,7 @@ export async function POST(req: NextRequest) {
       preferenceId: result.id,
       initPoint: result.init_point,
     });
-  } catch (err) {
-    console.error("MercadoPago preference error:", err);
+  } catch {
     return NextResponse.json({ error: "Error al crear la preferencia de pago." }, { status: 500 });
   }
 }

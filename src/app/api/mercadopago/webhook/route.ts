@@ -1,8 +1,8 @@
 import { createHmac } from "node:crypto";
 import { Payment } from "mercadopago";
 import { type NextRequest, NextResponse } from "next/server";
-import { sendNewOrderNotificationEmail, sendOrderConfirmationEmail } from "@/lib/email";
 import type { OrderEmailData } from "@/lib/email";
+import { sendNewOrderNotificationEmail, sendOrderConfirmationEmail } from "@/lib/email";
 import { getMpWebhookSecret } from "@/lib/env";
 import { getMercadoPagoClient } from "@/lib/mercadopago";
 
@@ -87,45 +87,54 @@ function buildOrderEmailData(paymentData: Record<string, any>): OrderEmailData {
 
 // ── Handler ───────────────────────────────────────────────────────────────────
 
+/** MP hace un GET para validar la URL antes de enviar POSTs */
+export async function GET() {
+  return NextResponse.json({ ok: true }, { status: 200 });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    if (body.type === "payment") {
-      const dataId = String(body.data?.id ?? "");
-
-      if (!verifyMpSignature(req, dataId)) {
-        return NextResponse.json({ error: "Firma inválida." }, { status: 401 });
-      }
-
-      if (dataId) {
-        const client = getMercadoPagoClient();
-        const payment = new Payment(client);
-        const paymentData = await payment.get({ id: dataId });
-
-        if (paymentData.status === "approved") {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const orderData = buildOrderEmailData(paymentData as Record<string, any>);
-
-          // Enviar emails en paralelo — errores no rompen el webhook
-          const [buyerResult, ownerResult] = await Promise.allSettled([
-            sendOrderConfirmationEmail(orderData),
-            sendNewOrderNotificationEmail(orderData),
-          ]);
-
-          if (buyerResult.status === "rejected") {
-            console.error("Email al comprador falló:", buyerResult.reason);
-          }
-          if (ownerResult.status === "rejected") {
-            console.error("Email al vendedor falló:", ownerResult.reason);
-          }
-        }
-      }
+    if (body.type !== "payment") {
+      return NextResponse.json({ received: true }, { status: 200 });
     }
 
+    const dataId = String(body.data?.id ?? "");
+
+    const signatureOk = verifyMpSignature(req, dataId);
+
+    if (!signatureOk) {
+      return NextResponse.json({ error: "Firma inválida." }, { status: 401 });
+    }
+
+    if (!dataId) {
+      return NextResponse.json({ received: true }, { status: 200 });
+    }
+
+    let paymentData: Awaited<ReturnType<Payment["get"]>>;
+    try {
+      const client = getMercadoPagoClient();
+      const payment = new Payment(client);
+      paymentData = await payment.get({ id: dataId });
+    } catch {
+      // MP API unavailable — return 200 to prevent infinite retries.
+      return NextResponse.json({ received: true }, { status: 200 });
+    }
+
+    if (paymentData.status !== "approved") {
+      return NextResponse.json({ received: true }, { status: 200 });
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const orderData = buildOrderEmailData(paymentData as Record<string, any>);
+
+    await Promise.allSettled([
+      sendOrderConfirmationEmail(orderData),
+      sendNewOrderNotificationEmail(orderData),
+    ]);
     return NextResponse.json({ received: true }, { status: 200 });
-  } catch (err) {
-    console.error("Webhook error:", err);
-    return NextResponse.json({ error: "Webhook error" }, { status: 500 });
+  } catch {
+    return NextResponse.json({ received: true }, { status: 200 });
   }
 }

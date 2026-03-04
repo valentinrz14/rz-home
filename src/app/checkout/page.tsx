@@ -1,12 +1,26 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, CreditCard, Lock, MapPin, Package, Truck } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Bitcoin,
+  Building2,
+  CreditCard,
+  Loader2,
+  Lock,
+  MapPin,
+  Package,
+  Truck,
+} from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { MP_FEE } from "@/lib/products";
 import { formatPrice, getCartTotal } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import type { CartItem, CheckoutFormData, ShippingQuote } from "@/types";
+import type { PaymentMethod } from "@/types/orders";
 
 const PROVINCES = [
   "Buenos Aires",
@@ -143,7 +157,11 @@ function ShippingStep({
                   required
                   className={INPUT_CLASS}
                 />
-                <Button type="submit" disabled={loading || postalCode.length !== 4} className="shrink-0 gap-2">
+                <Button
+                  type="submit"
+                  disabled={loading || postalCode.length !== 4}
+                  className="shrink-0 gap-2"
+                >
                   {loading ? (
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                   ) : (
@@ -181,7 +199,8 @@ function ShippingStep({
                       <div className="flex justify-between">
                         <span className="text-green-700 dark:text-green-400">Plazo estimado</span>
                         <span className="text-green-800 dark:text-green-300">
-                          {quote.plazo} día{quote.plazo !== 1 ? "s" : ""} hábil{quote.plazo !== 1 ? "es" : ""}
+                          {quote.plazo} día{quote.plazo !== 1 ? "s" : ""} hábil
+                          {quote.plazo !== 1 ? "es" : ""}
                         </span>
                       </div>
                     )}
@@ -232,7 +251,9 @@ function ShippingStep({
             <div className="my-3 border-t border-zinc-200 dark:border-zinc-700" />
             <div className="flex justify-between text-base">
               <span className="text-zinc-600 dark:text-zinc-400">Envío (Andreani)</span>
-              <span className={quote ? "font-medium text-zinc-900 dark:text-white" : "text-zinc-500"}>
+              <span
+                className={quote ? "font-medium text-zinc-900 dark:text-white" : "text-zinc-500"}
+              >
                 {quote ? formatPrice(quote.costo) : "Ingresá tu CP"}
               </span>
             </div>
@@ -253,6 +274,206 @@ function ShippingStep({
   );
 }
 
+// ── Selector de método de pago ─────────────────────────────────────────────────
+
+type SelectedMethod = "mercadopago" | PaymentMethod;
+
+const CRYPTO_OPTIONS: { value: PaymentMethod; label: string }[] = [
+  { value: "crypto_usdt_trc20", label: "USDT TRC-20" },
+  { value: "crypto_usdt_polygon", label: "USDT Polygon" },
+  { value: "crypto_ltc", label: "Litecoin (LTC)" },
+];
+
+const MP_INSTALLMENT_OPTIONS: { count: 1 | 3 | 6; label: string; fee: number }[] = [
+  { count: 1, label: "1 pago", fee: MP_FEE.one_payment },
+  { count: 3, label: "3 cuotas", fee: MP_FEE.three_cuotas },
+  { count: 6, label: "6 cuotas", fee: MP_FEE.six_cuotas },
+];
+
+function PaymentMethodSelector({
+  grandTotal,
+  selected,
+  onSelect,
+  mpInstallments,
+  onSelectMpInstallments,
+  cryptoConversion,
+  cryptoLoading,
+}: {
+  grandTotal: number;
+  selected: SelectedMethod;
+  onSelect: (method: SelectedMethod) => void;
+  mpInstallments: 1 | 3 | 6;
+  onSelectMpInstallments: (n: 1 | 3 | 6) => void;
+  cryptoConversion: { amount: string; ticker: string } | null;
+  cryptoLoading: boolean;
+}) {
+  const cryptoTotal = Math.round(grandTotal * 0.9);
+  const isCrypto =
+    selected === "crypto_usdt_trc20" ||
+    selected === "crypto_usdt_polygon" ||
+    selected === "crypto_ltc";
+
+  const mpFee =
+    mpInstallments === 3
+      ? MP_FEE.three_cuotas
+      : mpInstallments === 6
+        ? MP_FEE.six_cuotas
+        : MP_FEE.one_payment;
+  const mpPrice = Math.round(grandTotal * (1 + mpFee));
+
+  return (
+    <div className="mb-6 space-y-3">
+      <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Método de pago</p>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {/* Transferencia — precio base */}
+        <button
+          type="button"
+          onClick={() => onSelect("transfer")}
+          className={`rounded-xl border p-4 text-left transition ${
+            selected === "transfer"
+              ? "border-green-600 bg-green-600 text-white"
+              : "border-zinc-200 bg-white hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-500"
+          }`}
+        >
+          <Building2
+            size={20}
+            className={`mb-2 ${selected === "transfer" ? "text-white" : "text-zinc-500"}`}
+          />
+          <p className="font-semibold text-sm">Transferencia</p>
+          <p
+            className={`text-xs mt-0.5 ${selected === "transfer" ? "text-green-100" : "text-green-600 dark:text-green-400"}`}
+          >
+            Precio base
+          </p>
+          <p className="mt-1.5 font-display text-base font-bold">{formatPrice(grandTotal)}</p>
+        </button>
+
+        {/* MercadoPago */}
+        <button
+          type="button"
+          onClick={() => onSelect("mercadopago")}
+          className={`rounded-xl border p-4 text-left transition ${
+            selected === "mercadopago"
+              ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+              : "border-zinc-200 bg-white hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-500"
+          }`}
+        >
+          <CreditCard
+            size={20}
+            className={`mb-2 ${selected === "mercadopago" ? "text-white dark:text-zinc-900" : "text-zinc-500"}`}
+          />
+          <p className="font-semibold text-sm">MercadoPago</p>
+          <p
+            className={`text-xs mt-0.5 ${selected === "mercadopago" ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-500"}`}
+          >
+            {selected === "mercadopago"
+              ? `${mpInstallments === 1 ? "1 pago" : `${mpInstallments} cuotas`} · +${Math.round(mpFee * 100)}%`
+              : "Tarjeta / cuotas"}
+          </p>
+          <p className="mt-1.5 font-display text-base font-bold">{formatPrice(mpPrice)}</p>
+        </button>
+
+        {/* Cripto */}
+        <button
+          type="button"
+          onClick={() => onSelect(isCrypto ? selected : "crypto_usdt_trc20")}
+          className={`rounded-xl border p-4 text-left transition ${
+            isCrypto
+              ? "border-green-600 bg-green-600 text-white"
+              : "border-zinc-200 bg-white hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-500"
+          }`}
+        >
+          <Bitcoin size={20} className={`mb-2 ${isCrypto ? "text-white" : "text-zinc-500"}`} />
+          <p className="font-semibold text-sm">Cripto</p>
+          <p
+            className={`text-xs mt-0.5 ${isCrypto ? "text-green-100" : "text-green-600 dark:text-green-400"}`}
+          >
+            −10% descuento
+          </p>
+          <p className="mt-1.5 font-display text-base font-bold">{formatPrice(cryptoTotal)}</p>
+        </button>
+      </div>
+
+      {/* Sub-selector de cuotas MP */}
+      {selected === "mercadopago" && (
+        <div className="flex gap-2 flex-wrap">
+          {MP_INSTALLMENT_OPTIONS.map(({ count, label, fee }) => {
+            const price = Math.round(grandTotal * (1 + fee));
+            const isSelected = mpInstallments === count;
+            return (
+              <button
+                key={count}
+                type="button"
+                onClick={() => onSelectMpInstallments(count)}
+                className={`flex flex-col items-start rounded-lg border px-3 py-2 text-xs font-medium transition ${
+                  isSelected
+                    ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                    : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                }`}
+              >
+                <span>{label}</span>
+                <span className="font-bold mt-0.5">{formatPrice(price)}</span>
+                {count > 1 && (
+                  <span
+                    className={isSelected ? "text-zinc-400 dark:text-zinc-500" : "text-zinc-400"}
+                  >
+                    {count}x {formatPrice(Math.round(price / count))}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Sub-selector de cripto + cotización en tiempo real */}
+      {isCrypto && (
+        <div className="space-y-2">
+          <div className="flex gap-2 flex-wrap">
+            {CRYPTO_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => onSelect(opt.value)}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                  selected === opt.value
+                    ? "border-green-600 bg-green-600 text-white"
+                    : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Cotización Ripio */}
+          <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 dark:border-green-900/40 dark:bg-green-950/30">
+            {cryptoLoading ? (
+              <Loader2 size={14} className="animate-spin text-green-600 dark:text-green-400" />
+            ) : cryptoConversion ? (
+              <>
+                <span className="text-xs text-green-700 dark:text-green-400">
+                  Equivalente a pagar:
+                </span>
+                <span className="font-mono text-sm font-bold text-green-800 dark:text-green-300">
+                  {cryptoConversion.amount} {cryptoConversion.ticker}
+                </span>
+                <span className="ml-auto text-xs text-green-600 dark:text-green-500">
+                  cotización Ripio
+                </span>
+              </>
+            ) : (
+              <span className="text-xs text-green-600 dark:text-green-400">
+                No se pudo obtener cotización
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Paso 2: Datos personales + pago ──────────────────────────────────────────
 
 function PaymentStep({
@@ -268,8 +489,12 @@ function PaymentStep({
   postalCode: string;
   onBack: () => void;
 }) {
+  const router = useRouter();
+  const { clearCart } = useCartStore();
   const grandTotal = total + shipping.costo;
 
+  const [selectedMethod, setSelectedMethod] = useState<SelectedMethod>("transfer");
+  const [mpInstallments, setMpInstallments] = useState<1 | 3 | 6>(1);
   const [form, setForm] = useState<CheckoutFormData>({
     firstName: "",
     lastName: "",
@@ -283,11 +508,151 @@ function PaymentStep({
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cryptoConversion, setCryptoConversion] = useState<{
+    amount: string;
+    ticker: string;
+  } | null>(null);
+  const [cryptoLoading, setCryptoLoading] = useState(false);
+
+  const isMercadoPago = selectedMethod === "mercadopago";
+  const isTransfer = selectedMethod === "transfer";
+  const isCrypto =
+    selectedMethod === "crypto_usdt_trc20" ||
+    selectedMethod === "crypto_usdt_polygon" ||
+    selectedMethod === "crypto_ltc";
+
+  const mpFee =
+    mpInstallments === 3
+      ? MP_FEE.three_cuotas
+      : mpInstallments === 6
+        ? MP_FEE.six_cuotas
+        : MP_FEE.one_payment;
+
+  const adjustedTotal = isMercadoPago
+    ? Math.round(grandTotal * (1 + mpFee))
+    : isCrypto
+      ? Math.round(grandTotal * 0.9)
+      : grandTotal; // transfer = precio base, sin ajuste
+
+  // Cotización cripto en tiempo real desde Ripio
+  useEffect(() => {
+    if (!isCrypto) {
+      setCryptoConversion(null);
+      return;
+    }
+    let cancelled = false;
+    setCryptoLoading(true);
+    setCryptoConversion(null);
+    fetch(`/api/ripio/rate?method=${selectedMethod}&amount=${adjustedTotal}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled) setCryptoConversion(data ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setCryptoConversion(null);
+      })
+      .finally(() => {
+        if (!cancelled) setCryptoLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isCrypto, selectedMethod, adjustedTotal]);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  }
+
+  async function handleMercadoPago() {
+    // Aplicar recargo de cuotas multiplicando cada precio
+    const feeMult = 1 + mpFee;
+    const mpItems = [
+      ...items.map((item) => ({
+        id: item.id,
+        title: item.name,
+        quantity: item.quantity,
+        unit_price: Math.round(item.unitPrice * feeMult),
+        currency_id: "ARS",
+      })),
+      {
+        id: "envio-andreani",
+        title: `Envío Andreani a CP ${postalCode}`,
+        quantity: 1,
+        unit_price: Math.round(shipping.costo * feeMult),
+        currency_id: "ARS",
+      },
+    ];
+
+    const res = await fetch("/api/mercadopago/preference", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: mpItems,
+        payer: {
+          name: form.firstName,
+          surname: form.lastName,
+          email: form.email,
+          phone: {
+            area_code: form.phone.replace(/\D/g, "").slice(0, 2),
+            number: form.phone.replace(/\D/g, "").slice(2),
+          },
+          address: { street_name: form.address, street_number: "0", zip_code: form.postalCode },
+        },
+      }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error ?? "Error al procesar el pago.");
+    }
+
+    const { initPoint } = await res.json();
+    window.location.href = initPoint;
+  }
+
+  async function handleAlternativePayment() {
+    const orderItems = [
+      ...items.map((item) => ({
+        title: item.name,
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+      })),
+      {
+        title: `Envío Andreani a CP ${postalCode}`,
+        quantity: 1,
+        unit_price: shipping.costo,
+      },
+    ];
+
+    const res = await fetch("/api/orders/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        buyerName: form.firstName,
+        buyerLastName: form.lastName,
+        buyerEmail: form.email,
+        buyerPhone: form.phone,
+        buyerAddress: `${form.address}, ${form.city}, ${form.province}`,
+        postalCode: form.postalCode,
+        items: orderItems,
+        paymentMethod: selectedMethod,
+        originalAmount: grandTotal,
+        finalAmount: adjustedTotal,
+      }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error ?? "Error al registrar el pedido.");
+    }
+
+    const { orderId } = await res.json();
+    clearCart();
+    router.push(
+      `/checkout/pending?orderId=${orderId}&method=${selectedMethod}&amount=${adjustedTotal}`
+    );
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -296,48 +661,11 @@ function PaymentStep({
     setLoading(true);
 
     try {
-      const mpItems = [
-        ...items.map((item) => ({
-          id: item.id,
-          title: item.name,
-          quantity: item.quantity,
-          unit_price: item.unitPrice,
-          currency_id: "ARS",
-        })),
-        {
-          id: "envio-andreani",
-          title: `Envío Andreani a CP ${postalCode}`,
-          quantity: 1,
-          unit_price: shipping.costo,
-          currency_id: "ARS",
-        },
-      ];
-
-      const res = await fetch("/api/mercadopago/preference", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: mpItems,
-          payer: {
-            name: form.firstName,
-            surname: form.lastName,
-            email: form.email,
-            phone: {
-              area_code: form.phone.replace(/\D/g, "").slice(0, 2),
-              number: form.phone.replace(/\D/g, "").slice(2),
-            },
-            address: { street_name: form.address, street_number: "0", zip_code: form.postalCode },
-          },
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Error al procesar el pago.");
+      if (isMercadoPago) {
+        await handleMercadoPago();
+      } else {
+        await handleAlternativePayment();
       }
-
-      const { initPoint } = await res.json();
-      window.location.href = initPoint;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ocurrió un error inesperado.");
       setLoading(false);
@@ -518,6 +846,17 @@ function PaymentStep({
               />
             </div>
 
+            {/* Selector de método de pago */}
+            <PaymentMethodSelector
+              grandTotal={grandTotal}
+              selected={selectedMethod}
+              onSelect={setSelectedMethod}
+              mpInstallments={mpInstallments}
+              onSelectMpInstallments={setMpInstallments}
+              cryptoConversion={cryptoConversion}
+              cryptoLoading={cryptoLoading}
+            />
+
             {error && (
               <div className="rounded-lg bg-red-50 p-3 text-base text-red-600 dark:bg-red-900/20 dark:text-red-400">
                 {error}
@@ -530,16 +869,36 @@ function PaymentStep({
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                   Procesando...
                 </>
+              ) : isMercadoPago ? (
+                <>
+                  <CreditCard size={20} /> Pagar {formatPrice(adjustedTotal)} con MercadoPago
+                </>
               ) : (
                 <>
-                  <CreditCard size={20} /> Pagar {formatPrice(grandTotal)} con MercadoPago
+                  Confirmar pedido · {formatPrice(adjustedTotal)}
+                  <ArrowRight size={20} />
                 </>
               )}
             </Button>
 
-            <div className="flex items-center justify-center gap-2 text-sm text-zinc-400">
-              <Lock size={14} /> Pago seguro con MercadoPago · SSL encriptado
-            </div>
+            {isMercadoPago && (
+              <div className="flex items-center justify-center gap-2 text-sm text-zinc-400">
+                <Lock size={14} /> Pago seguro con MercadoPago · SSL encriptado
+              </div>
+            )}
+
+            {isTransfer && (
+              <p className="text-center text-xs text-zinc-400">
+                Recibirás los datos bancarios en la siguiente pantalla.
+              </p>
+            )}
+
+            {isCrypto && (
+              <p className="text-center text-xs text-zinc-400">
+                Recibirás la dirección de wallet en la siguiente pantalla. Precio con 10% de
+                descuento.
+              </p>
+            )}
           </form>
         </div>
 
@@ -577,19 +936,71 @@ function PaymentStep({
               </span>
             </div>
             <div className="my-3 border-t border-zinc-200 dark:border-zinc-700" />
+
+            {/* Recargo MP */}
+            {isMercadoPago && (
+              <>
+                <div className="flex justify-between text-sm text-zinc-500">
+                  <span>Subtotal base</span>
+                  <span>{formatPrice(grandTotal)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-zinc-500">
+                  <span>
+                    Recargo MP ({mpInstallments === 1 ? "1 pago" : `${mpInstallments} cuotas`} · +
+                    {Math.round(mpFee * 100)}%)
+                  </span>
+                  <span>+{formatPrice(adjustedTotal - grandTotal)}</span>
+                </div>
+                <div className="my-2 border-t border-zinc-200 dark:border-zinc-700" />
+              </>
+            )}
+
+            {/* Descuento cripto */}
+            {isCrypto && (
+              <>
+                <div className="flex justify-between text-sm text-zinc-500">
+                  <span>Subtotal</span>
+                  <span className="line-through">{formatPrice(grandTotal)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-green-600">Descuento cripto (−10%)</span>
+                  <span className="text-green-600">−{formatPrice(grandTotal - adjustedTotal)}</span>
+                </div>
+                <div className="my-2 border-t border-zinc-200 dark:border-zinc-700" />
+              </>
+            )}
+
             <div className="flex justify-between">
               <span className="text-lg font-semibold text-zinc-900 dark:text-white">Total</span>
               <span className="font-display text-2xl font-bold text-zinc-900 dark:text-white">
-                {formatPrice(grandTotal)}
+                {formatPrice(adjustedTotal)}
               </span>
             </div>
 
-            <div className="mt-5 rounded-lg bg-brand-50 p-4 text-sm text-brand-800 dark:bg-brand-900/20 dark:text-brand-300">
-              <p className="font-semibold">Cuotas sin interés</p>
-              <p className="mt-1 text-brand-700 dark:text-brand-400">
-                Hasta 12 cuotas sin interés con tarjetas seleccionadas via MercadoPago.
+            {isMercadoPago && mpInstallments > 1 && (
+              <p className="mt-1 text-right text-xs text-zinc-400">
+                {mpInstallments} cuotas de {formatPrice(Math.round(adjustedTotal / mpInstallments))}{" "}
+                c/u
               </p>
-            </div>
+            )}
+
+            {/* Equivalente cripto en sidebar */}
+            {isCrypto && (
+              <div className="mt-3 flex items-center justify-between rounded-lg border border-green-200 bg-green-50 px-3 py-2 dark:border-green-900/40 dark:bg-green-950/30">
+                <span className="text-xs text-green-700 dark:text-green-400">
+                  Equivalente cripto
+                </span>
+                {cryptoLoading ? (
+                  <Loader2 size={13} className="animate-spin text-green-500" />
+                ) : cryptoConversion ? (
+                  <span className="font-mono text-sm font-bold text-green-800 dark:text-green-300">
+                    {cryptoConversion.amount} {cryptoConversion.ticker}
+                  </span>
+                ) : (
+                  <span className="text-xs text-green-500">—</span>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -33,10 +33,10 @@ describe("getProductPrice", () => {
   });
 
   it("retorna el precio de la tapa por medida", () => {
-    expect(getProductPrice({ type: "tabla", tableSize: "120x60" })).toBe(149_000);
-    expect(getProductPrice({ type: "tabla", tableSize: "140x70" })).toBe(179_000);
-    expect(getProductPrice({ type: "tabla", tableSize: "150x70" })).toBe(199_000);
-    expect(getProductPrice({ type: "tabla", tableSize: "160x80" })).toBe(249_000);
+    expect(getProductPrice({ type: "tabla", tableSize: "120x60" })).toBe(365_000);
+    expect(getProductPrice({ type: "tabla", tableSize: "140x70" })).toBe(380_000);
+    expect(getProductPrice({ type: "tabla", tableSize: "150x70" })).toBe(390_000);
+    expect(getProductPrice({ type: "tabla", tableSize: "160x80" })).toBe(400_000);
   });
 
   it("retorna el precio del bundle completo por medida", () => {
