@@ -30,7 +30,7 @@ cp .env.example .env.prod
 
 # 3. Completar variables en .env:
 #    - MERCADOPAGO_ACCESS_TOKEN
-#    - NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY
+#    - MERCADOPAGO_PUBLIC_KEY
 #    - NEXT_PUBLIC_SITE_URL
 
 # 4. Iniciar en desarrollo

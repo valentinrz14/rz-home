@@ -5,6 +5,7 @@ import { Hero } from "@/components/home/Hero";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { PriceComparison } from "@/components/home/PriceComparison";
 import { ProductShowcase } from "@/components/home/ProductShowcase";
+import { getStock } from "@/lib/amazon-stock";
 import { getPrices } from "@/lib/prices";
 
 export const metadata: Metadata = {
@@ -13,12 +14,15 @@ export const metadata: Metadata = {
     "Standing desks con doble motor silencioso y tapas MDF de 36mm. Personalizá tu escritorio: 3 medidas, 6 colores. Envío Andreani a todo el país.",
 };
 
+// Revalidate the home page every 5 minutes so stock badges stay fresh
+export const revalidate = 300;
+
 export default async function HomePage() {
-  const prices = await getPrices();
+  const [prices, stock] = await Promise.all([getPrices(), getStock()]);
   return (
     <>
       <Hero />
-      <ProductShowcase prices={prices} />
+      <ProductShowcase prices={prices} stock={stock} />
       <Features />
       <PriceComparison prices={prices} />
       <HowItWorks />

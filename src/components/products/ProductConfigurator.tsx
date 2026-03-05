@@ -1,9 +1,11 @@
 "use client";
 
-import { Check, Loader2, ShoppingCart } from "lucide-react";
+import { AlertTriangle, Check, Loader2, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { usePrices } from "@/hooks/usePrices";
+import { useStock } from "@/hooks/useStock";
+import { isConfigOOS } from "@/lib/amazon-stock";
 import { STRUCTURE_COLORS, TABLE_COLORS, TABLE_SIZES } from "@/lib/products";
 import { formatPrice, getProductPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
@@ -45,11 +47,27 @@ export function ProductConfigurator({
     }
   }, [motorType, tableSize]);
 
+  // Simple motor only comes in negro — reset if switching from doble blanco
+  useEffect(() => {
+    if (motorType === "simple" && structureColor === "blanco") {
+      setStructureColor("negro");
+      onStructureColorChange?.("negro");
+    }
+  }, [motorType, structureColor, onStructureColorChange]);
+
   const { addItem } = useCartStore();
   const prices = usePrices();
+  const { stock } = useStock();
 
   const availableSizes =
     motorType === "simple" ? TABLE_SIZES.filter((s) => s.id !== TABLE_SIZE.L) : TABLE_SIZES;
+
+  // Simple motor has no white structure option
+  const availableStructureColors =
+    motorType === "simple" ? STRUCTURE_COLORS.filter((c) => c.id !== "blanco") : STRUCTURE_COLORS;
+
+  // Stock check for current config
+  const currentConfigOOS = isConfigOOS(stock, motorType, structureColor, productType);
 
   const config = {
     type: productType,
@@ -185,31 +203,44 @@ export function ProductConfigurator({
             Color de estructura
           </label>
           <div className="flex gap-3">
-            {STRUCTURE_COLORS.map((color) => (
-              <button
-                key={color.id}
-                onClick={() => {
-                  setStructureColor(color.id);
-                  onStructureColorChange?.(color.id);
-                }}
-                title={color.name}
-                className={`relative flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all ${
-                  structureColor === color.id
-                    ? "border-brand-500 scale-110"
-                    : "border-zinc-200 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-500"
-                }`}
-                style={{ backgroundColor: color.hex }}
-              >
-                {structureColor === color.id && (
-                  <Check
-                    size={16}
-                    className={color.id === "blanco" ? "text-zinc-900" : "text-white"}
-                  />
-                )}
-              </button>
-            ))}
+            {availableStructureColors.map((color) => {
+              const colorOOS =
+                motorType === "doble" && stock?.doble[color.id as "negro" | "blanco"] === false;
+              return (
+                <button
+                  key={color.id}
+                  onClick={() => {
+                    if (colorOOS) return;
+                    setStructureColor(color.id);
+                    onStructureColorChange?.(color.id);
+                  }}
+                  title={colorOOS ? `${color.name} — Sin stock` : color.name}
+                  disabled={colorOOS}
+                  className={`relative flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all ${
+                    colorOOS
+                      ? "cursor-not-allowed opacity-40"
+                      : structureColor === color.id
+                        ? "border-brand-500 scale-110"
+                        : "border-zinc-200 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-500"
+                  }`}
+                  style={{ backgroundColor: color.hex }}
+                >
+                  {structureColor === color.id && !colorOOS && (
+                    <Check
+                      size={16}
+                      className={color.id === "blanco" ? "text-zinc-900" : "text-white"}
+                    />
+                  )}
+                  {colorOOS && (
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-red-500">✕</span>
+                    </span>
+                  )}
+                </button>
+              );
+            })}
             <span className="ml-2 flex items-center text-base font-medium text-zinc-700 dark:text-zinc-300">
-              {STRUCTURE_COLORS.find((c) => c.id === structureColor)?.name}
+              {availableStructureColors.find((c) => c.id === structureColor)?.name}
             </span>
           </div>
         </div>
@@ -345,7 +376,22 @@ export function ProductConfigurator({
           )}
         </div>
 
-        <Button size="lg" className="mt-4 w-full gap-2 text-lg" onClick={handleAdd}>
+        {currentConfigOOS && (
+          <div className="mt-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 dark:border-red-900/40 dark:bg-red-950/30">
+            <AlertTriangle size={16} className="mt-0.5 shrink-0 text-red-500" />
+            <p className="text-sm text-red-700 dark:text-red-400">
+              Este color está <strong>sin stock</strong> en este momento. Elegí otro color o
+              escribinos por WhatsApp para anotarte en lista de espera.
+            </p>
+          </div>
+        )}
+
+        <Button
+          size="lg"
+          className="mt-4 w-full gap-2 text-lg"
+          onClick={handleAdd}
+          disabled={currentConfigOOS}
+        >
           {added ? (
             <>
               <Check size={20} /> ¡Agregado al carrito!

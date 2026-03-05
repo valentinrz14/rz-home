@@ -3,6 +3,8 @@ import Link from "next/link";
 import { DersiteIllustration } from "@/components/products/DersiteIllustration";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { StockStatus } from "@/lib/amazon-stock";
+import { isMotorFullyOOS } from "@/lib/amazon-stock";
 import type { PricesConfig } from "@/lib/prices";
 import { BUNDLE_PRICES_SIMPLE } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
@@ -60,10 +62,15 @@ const productDefs = [
 
 interface Props {
   prices: PricesConfig;
+  stock?: StockStatus | null;
 }
 
-export function ProductShowcase({ prices }: Props) {
-  const products = productDefs.map((p) => ({ ...p, price: p.getPrice(prices) }));
+export function ProductShowcase({ prices, stock = null }: Props) {
+  const products = productDefs.map((p) => ({
+    ...p,
+    price: p.getPrice(prices),
+    fullyOOS: isMotorFullyOOS(stock, p.id as "simple" | "doble"),
+  }));
   return (
     <section id="productos-destacados" className="bg-zinc-50 px-4 py-20 dark:bg-zinc-900/50">
       <div className="mx-auto max-w-7xl">
@@ -104,13 +111,18 @@ export function ProductShowcase({ prices }: Props) {
                     className="w-full"
                   />
                 </div>
-                <div className="absolute top-4 left-5">
+                <div className="absolute top-4 left-5 flex gap-2">
                   <Badge
                     variant={product.highlight ? "brand" : "secondary"}
                     className={`text-sm ${product.highlight ? "bg-brand-500 text-white" : "dark:bg-zinc-700 dark:text-zinc-200"}`}
                   >
                     {product.badge}
                   </Badge>
+                  {product.fullyOOS && (
+                    <Badge variant="destructive" className="text-sm">
+                      Sin stock
+                    </Badge>
+                  )}
                 </div>
               </div>
 

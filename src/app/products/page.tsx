@@ -177,16 +177,16 @@ function ProductViewer({
         : [{ id: "completo" as const, label: "Con tapa" }];
 
   return (
-    <div className="rounded-2xl border border-zinc-100 bg-gradient-to-b from-zinc-50 to-white p-6 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-950">
+    <div className="rounded-2xl border border-zinc-100 bg-gradient-to-b from-zinc-50 to-white p-3 lg:p-6 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-950">
       {/* Tabs de vista */}
       {tabs.length > 1 && (
-        <div className="mb-4 flex gap-2">
+        <div className="mb-2 flex gap-2 lg:mb-4">
           {tabs.map((tab) => (
             <button
               type="button"
               key={tab.id}
               onClick={() => setView(tab.id)}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
+              className={`rounded-lg px-3 py-1 text-xs font-medium transition-all lg:px-4 lg:py-1.5 lg:text-sm ${
                 view === tab.id
                   ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
                   : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
@@ -199,16 +199,18 @@ function ProductViewer({
       )}
 
       {/* Ilustración SVG de la estructura */}
-      <DersiteIllustration
-        structureColor={structureColor}
-        withTabletop={view === "completo" || tipo === "tabla"}
-        withStructure={tipo !== "tabla"}
-        tableColorHex={tableColorHex}
-        className="w-full"
-      />
+      <div className="mx-auto w-36 lg:w-full">
+        <DersiteIllustration
+          structureColor={structureColor}
+          withTabletop={view === "completo" || tipo === "tabla"}
+          withStructure={tipo !== "tabla"}
+          tableColorHex={tableColorHex}
+          className="w-full"
+        />
+      </div>
 
-      {/* Leyenda */}
-      <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-zinc-400 dark:text-zinc-500">
+      {/* Leyenda — hidden on mobile to save space */}
+      <div className="mt-3 hidden flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-zinc-400 lg:flex dark:text-zinc-500">
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-brand-500" />
           Estructura: {STRUCTURE_COLORS.find((c) => c.id === structureColor)?.name}
@@ -260,7 +262,7 @@ function ProductsContent() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* Columna izquierda: visualizador interactivo */}
-        <div className="lg:sticky lg:top-20 lg:self-start">
+        <div className="sticky top-16 z-10 self-start lg:top-20">
           <ProductViewer tipo={tipo} structureColor={structureColor} tableColor={tableColor} />
         </div>
 

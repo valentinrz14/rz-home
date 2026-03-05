@@ -207,10 +207,7 @@ export default async function AdminPage() {
             </h2>
             <div className="space-y-2">
               <EnvStatus label="MERCADOPAGO_ACCESS_TOKEN" varName="MERCADOPAGO_ACCESS_TOKEN" />
-              <EnvStatus
-                label="NEXT_PUBLIC_MP_PUBLIC_KEY"
-                varName="NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY"
-              />
+              <EnvStatus label="NEXT_PUBLIC_MP_PUBLIC_KEY" varName="MERCADOPAGO_PUBLIC_KEY" />
               <EnvStatus label="ADMIN_PASSWORD" varName="ADMIN_PASSWORD" />
               <EnvStatus label="NEXT_PUBLIC_SITE_URL" varName="NEXT_PUBLIC_SITE_URL" />
               <EnvStatus label="UPSTASH_REDIS_REST_URL" varName="UPSTASH_REDIS_REST_URL" />
