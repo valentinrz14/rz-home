@@ -41,7 +41,7 @@ describe("getProductPrice — todas las combinaciones", () => {
   });
 
   it("tapa devuelve el precio correcto para cada medida y color", () => {
-    const sizes: TableSize[] = ["120x60", "140x70", "150x70", "160x80"];
+    const sizes: TableSize[] = ["120x60", "140x70", "160x80"];
     const colors: TableColor[] = [
       "hickory",
       "roble-claro",
@@ -61,7 +61,7 @@ describe("getProductPrice — todas las combinaciones", () => {
   });
 
   it("bundle devuelve el precio correcto para cada medida y combinación de colores", () => {
-    const sizes: TableSize[] = ["120x60", "140x70", "150x70", "160x80"];
+    const sizes: TableSize[] = ["120x60", "140x70", "160x80"];
     const structureColors: StructureColor[] = ["negro", "blanco"];
     const tableColors: TableColor[] = ["hickory", "negro"];
 
@@ -96,14 +96,12 @@ describe("getProductPrice — todas las combinaciones", () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe("invariantes de precios del catálogo", () => {
-  it("los bundles son SIEMPRE más baratos que estructura + tapa por separado", () => {
+  it("los bundles son mayores o iguales a estructura + tapa (redondeados para arriba)", () => {
     TABLE_SIZES.forEach((size) => {
       const bundlePrice = BUNDLE_PRICES[size.id];
       const separateTotal = STRUCTURE_PRICE + TABLE_PRICES[size.id];
-      const ahorro = separateTotal - bundlePrice;
 
-      expect(bundlePrice).toBeLessThan(separateTotal);
-      expect(ahorro).toBeGreaterThan(0);
+      expect(bundlePrice).toBeGreaterThanOrEqual(separateTotal);
     });
   });
 
@@ -139,19 +137,18 @@ describe("invariantes de precios del catálogo", () => {
     });
   });
 
-  it("todos los precios son más baratos que la competencia ($2.240.000)", () => {
-    const COMPETITOR_PRICE = 2_240_000;
+  it("todos los precios son más baratos que la competencia ($1.400.000)", () => {
+    const COMPETITOR_PRICE = 1_400_000;
     TABLE_SIZES.forEach((size) => {
       expect(BUNDLE_PRICES[size.id]).toBeLessThan(COMPETITOR_PRICE);
     });
   });
 
-  it("el ahorro del bundle es al menos 5% del precio por separado", () => {
+  it("el precio del bundle incluye estructura y tapa", () => {
     TABLE_SIZES.forEach((size) => {
-      const separateTotal = STRUCTURE_PRICE + TABLE_PRICES[size.id];
       const bundlePrice = BUNDLE_PRICES[size.id];
-      const savingPct = (separateTotal - bundlePrice) / separateTotal;
-      expect(savingPct).toBeGreaterThanOrEqual(0.05);
+      expect(bundlePrice).toBeGreaterThan(STRUCTURE_PRICE);
+      expect(bundlePrice).toBeGreaterThan(TABLE_PRICES[size.id]);
     });
   });
 });
@@ -173,7 +170,7 @@ describe("getProductName — generación de nombres", () => {
   });
 
   it("tapa incluye la medida correcta", () => {
-    const sizes: TableSize[] = ["120x60", "140x70", "150x70", "160x80"];
+    const sizes: TableSize[] = ["120x60", "140x70", "160x80"];
     sizes.forEach((size) => {
       const name = getProductName({ type: "tabla", tableSize: size });
       expect(name).toContain(size);
@@ -209,7 +206,7 @@ describe("getProductName — generación de nombres", () => {
       { type: "tabla", tableSize: "120x60", tableColor: "hickory" },
       { type: "tabla", tableSize: "160x80", tableColor: "negro" },
       { type: "completo", tableSize: "140x70", structureColor: "negro", tableColor: "nogal" },
-      { type: "completo", tableSize: "150x70", structureColor: "blanco", tableColor: "blanco" },
+      { type: "completo", tableSize: "160x80", structureColor: "blanco", tableColor: "blanco" },
     ];
 
     configs.forEach((config) => {
@@ -284,9 +281,8 @@ describe("formatPrice — formateo de todos los precios del catálogo", () => {
   });
 
   it("precios grandes incluyen separador de miles", () => {
-    // $699.000 o $699,000 dependiendo del locale
     const formatted = formatPrice(STRUCTURE_PRICE);
-    expect(formatted).toMatch(/699/);
+    expect(formatted).toMatch(/650/);
   });
 
   it("precio cero se formatea correctamente", () => {
@@ -295,9 +291,9 @@ describe("formatPrice — formateo de todos los precios del catálogo", () => {
     expect(formatted).toContain("0");
   });
 
-  it("el bundle 160x80 se muestra como $899.XXX", () => {
+  it("el bundle 160x80 se muestra como $790.XXX", () => {
     const formatted = formatPrice(BUNDLE_PRICES["160x80"]);
-    expect(formatted).toContain("899");
+    expect(formatted).toContain("790");
   });
 });
 

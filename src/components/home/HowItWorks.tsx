@@ -12,8 +12,8 @@ export function HowItWorks() {
     },
     {
       number: "03",
-      title: "Pagá en cuotas",
-      description: "Tarjetas de crédito con cuotas sin interés via MercadoPago.",
+      title: "Elegí cómo pagar",
+      description: "Transferencia bancaria o MercadoPago.",
     },
     {
       number: "04",

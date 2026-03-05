@@ -38,8 +38,8 @@ export function Hero() {
         </h1>
 
         <p className="mx-auto mt-7 max-w-2xl text-xl leading-relaxed text-zinc-400">
-          Standing desks con doble motor silencioso, tapas MDF premium de 36mm y envío a todo el
-          país. Personalizá tu espacio de trabajo.
+          Standing desks con motor eléctrico silencioso y tapas MDF premium de 36mm. Dos modelos
+          para cada presupuesto. Envío Andreani a todo el país.
         </p>
 
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -61,8 +61,8 @@ export function Hero() {
 
         <div className="mt-16 grid grid-cols-3 gap-8 border-t border-zinc-800 pt-10">
           {[
-            { value: "2 motores", label: "independientes" },
-            { value: "120 kg", label: "capacidad de carga" },
+            { value: "2 modelos", label: "disponibles" },
+            { value: "6 colores", label: "de tapa" },
             { value: "36 mm", label: "espesor de tapa" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">

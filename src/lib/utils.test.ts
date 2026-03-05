@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 import type { TableSize } from "@/types";
 import {
+  BUNDLE_PRICES,
+  BUNDLE_PRICES_SIMPLE,
+  BUNDLE_PRICES_SIMPLE_MP,
+  STRUCTURE_PRICE,
+  STRUCTURE_PRICE_SIMPLE,
+  STRUCTURE_PRICE_SIMPLE_MP,
+  TABLE_PRICES,
+} from "./products";
+import {
   formatPrice,
   generateCartItemId,
   getCartTotal,
@@ -29,24 +38,80 @@ describe("formatPrice", () => {
 // ─── getProductPrice ──────────────────────────────────────────────────────────
 describe("getProductPrice", () => {
   it("retorna el precio de la estructura", () => {
-    expect(getProductPrice({ type: "estructura" })).toBe(699_000);
+    expect(getProductPrice({ type: "estructura" })).toBe(STRUCTURE_PRICE);
   });
 
   it("retorna el precio de la tapa por medida", () => {
-    expect(getProductPrice({ type: "tabla", tableSize: "120x60" })).toBe(365_000);
-    expect(getProductPrice({ type: "tabla", tableSize: "140x70" })).toBe(380_000);
-    expect(getProductPrice({ type: "tabla", tableSize: "150x70" })).toBe(390_000);
-    expect(getProductPrice({ type: "tabla", tableSize: "160x80" })).toBe(400_000);
+    expect(getProductPrice({ type: "tabla", tableSize: "120x60" })).toBe(TABLE_PRICES["120x60"]);
+    expect(getProductPrice({ type: "tabla", tableSize: "140x70" })).toBe(TABLE_PRICES["140x70"]);
+    expect(getProductPrice({ type: "tabla", tableSize: "160x80" })).toBe(TABLE_PRICES["160x80"]);
   });
 
   it("retorna el precio del bundle completo por medida", () => {
-    expect(getProductPrice({ type: "completo", tableSize: "120x60" })).toBe(799_000);
-    expect(getProductPrice({ type: "completo", tableSize: "160x80" })).toBe(899_000);
+    expect(getProductPrice({ type: "completo", tableSize: "120x60" })).toBe(
+      BUNDLE_PRICES["120x60"]
+    );
+    expect(getProductPrice({ type: "completo", tableSize: "160x80" })).toBe(
+      BUNDLE_PRICES["160x80"]
+    );
   });
 
   it("retorna 0 si falta la medida", () => {
     expect(getProductPrice({ type: "tabla" })).toBe(0);
     expect(getProductPrice({ type: "completo" })).toBe(0);
+  });
+});
+
+// ─── getProductPrice — motor simple ───────────────────────────────────────────
+describe("getProductPrice (motor simple)", () => {
+  it("retorna STRUCTURE_PRICE_SIMPLE para estructura sin tier", () => {
+    expect(getProductPrice({ type: "estructura", motorType: "simple" })).toBe(
+      STRUCTURE_PRICE_SIMPLE
+    );
+  });
+
+  it("retorna STRUCTURE_PRICE_SIMPLE_MP cuando el tier es MP", () => {
+    const mpTier = {
+      structure: STRUCTURE_PRICE + 1,
+      tables: TABLE_PRICES,
+      bundles: BUNDLE_PRICES,
+    };
+    expect(getProductPrice({ type: "estructura", motorType: "simple" }, mpTier)).toBe(
+      STRUCTURE_PRICE_SIMPLE_MP
+    );
+  });
+
+  it("retorna bundle correcto para 120x60 (transfer)", () => {
+    expect(getProductPrice({ type: "completo", motorType: "simple", tableSize: "120x60" })).toBe(
+      BUNDLE_PRICES_SIMPLE["120x60"]
+    );
+  });
+
+  it("retorna bundle correcto para 140x70 (transfer)", () => {
+    expect(getProductPrice({ type: "completo", motorType: "simple", tableSize: "140x70" })).toBe(
+      BUNDLE_PRICES_SIMPLE["140x70"]
+    );
+  });
+
+  it("retorna bundle MP para 120x60", () => {
+    const mpTier = {
+      structure: STRUCTURE_PRICE + 1,
+      tables: TABLE_PRICES,
+      bundles: BUNDLE_PRICES,
+    };
+    expect(
+      getProductPrice({ type: "completo", motorType: "simple", tableSize: "120x60" }, mpTier)
+    ).toBe(BUNDLE_PRICES_SIMPLE_MP["120x60"]);
+  });
+
+  it("retorna precio de tapa igual al doble motor", () => {
+    expect(getProductPrice({ type: "tabla", motorType: "simple", tableSize: "120x60" })).toBe(
+      TABLE_PRICES["120x60"]
+    );
+  });
+
+  it("retorna 0 si falta la medida en bundle simple", () => {
+    expect(getProductPrice({ type: "completo", motorType: "simple" })).toBe(0);
   });
 });
 
@@ -67,12 +132,46 @@ describe("getProductName", () => {
   it("incluye medida y color de estructura para completo", () => {
     const name = getProductName({
       type: "completo",
-      tableSize: "150x70",
+      tableSize: "160x80",
       structureColor: "blanco",
     });
     expect(name).toContain("Standing Desk Completo");
-    expect(name).toContain("150x70");
+    expect(name).toContain("160x80");
     expect(name).toContain("Blanca");
+  });
+});
+
+// ─── getProductName — motor simple ────────────────────────────────────────────
+describe("getProductName (motor simple)", () => {
+  it("incluye 'Motor Simple' en nombre de estructura", () => {
+    const name = getProductName({
+      type: "estructura",
+      motorType: "simple",
+      structureColor: "negro",
+    });
+    expect(name).toContain("Motor Simple");
+    expect(name).toContain("Negro");
+  });
+
+  it("incluye 'Motor Simple' en nombre de bundle", () => {
+    const name = getProductName({
+      type: "completo",
+      motorType: "simple",
+      tableSize: "120x60",
+      structureColor: "negro",
+    });
+    expect(name).toContain("Motor Simple");
+    expect(name).toContain("120x60");
+  });
+
+  it("NO incluye 'Motor Simple' cuando motorType es doble", () => {
+    const name = getProductName({
+      type: "estructura",
+      motorType: "doble",
+      structureColor: "negro",
+    });
+    expect(name).not.toContain("Motor Simple");
+    expect(name).toContain("Doble Motor");
   });
 });
 
@@ -83,7 +182,7 @@ describe("getCartTotal", () => {
       {
         id: "1",
         config: { type: "estructura" as const },
-        unitPrice: 699_000,
+        unitPrice: 520_000,
         quantity: 1,
         name: "Estructura",
       },
@@ -95,7 +194,7 @@ describe("getCartTotal", () => {
         name: "Tapa",
       },
     ];
-    expect(getCartTotal(items)).toBe(699_000 + 149_000 * 2);
+    expect(getCartTotal(items)).toBe(520_000 + 149_000 * 2);
   });
 
   it("retorna 0 para carrito vacío", () => {
@@ -107,12 +206,12 @@ describe("getCartTotal", () => {
       {
         id: "1",
         config: { type: "completo" as const, tableSize: "160x80" as TableSize },
-        unitPrice: 899_000,
+        unitPrice: 680_000,
         quantity: 3,
         name: "Completo",
       },
     ];
-    expect(getCartTotal(items)).toBe(899_000 * 3);
+    expect(getCartTotal(items)).toBe(680_000 * 3);
   });
 });
 

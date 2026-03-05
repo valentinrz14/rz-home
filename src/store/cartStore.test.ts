@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { BUNDLE_PRICES, STRUCTURE_PRICE } from "@/lib/products";
 import { useCartStore } from "./cartStore";
 
 // ─── Reset store antes de cada test ──────────────────────────────────────────
@@ -15,7 +16,7 @@ describe("addItem", () => {
 
   it("asigna el precio correcto al agregar la estructura", () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
-    expect(useCartStore.getState().items[0]?.unitPrice).toBe(699_000);
+    expect(useCartStore.getState().items[0]?.unitPrice).toBe(STRUCTURE_PRICE);
   });
 
   it("asigna el precio correcto al agregar un bundle", () => {
@@ -25,7 +26,7 @@ describe("addItem", () => {
       structureColor: "negro",
       tableColor: "hickory",
     });
-    expect(useCartStore.getState().items[0]?.unitPrice).toBe(899_000);
+    expect(useCartStore.getState().items[0]?.unitPrice).toBe(BUNDLE_PRICES["160x80"]);
   });
 
   it("incrementa la cantidad si se agrega el mismo ítem dos veces", () => {

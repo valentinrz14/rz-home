@@ -70,7 +70,7 @@ describe("flujo completo de carrito", () => {
   it("ciclo completo: agrega → modifica cantidad → elimina uno → vacía", () => {
     addStructure();
     addTable("140x70");
-    addBundle("150x70");
+    addBundle("160x80");
 
     expect(getItems()).toHaveLength(3);
 
@@ -84,7 +84,7 @@ describe("flujo completo de carrito", () => {
     expect(estructura.unitPrice).toBe(STRUCTURE_PRICE);
 
     // Total incluye 3x estructura
-    const totalEsperado = STRUCTURE_PRICE * 3 + TABLE_PRICES["140x70"] + BUNDLE_PRICES["150x70"];
+    const totalEsperado = STRUCTURE_PRICE * 3 + TABLE_PRICES["140x70"] + BUNDLE_PRICES["160x80"];
     expect(getCartTotal(items)).toBe(totalEsperado);
 
     // Eliminar la tapa
@@ -187,7 +187,7 @@ describe("deduplicación y cantidades", () => {
 
 describe("todas las combinaciones de productos", () => {
   it("cada medida de tapa tiene precio correcto en el carrito", () => {
-    const sizes: TableSize[] = ["120x60", "140x70", "150x70", "160x80"];
+    const sizes: TableSize[] = ["120x60", "140x70", "160x80"];
     for (const size of sizes) addTable(size);
 
     const items = getItems();
@@ -198,7 +198,7 @@ describe("todas las combinaciones de productos", () => {
   });
 
   it("todos los bundles tienen precios correctos en el carrito", () => {
-    const sizes: TableSize[] = ["120x60", "140x70", "150x70", "160x80"];
+    const sizes: TableSize[] = ["120x60", "140x70", "160x80"];
     for (const size of sizes) addBundle(size, "negro", "hickory");
 
     const expectedTotal = sizes.reduce((sum, size) => sum + BUNDLE_PRICES[size], 0);
@@ -209,15 +209,15 @@ describe("todas las combinaciones de productos", () => {
     addStructure("negro");
     addStructure("blanco");
 
-    const sizes: TableSize[] = ["120x60", "140x70", "150x70", "160x80"];
+    const sizes: TableSize[] = ["120x60", "140x70", "160x80"];
     sizes.forEach((size) => {
       addTable(size, "hickory");
       addBundle(size, "negro", "nogal");
     });
 
     const items = getItems();
-    // 2 estructuras + 4 tapas + 4 bundles = 10 ítems
-    expect(items).toHaveLength(10);
+    // 2 estructuras + 3 tapas + 3 bundles = 8 ítems
+    expect(items).toHaveLength(8);
 
     const expectedTotal =
       STRUCTURE_PRICE * 2 +
@@ -241,11 +241,11 @@ describe("todas las combinaciones de productos", () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe("invariantes de negocio en el carrito", () => {
-  it("el bundle siempre es más barato que estructura + tapa por separado", () => {
+  it("el bundle es mayor o igual a estructura + tapa (redondeado para arriba)", () => {
     TABLE_SIZES.forEach((size) => {
       const bundlePrice = BUNDLE_PRICES[size.id];
       const separatePrice = STRUCTURE_PRICE + TABLE_PRICES[size.id];
-      expect(bundlePrice).toBeLessThan(separatePrice);
+      expect(bundlePrice).toBeGreaterThanOrEqual(separatePrice);
     });
   });
 
@@ -280,7 +280,7 @@ describe("invariantes de negocio en el carrito", () => {
     const total = getCartTotal(getItems());
     const formatted = formatPrice(total);
     expect(formatted).toContain("$");
-    expect(formatted).toContain("899");
+    expect(formatted).toContain("790");
   });
 
   it("nombre generado incluye tipo, medida y color de estructura", () => {

@@ -1,7 +1,8 @@
-import { CheckCircle2, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { BUNDLE_PRICES } from "@/lib/products";
+import type { PricesConfig } from "@/lib/prices";
+import { BUNDLE_PRICES_SIMPLE } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 
 const rows = [
@@ -11,7 +12,7 @@ const rows = [
   { feature: "Sensor anticolisión", rzroom: true, comp: true },
   { feature: "Tapa MDF 36mm de doble capa", rzroom: true, comp: false },
   { feature: "6 colores de tapa disponibles", rzroom: true, comp: false },
-  { feature: "4 medidas de tapa disponibles", rzroom: true, comp: false },
+  { feature: "3 medidas de tapa disponibles", rzroom: true, comp: false },
   {
     feature: "Envío Andreani incluido",
     rzroom: false,
@@ -20,9 +21,13 @@ const rows = [
   },
 ];
 
-export function PriceComparison() {
-  const rzroomPrice = BUNDLE_PRICES["160x80"];
-  const competitorPrice = 2_240_000;
+interface Props {
+  prices: PricesConfig;
+}
+
+export function PriceComparison({ prices }: Props) {
+  const rzroomPrice = prices.transfer.bundles["160x80"];
+  const competitorPrice = 1_400_000;
   const saving = competitorPrice - rzroomPrice;
 
   return (
@@ -36,7 +41,8 @@ export function PriceComparison() {
             La misma calidad, otro precio
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-zinc-500 dark:text-zinc-400">
-            Misma estructura de doble motor. Tapas premium propias. Sin el markup de intermediarios.
+            Nuestro Standing Desk Doble Motor contra la competencia. Mismas especificaciones, tapas
+            propias incluidas y sin intermediarios.
           </p>
         </div>
 
@@ -50,6 +56,9 @@ export function PriceComparison() {
             <div className="flex flex-col items-center justify-center border-l border-zinc-200 bg-zinc-900 p-5 dark:border-zinc-700 dark:bg-zinc-800">
               <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
                 rz room
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-brand-400 mt-0.5">
+                Doble Motor
               </span>
               <span className="mt-1.5 font-display text-2xl font-bold text-white">
                 {formatPrice(rzroomPrice)}
@@ -113,12 +122,33 @@ export function PriceComparison() {
               {formatPrice(saving)}
             </p>
             <p className="mt-2 text-sm text-brand-600/70 dark:text-brand-400/70">
-              Más las ventajas exclusivas: tapas propias, 6 colores y 4 medidas.
+              Vs. la competencia: mismas specs, tapas propias en 6 colores y 3 medidas.
             </p>
           </div>
           <Button size="lg" asChild className="shrink-0">
-            <Link href="/productos">Configurar ahora</Link>
+            <Link href="/productos?motor=doble">Ver Doble Motor</Link>
           </Button>
+        </div>
+
+        {/* Motor simple callout */}
+        <div className="mt-4 flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
+          <div>
+            <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+              ¿Buscás una opción más accesible?
+            </p>
+            <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+              También tenemos el Standing Desk Motor Simple desde{" "}
+              <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                {formatPrice(BUNDLE_PRICES_SIMPLE["120x60"])}
+              </span>
+            </p>
+          </div>
+          <Link
+            href="/productos?motor=simple"
+            className="ml-4 flex shrink-0 items-center gap-1.5 text-sm font-semibold text-zinc-700 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+          >
+            Ver Motor Simple <ArrowRight size={14} />
+          </Link>
         </div>
       </div>
     </section>

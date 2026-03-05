@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s | rz room",
   },
   description:
-    "Standing desks con doble motor silencioso y tapas MDF premium de 36mm. Personalizá tu escritorio: 4 medidas, 6 colores. Envío Andreani a todo el país. Pagá en cuotas sin interés.",
+    "Standing desks con doble motor silencioso y tapas MDF premium de 36mm. Personalizá tu escritorio: 3 medidas, 6 colores. Envío Andreani a todo el país.",
   keywords: [
     "standing desk",
     "escritorio regulable en altura",
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "rz room — Standing Desks Premium en Argentina",
     description:
-      "Personalizá tu standing desk: 4 medidas, 6 colores, doble motor. Envío a todo el país.",
+      "Personalizá tu standing desk: 3 medidas, 6 colores, doble motor. Envío a todo el país.",
     images: ["/og-image.jpg"],
   },
   robots: {

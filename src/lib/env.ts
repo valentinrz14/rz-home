@@ -93,4 +93,12 @@ export function getCryptoWallets() {
   };
 }
 
+/** Dirección de retiro en local */
+export function getPickupAddress() {
+  return {
+    zona: optional("PICKUP_ZONA", "Buenos Aires, Ituzaingó"),
+    completa: optional("PICKUP_ADDRESS", "Buenos Aires, Ituzaingó, Cerrito 1696"),
+  };
+}
+
 // Upstash Redis — usadas por @upstash/redis via UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN

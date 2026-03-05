@@ -8,18 +8,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { getWhatsappNumber } from "@/lib/env";
-import {
-  BUNDLE_PRICES,
-  STRUCTURE_PRICE,
-  TABLE_COLORS,
-  TABLE_PRICES,
-  TABLE_SIZES,
-} from "@/lib/products";
+import { getPrices } from "@/lib/prices";
+import { TABLE_COLORS, TABLE_SIZES } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 
 // ─── Componente de cierre de sesión (cliente) ─────────────────────────────────
 import { AdminLogoutButton } from "./LogoutButton";
 import { PendingOrders } from "./PendingOrders";
+import { PriceEditor } from "./PriceEditor";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function EnvStatus({ label, varName }: { label: string; varName: string }) {
@@ -41,8 +37,9 @@ function EnvStatus({ label, varName }: { label: string; varName: string }) {
 }
 
 // ─── Página principal ─────────────────────────────────────────────────────────
-export default function AdminPage() {
+export default async function AdminPage() {
   const whatsapp = getWhatsappNumber();
+  const prices = await getPrices();
   return (
     <div className="min-h-screen bg-zinc-950 px-4 py-8 text-white">
       <div className="mx-auto max-w-5xl">
@@ -67,15 +64,19 @@ export default function AdminPage() {
         {/* Resumen de precios */}
         <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {[
-            { label: "Estructura sola", value: formatPrice(STRUCTURE_PRICE), icon: Package },
             {
-              label: "Bundle desde",
-              value: formatPrice(BUNDLE_PRICES["120x60"]),
+              label: "Estructura transferencia",
+              value: formatPrice(prices.transfer.structure),
+              icon: Package,
+            },
+            {
+              label: "Bundle transferencia desde",
+              value: formatPrice(prices.transfer.bundles["120x60"]),
               icon: ShoppingCart,
             },
             {
-              label: "Bundle hasta",
-              value: formatPrice(BUNDLE_PRICES["160x80"]),
+              label: "Bundle MP desde",
+              value: formatPrice(prices.mp_one.bundles["120x60"]),
               icon: DollarSign,
             },
             { label: "Colores de tapa", value: `${TABLE_COLORS.length} opciones`, icon: Package },
@@ -92,6 +93,9 @@ export default function AdminPage() {
             );
           })}
         </div>
+
+        {/* Editor de precios */}
+        <PriceEditor initialPrices={prices} />
 
         {/* Tabla de productos y precios */}
         <section className="mb-8">
@@ -115,10 +119,10 @@ export default function AdminPage() {
                     <td className="px-4 py-3 text-zinc-300">Standing Desk</td>
                     <td className="px-4 py-3 font-mono text-zinc-400">{size.label}</td>
                     <td className="px-4 py-3 text-right font-semibold text-zinc-300">
-                      {formatPrice(TABLE_PRICES[size.id])}
+                      {formatPrice(prices.transfer.tables[size.id])}
                     </td>
                     <td className="px-4 py-3 text-right font-semibold text-white">
-                      {formatPrice(BUNDLE_PRICES[size.id])}
+                      {formatPrice(prices.transfer.bundles[size.id])}
                     </td>
                   </tr>
                 ))}
@@ -127,7 +131,7 @@ export default function AdminPage() {
                   <td className="px-4 py-3 text-zinc-500">—</td>
                   <td className="px-4 py-3 text-right text-zinc-500">—</td>
                   <td className="px-4 py-3 text-right font-semibold text-white">
-                    {formatPrice(STRUCTURE_PRICE)}
+                    {formatPrice(prices.transfer.structure)}
                   </td>
                 </tr>
               </tbody>

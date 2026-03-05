@@ -25,8 +25,8 @@ const faqs = [
     a: "Enviamos a todo el país por Andreani. El costo se cotiza en el checkout según tu código postal. Tiempo estimado: 10 a 15 días hábiles.",
   },
   {
-    q: "¿Cuántas cuotas puedo elegir?",
-    a: "Aceptamos tarjetas de crédito con cuotas sin interés a través de MercadoPago. La cantidad de cuotas depende de tu banco y tarjeta.",
+    q: "¿Qué métodos de pago aceptan?",
+    a: "Aceptamos transferencia bancaria, MercadoPago (tarjeta de crédito o débito) y criptomonedas (USDT, LTC).",
   },
   {
     q: "¿Qué garantía tiene?",

@@ -1,6 +1,6 @@
-import { CheckCircle2, MessageCircle } from "lucide-react";
+import { CheckCircle2, MapPin, MessageCircle } from "lucide-react";
 import Link from "next/link";
-import { getBankDetails, getCryptoWallets, getWhatsappNumber } from "@/lib/env";
+import { getBankDetails, getCryptoWallets, getPickupAddress, getWhatsappNumber } from "@/lib/env";
 import { getCryptoConversion } from "@/lib/ripio";
 import type { PaymentMethod } from "@/types/orders";
 import { CopyableField } from "./CopyableField";
@@ -27,11 +27,13 @@ interface Props {
     orderId?: string;
     method?: string;
     amount?: string;
+    shipping?: string;
   }>;
 }
 
 export default async function CheckoutPendingPage({ searchParams }: Props) {
-  const { orderId, method, amount } = await searchParams;
+  const { orderId, method, amount, shipping } = await searchParams;
+  const isPickup = shipping === "pickup";
 
   const paymentMethod = (method ?? "transfer") as PaymentMethod;
   const isTransfer = paymentMethod === "transfer";
@@ -40,6 +42,7 @@ export default async function CheckoutPendingPage({ searchParams }: Props) {
   const bank = getBankDetails();
   const wallets = getCryptoWallets();
   const whatsapp = getWhatsappNumber();
+  const pickup = getPickupAddress();
 
   const arsAmount = Number(amount ?? 0);
   const formattedARS = arsAmount
@@ -63,9 +66,13 @@ export default async function CheckoutPendingPage({ searchParams }: Props) {
 
   const waText = orderId
     ? encodeURIComponent(
-        isCrypto && cryptoConversion
-          ? `Hola! Les envío el comprobante del pedido Ref: ${orderId} — ${cryptoConversion.amount} ${cryptoConversion.ticker}${formattedARS ? ` (${formattedARS})` : ""}. Adjunto el hash de la transacción.`
-          : `Hola! Les envío el comprobante del pedido Ref: ${orderId}${formattedARS ? ` — ${formattedARS}` : ""}. Adjunto el comprobante de transferencia.`
+        isPickup
+          ? isCrypto && cryptoConversion
+            ? `Hola! Les envío el comprobante del pedido Ref: ${orderId} — ${cryptoConversion.amount} ${cryptoConversion.ticker}${formattedARS ? ` (${formattedARS})` : ""}. Voy a retirar en el local. Adjunto el hash de la transacción.`
+            : `Hola! Les envío el comprobante del pedido Ref: ${orderId}${formattedARS ? ` — ${formattedARS}` : ""}. Voy a retirar en el local. Adjunto el comprobante de transferencia.`
+          : isCrypto && cryptoConversion
+            ? `Hola! Les envío el comprobante del pedido Ref: ${orderId} — ${cryptoConversion.amount} ${cryptoConversion.ticker}${formattedARS ? ` (${formattedARS})` : ""}. Adjunto el hash de la transacción.`
+            : `Hola! Les envío el comprobante del pedido Ref: ${orderId}${formattedARS ? ` — ${formattedARS}` : ""}. Adjunto el comprobante de transferencia.`
       )
     : "";
 
@@ -85,12 +92,30 @@ export default async function CheckoutPendingPage({ searchParams }: Props) {
           </p>
         )}
         <p className="mt-3 text-base text-zinc-500 dark:text-zinc-400">
-          Una vez que confirmemos tu pago, te enviamos la información de envío por email.
+          {isPickup
+            ? "Una vez que confirmemos tu pago, coordinamos el día y horario de retiro por WhatsApp."
+            : "Una vez que confirmemos tu pago, te enviamos la información de envío por email."}
         </p>
       </div>
 
       {/* Datos de pago */}
       <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        {isPickup && (
+          <div className="mb-4 flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-900/40 dark:bg-green-950/30">
+            <MapPin size={20} className="mt-0.5 shrink-0 text-green-600 dark:text-green-400" />
+            <div>
+              <p className="text-sm font-semibold text-green-800 dark:text-green-300">
+                Dirección de retiro
+              </p>
+              <p className="mt-0.5 text-base font-medium text-green-700 dark:text-green-400">
+                {pickup.completa}
+              </p>
+              <p className="mt-1 text-xs text-green-600 dark:text-green-500">
+                Coordinamos el día y horario por WhatsApp una vez confirmado el pago.
+              </p>
+            </div>
+          </div>
+        )}
         {isTransfer && (
           <>
             <h2 className="mb-1 text-lg font-semibold text-zinc-900 dark:text-white">

@@ -99,7 +99,7 @@ describe("construcción del payload de checkout", () => {
   });
 
   it("tapa sola tiene precio correcto para cada medida", () => {
-    const sizes: TableSize[] = ["120x60", "140x70", "150x70", "160x80"];
+    const sizes: TableSize[] = ["120x60", "140x70", "160x80"];
     sizes.forEach((size) => {
       resetCart();
       useCartStore.getState().addItem({ type: "tabla", tableSize: size, tableColor: "hickory" });

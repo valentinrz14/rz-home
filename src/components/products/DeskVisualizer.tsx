@@ -25,7 +25,6 @@ export function DeskVisualizer({
   const sizeWidths: Record<TableSize, number> = {
     "120x60": 240,
     "140x70": 280,
-    "150x70": 300,
     "160x80": 320,
   };
   const tableWidth = sizeWidths[tableSize];
