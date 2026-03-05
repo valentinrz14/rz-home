@@ -2,8 +2,9 @@ import { ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import type { PricesConfig } from "@/lib/prices";
-import { BUNDLE_PRICES_SIMPLE } from "@/lib/products";
+import { BUNDLE_PRICES_SIMPLE, COMPETITOR_PRICE } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
+import { TABLE_SIZE } from "@/types";
 
 const rows = [
   { feature: "Doble motor independiente", rzroom: true, comp: true },
@@ -26,8 +27,8 @@ interface Props {
 }
 
 export function PriceComparison({ prices }: Props) {
-  const rzroomPrice = prices.transfer.bundles["160x80"];
-  const competitorPrice = 1_400_000;
+  const rzroomPrice = prices.transfer.bundles[TABLE_SIZE.L];
+  const competitorPrice = COMPETITOR_PRICE;
   const saving = competitorPrice - rzroomPrice;
 
   return (
@@ -50,29 +51,31 @@ export function PriceComparison({ prices }: Props) {
         <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800">
           {/* Encabezado */}
           <div className="grid grid-cols-3 border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="p-5 text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            <div className="p-3 text-xs font-semibold uppercase tracking-wider text-zinc-500 sm:p-5 sm:text-sm dark:text-zinc-400">
               Característica
             </div>
-            <div className="flex flex-col items-center justify-center border-l border-zinc-200 bg-zinc-900 p-5 dark:border-zinc-700 dark:bg-zinc-800">
-              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+            <div className="flex flex-col items-center justify-center border-l border-zinc-200 bg-zinc-900 p-3 sm:p-5 dark:border-zinc-700 dark:bg-zinc-800">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 sm:text-xs">
                 rz room
               </span>
-              <span className="text-[10px] font-medium uppercase tracking-wider text-brand-400 mt-0.5">
+              <span className="text-[9px] font-medium uppercase tracking-wider text-brand-400 mt-0.5 sm:text-[10px]">
                 Doble Motor
               </span>
-              <span className="mt-1.5 font-display text-2xl font-bold text-white">
+              <span className="mt-1 font-display text-base font-bold text-white sm:mt-1.5 sm:text-2xl">
                 {formatPrice(rzroomPrice)}
               </span>
-              <span className="mt-0.5 text-xs text-zinc-500">escritorio completo 160×80</span>
+              <span className="hidden text-xs text-zinc-500 sm:mt-0.5 sm:block">
+                escritorio completo 160×80
+              </span>
             </div>
-            <div className="flex flex-col items-center justify-center border-l border-zinc-200 p-5 dark:border-zinc-800">
-              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+            <div className="flex flex-col items-center justify-center border-l border-zinc-200 p-3 sm:p-5 dark:border-zinc-800">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 sm:text-xs dark:text-zinc-500">
                 Competencia
               </span>
-              <span className="mt-1.5 font-display text-2xl font-bold text-zinc-400 line-through dark:text-zinc-600">
+              <span className="mt-1 font-display text-base font-bold text-zinc-400 line-through sm:mt-1.5 sm:text-2xl dark:text-zinc-600">
                 {formatPrice(competitorPrice)}
               </span>
-              <span className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-600">
+              <span className="hidden text-xs text-zinc-400 sm:mt-0.5 sm:block dark:text-zinc-600">
                 precio referencia
               </span>
             </div>
@@ -126,7 +129,7 @@ export function PriceComparison({ prices }: Props) {
             </p>
           </div>
           <Button size="lg" asChild className="shrink-0">
-            <Link href="/productos?motor=doble">Ver Doble Motor</Link>
+            <Link href="/products?motor=doble">Ver Doble Motor</Link>
           </Button>
         </div>
 
@@ -139,12 +142,12 @@ export function PriceComparison({ prices }: Props) {
             <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
               También tenemos el Standing Desk Motor Simple desde{" "}
               <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                {formatPrice(BUNDLE_PRICES_SIMPLE["120x60"])}
+                {formatPrice(BUNDLE_PRICES_SIMPLE[TABLE_SIZE.S])}
               </span>
             </p>
           </div>
           <Link
-            href="/productos?motor=simple"
+            href="/products?motor=simple"
             className="ml-4 flex shrink-0 items-center gap-1.5 text-sm font-semibold text-zinc-700 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
           >
             Ver Motor Simple <ArrowRight size={14} />

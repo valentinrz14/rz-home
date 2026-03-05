@@ -1,4 +1,10 @@
-export type TableSize = "120x60" | "140x70" | "160x80";
+export const TABLE_SIZE = {
+  S: "120x60",
+  M: "140x70",
+  L: "160x80",
+} as const;
+
+export type TableSize = (typeof TABLE_SIZE)[keyof typeof TABLE_SIZE];
 
 export type TableColor = "hickory" | "roble-claro" | "blanco" | "gris-cemento" | "nogal" | "negro";
 

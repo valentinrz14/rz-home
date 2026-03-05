@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ShoppingCart } from "lucide-react";
+import { Check, Loader2, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { usePrices } from "@/hooks/usePrices";
@@ -8,6 +8,7 @@ import { STRUCTURE_COLORS, TABLE_COLORS, TABLE_SIZES } from "@/lib/products";
 import { formatPrice, getProductPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import type { MotorType, ProductType, StructureColor, TableColor, TableSize } from "@/types";
+import { TABLE_SIZE } from "@/types";
 
 interface Props {
   defaultType?: ProductType;
@@ -28,15 +29,19 @@ export function ProductConfigurator({
 }: Props) {
   const [productType, setProductType] = useState<ProductType>(defaultType);
   const [motorType, setMotorType] = useState<MotorType>(defaultMotor);
-  const [tableSize, setTableSize] = useState<TableSize>("140x70");
+  const [tableSize, setTableSize] = useState<TableSize>(TABLE_SIZE.M);
   const [tableColor, setTableColor] = useState<TableColor>("hickory");
   const [structureColor, setStructureColor] = useState<StructureColor>("negro");
   const [added, setAdded] = useState(false);
+  const [postalCode, setPostalCode] = useState("");
+  const [shipping, setShipping] = useState<{ costo: number; plazo: number | null } | null>(null);
+  const [shippingLoading, setShippingLoading] = useState(false);
+  const [shippingError, setShippingError] = useState<string | null>(null);
 
-  // Reset 160x80 when switching to simple motor (only 120x60 and 140x70 available)
+  // Reset L size when switching to simple motor (only S and M available)
   useEffect(() => {
-    if (motorType === "simple" && tableSize === "160x80") {
-      setTableSize("140x70");
+    if (motorType === "simple" && tableSize === TABLE_SIZE.L) {
+      setTableSize(TABLE_SIZE.M);
     }
   }, [motorType, tableSize]);
 
@@ -44,7 +49,7 @@ export function ProductConfigurator({
   const prices = usePrices();
 
   const availableSizes =
-    motorType === "simple" ? TABLE_SIZES.filter((s) => s.id !== "160x80") : TABLE_SIZES;
+    motorType === "simple" ? TABLE_SIZES.filter((s) => s.id !== TABLE_SIZE.L) : TABLE_SIZES;
 
   const config = {
     type: productType,
@@ -56,10 +61,53 @@ export function ProductConfigurator({
 
   const price = getProductPrice(config, prices.transfer);
 
+  // Reset shipping estimate when product config changes
+  useEffect(() => {
+    setShipping(null);
+    setShippingError(null);
+  }, [productType, motorType, tableSize]);
+
   function handleAdd() {
     addItem(config, price);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+  }
+
+  async function handleCalculateShipping() {
+    if (!/^\d{4}$/.test(postalCode)) {
+      setShippingError("El código postal debe tener 4 dígitos.");
+      return;
+    }
+    setShippingLoading(true);
+    setShippingError(null);
+    try {
+      const res = await fetch("/api/andreani/cotizar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          codigoPostal: postalCode,
+          items: [
+            {
+              type: productType,
+              motorType,
+              size: productType !== "estructura" ? tableSize : undefined,
+              quantity: 1,
+              unitPrice: price,
+            },
+          ],
+        }),
+      });
+      const data = (await res.json()) as { costo?: number; plazo?: number | null; error?: string };
+      if (!res.ok) {
+        setShippingError(data.error ?? "No se pudo calcular el costo de envío.");
+      } else {
+        setShipping({ costo: data.costo!, plazo: data.plazo ?? null });
+      }
+    } catch {
+      setShippingError("No se pudo calcular el costo de envío.");
+    } finally {
+      setShippingLoading(false);
+    }
   }
 
   return (
@@ -243,17 +291,58 @@ export function ProductConfigurator({
 
       {/* Precio y CTA */}
       <div className="rounded-xl bg-zinc-50 p-4 dark:bg-zinc-800">
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">Transferencia bancaria</p>
-            <p className="font-display text-4xl font-bold text-zinc-900 dark:text-white">
-              {formatPrice(price)}
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">Transferencia bancaria</p>
+        <p className="font-display text-4xl font-bold text-zinc-900 dark:text-white">
+          {formatPrice(price)}
+        </p>
+
+        {/* Shipping estimator */}
+        <div className="mt-3 border-t border-zinc-200 pt-3 dark:border-zinc-700">
+          <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            Envío Andreani
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              inputMode="numeric"
+              value={postalCode}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                setPostalCode(val);
+                if (shipping ?? shippingError) {
+                  setShipping(null);
+                  setShippingError(null);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") void handleCalculateShipping();
+              }}
+              placeholder="Código postal"
+              maxLength={4}
+              className="h-9 w-36 rounded-lg border border-zinc-300 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-900 dark:text-white dark:focus:ring-zinc-400"
+            />
+            <button
+              type="button"
+              onClick={() => void handleCalculateShipping()}
+              disabled={shippingLoading || postalCode.length !== 4}
+              className="flex h-9 items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+            >
+              {shippingLoading ? <Loader2 size={14} className="animate-spin" /> : "Calcular"}
+            </button>
+          </div>
+          {shipping && (
+            <p className="mt-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              + {formatPrice(shipping.costo)}
+              {shipping.plazo !== null && (
+                <span className="ml-1 font-normal text-zinc-500 dark:text-zinc-400">
+                  · {shipping.plazo} días hábiles
+                </span>
+              )}
             </p>
-          </div>
-          <div className="text-right text-sm text-zinc-400">
-            <p>+ envío Andreani</p>
-            <p>a calcular</p>
-          </div>
+          )}
+          {shippingError && (
+            <p className="mt-1.5 text-sm text-red-500 dark:text-red-400">{shippingError}</p>
+          )}
         </div>
 
         <Button size="lg" className="mt-4 w-full gap-2 text-lg" onClick={handleAdd}>

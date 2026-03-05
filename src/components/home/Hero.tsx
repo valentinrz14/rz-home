@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden bg-zinc-950 px-4 text-center">
-      {/* Fondo gradiente */}
-      <div className="absolute inset-0 bg-gradient-to-br from-zinc-950 via-zinc-950 to-zinc-900" />
-      {/* Glow de marca */}
-      <div className="absolute right-0 top-0 h-[500px] w-[500px] rounded-full bg-brand-600/10 blur-3xl" />
-      <div className="absolute -bottom-20 left-0 h-[400px] w-[400px] rounded-full bg-brand-800/8 blur-3xl" />
+    <section className="relative flex min-h-[90vh] flex-col items-center justify-center bg-zinc-950 px-4 text-center">
+      {/* Decorative elements clipped within their own container */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-zinc-950 via-zinc-950 to-zinc-900" />
+        <div className="absolute right-0 top-0 h-[500px] w-[500px] rounded-full bg-brand-600/10 blur-3xl" />
+        <div className="absolute -bottom-20 left-0 h-[400px] w-[400px] rounded-full bg-brand-800/8 blur-3xl" />
+      </div>
 
       {/* Ilustración decorativa — solo desktop */}
       <div
@@ -30,7 +31,7 @@ export function Hero() {
           Standing Desk Premium · Argentina
         </p>
 
-        <h1 className="font-display text-6xl font-bold leading-[1.1] tracking-tight text-white sm:text-7xl lg:text-8xl">
+        <h1 className="font-display text-5xl font-bold leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-8xl">
           Tu escritorio,{" "}
           <span className="bg-gradient-to-r from-brand-300 to-brand-500 bg-clip-text text-transparent">
             hecho a tu medida
@@ -44,7 +45,7 @@ export function Hero() {
 
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button size="xl" asChild className="bg-white text-zinc-900 hover:bg-zinc-100">
-            <Link href="/productos">
+            <Link href="/products">
               Configurar mi escritorio
               <ArrowRight size={20} />
             </Link>

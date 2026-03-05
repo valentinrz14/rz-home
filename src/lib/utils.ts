@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { CartItem, CartItemConfig } from "@/types";
+import type { CartItem, CartItemConfig, TABLE_SIZE } from "@/types";
 import type { PriceTier } from "./prices";
 import {
   BUNDLE_PRICES,
@@ -36,7 +36,7 @@ export function getProductPrice(config: CartItemConfig, tier?: PriceTier): numbe
       return tables[config.tableSize] ?? 0;
     }
     if (config.type === "completo" && config.tableSize) {
-      const s = config.tableSize as "120x60" | "140x70";
+      const s = config.tableSize as typeof TABLE_SIZE.S | typeof TABLE_SIZE.M;
       return isMP ? (BUNDLE_PRICES_SIMPLE_MP[s] ?? 0) : (BUNDLE_PRICES_SIMPLE[s] ?? 0);
     }
     return 0;

@@ -41,7 +41,7 @@ export function CartDrawer() {
               <ShoppingBag size={56} className="text-zinc-200 dark:text-zinc-700" />
               <p className="text-base text-zinc-500 dark:text-zinc-400">Tu carrito está vacío</p>
               <Button variant="outline" size="sm" onClick={closeCart} asChild>
-                <Link href="/productos">Ver productos</Link>
+                <Link href="/products">View products</Link>
               </Button>
             </div>
           ) : (

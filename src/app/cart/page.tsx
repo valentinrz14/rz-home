@@ -23,7 +23,7 @@ export default function CarritoPage() {
           </p>
         </div>
         <Button asChild size="lg">
-          <Link href="/productos">
+          <Link href="/products">
             <ArrowLeft size={18} /> Ver productos
           </Link>
         </Button>
@@ -91,7 +91,7 @@ export default function CarritoPage() {
           </ul>
           <div className="mt-4">
             <Link
-              href="/productos"
+              href="/products"
               className="inline-flex items-center gap-2 text-base text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
             >
               <ArrowLeft size={16} /> Seguir comprando

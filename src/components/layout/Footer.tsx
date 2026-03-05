@@ -37,9 +37,9 @@ export function Footer() {
             <h3 className="text-base font-semibold text-zinc-900 dark:text-white">Productos</h3>
             <ul className="mt-4 space-y-3">
               {[
-                { href: "/productos", label: "Standing Desk Completo" },
-                { href: "/productos?tipo=estructura", label: "Solo Estructura" },
-                { href: "/productos?tipo=tabla", label: "Solo Tapa" },
+                { href: "/products", label: "Complete Standing Desk" },
+                { href: "/products?tipo=estructura", label: "Structure Only" },
+                { href: "/products?tipo=tabla", label: "Tabletop Only" },
               ].map((item) => (
                 <li key={item.href}>
                   <Link

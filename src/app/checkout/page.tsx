@@ -115,7 +115,7 @@ function ShippingStep({
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-6 flex items-center gap-4">
         <Link
-          href="/carrito"
+          href="/cart"
           className="flex items-center gap-2 text-base text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
         >
           <ArrowLeft size={16} /> Volver al carrito
@@ -1090,7 +1090,7 @@ export default function CheckoutPage() {
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4">
         <p className="text-lg text-zinc-600 dark:text-zinc-400">No hay productos en tu carrito.</p>
         <Button asChild variant="outline">
-          <Link href="/productos">
+          <Link href="/products">
             <ArrowLeft size={16} /> Ir a productos
           </Link>
         </Button>

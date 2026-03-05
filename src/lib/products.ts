@@ -1,20 +1,21 @@
 import type { StructureColorOption, TableColorOption, TableSize, TableSizeOption } from "@/types";
+import { TABLE_SIZE } from "@/types";
 
 // ─── Precios transferencia / cripto ───────────────────────────────────────────
 export const STRUCTURE_PRICE = 650_000;
 
 // Redondeado para arriba al próximo múltiplo de $5.000
 export const TABLE_PRICES: Record<TableSize, number> = {
-  "120x60": 100_000,
-  "140x70": 120_000,
-  "160x80": 140_000,
+  [TABLE_SIZE.S]: 100_000,
+  [TABLE_SIZE.M]: 120_000,
+  [TABLE_SIZE.L]: 140_000,
 };
 
 // Redondeado para arriba al próximo múltiplo de $5.000
 export const BUNDLE_PRICES: Record<TableSize, number> = {
-  "120x60": 750_000,
-  "140x70": 770_000,
-  "160x80": 790_000,
+  [TABLE_SIZE.S]: 750_000,
+  [TABLE_SIZE.M]: 770_000,
+  [TABLE_SIZE.L]: 790_000,
 };
 
 // ─── Precios MercadoPago 1 pago ────────────────────────────────────────────────
@@ -22,31 +23,34 @@ export const STRUCTURE_PRICE_MP = 722_000;
 
 // Redondeado para arriba al próximo múltiplo de $5.000
 export const TABLE_PRICES_MP: Record<TableSize, number> = {
-  "120x60": 110_000,
-  "140x70": 130_000,
-  "160x80": 155_000,
+  [TABLE_SIZE.S]: 110_000,
+  [TABLE_SIZE.M]: 130_000,
+  [TABLE_SIZE.L]: 155_000,
 };
 
 // Redondeado para arriba al próximo múltiplo de $5.000
 export const BUNDLE_PRICES_MP: Record<TableSize, number> = {
-  "120x60": 835_000,
-  "140x70": 855_000,
-  "160x80": 880_000,
+  [TABLE_SIZE.S]: 835_000,
+  [TABLE_SIZE.M]: 855_000,
+  [TABLE_SIZE.L]: 880_000,
 };
 
 // ─── Precios motor simple (transferencia / cripto) ────────────────────────────
 export const STRUCTURE_PRICE_SIMPLE = 320_000;
-export const BUNDLE_PRICES_SIMPLE: Record<"120x60" | "140x70", number> = {
-  "120x60": 420_000,
-  "140x70": 459_000,
+export const BUNDLE_PRICES_SIMPLE: Record<typeof TABLE_SIZE.S | typeof TABLE_SIZE.M, number> = {
+  [TABLE_SIZE.S]: 420_000,
+  [TABLE_SIZE.M]: 459_000,
 };
 
 // ─── Precios motor simple MercadoPago 1 pago ──────────────────────────────────
 export const STRUCTURE_PRICE_SIMPLE_MP = 326_400; // 320k * 1.02
-export const BUNDLE_PRICES_SIMPLE_MP: Record<"120x60" | "140x70", number> = {
-  "120x60": 428_400, // 420k * 1.02
-  "140x70": 468_180, // 459k * 1.02
+export const BUNDLE_PRICES_SIMPLE_MP: Record<typeof TABLE_SIZE.S | typeof TABLE_SIZE.M, number> = {
+  [TABLE_SIZE.S]: 428_400, // 420k * 1.02
+  [TABLE_SIZE.M]: 468_180, // 459k * 1.02
 };
+
+// ─── Precios de referencia de competencia ──────────────────────────────────────
+export const COMPETITOR_PRICE = 1_400_000;
 
 // ─── Opciones de colores de tabla ─────────────────────────────────────────────
 export const TABLE_COLORS: TableColorOption[] = [
@@ -88,28 +92,28 @@ export const TABLE_COLORS: TableColorOption[] = [
 // ─── Opciones de tamaño de tabla ──────────────────────────────────────────────
 export const TABLE_SIZES: TableSizeOption[] = [
   {
-    id: "120x60",
+    id: TABLE_SIZE.S,
     label: "120 × 60 cm",
     width: 120,
     depth: 60,
-    price: TABLE_PRICES["120x60"],
-    bundlePrice: BUNDLE_PRICES["120x60"],
+    price: TABLE_PRICES[TABLE_SIZE.S],
+    bundlePrice: BUNDLE_PRICES[TABLE_SIZE.S],
   },
   {
-    id: "140x70",
+    id: TABLE_SIZE.M,
     label: "140 × 70 cm",
     width: 140,
     depth: 70,
-    price: TABLE_PRICES["140x70"],
-    bundlePrice: BUNDLE_PRICES["140x70"],
+    price: TABLE_PRICES[TABLE_SIZE.M],
+    bundlePrice: BUNDLE_PRICES[TABLE_SIZE.M],
   },
   {
-    id: "160x80",
+    id: TABLE_SIZE.L,
     label: "160 × 80 cm",
     width: 160,
     depth: 80,
-    price: TABLE_PRICES["160x80"],
-    bundlePrice: BUNDLE_PRICES["160x80"],
+    price: TABLE_PRICES[TABLE_SIZE.L],
+    bundlePrice: BUNDLE_PRICES[TABLE_SIZE.L],
   },
 ];
 

@@ -30,12 +30,12 @@ export const metadata: Metadata = {
     template: "%s | rz room",
   },
   description:
-    "Standing desks con doble motor silencioso y tapas MDF premium de 36mm. Personalizá tu escritorio: 3 medidas, 6 colores. Envío Andreani a todo el país.",
+    "Standing desks eléctricos con tapas MDF premium de 36mm. Dos modelos: motor simple desde $420.000 y doble motor desde $750.000. 3 medidas, 6 colores. Envío Andreani a todo el país.",
   keywords: [
     "standing desk",
     "escritorio regulable en altura",
     "standing desk Argentina",
-    "escritorio electrico doble motor",
+    "escritorio electrico",
     "escritorio de pie",
     "home office",
     "escritorio regulable",
@@ -43,6 +43,8 @@ export const metadata: Metadata = {
     "escritorio MDF",
     "rz room",
     "standing desk doble motor",
+    "standing desk motor simple",
+    "escritorio electrico barato argentina",
   ],
   authors: [{ name: "rz room" }],
   creator: "rz room",
@@ -62,7 +64,7 @@ export const metadata: Metadata = {
     siteName: "rz room",
     title: "rz room — Standing Desks Premium en Argentina",
     description:
-      "Standing desks con doble motor silencioso y tapas MDF premium de 36mm. Personalizá tu escritorio ideal. Envío a todo el país.",
+      "Standing desks eléctricos con tapas MDF premium de 36mm. Motor simple desde $420.000 o doble motor desde $750.000. Personalizá el tuyo y recibilo en todo el país.",
     images: [
       {
         url: "/og-image.jpg",
@@ -76,7 +78,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "rz room — Standing Desks Premium en Argentina",
     description:
-      "Personalizá tu standing desk: 3 medidas, 6 colores, doble motor. Envío a todo el país.",
+      "Standing desks eléctricos desde $420.000. Motor simple o doble motor, 3 medidas, 6 colores. Envío a todo el país.",
     images: ["/og-image.jpg"],
   },
   robots: {
@@ -117,7 +119,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@type": "Store",
               name: "rz room",
               description:
-                "Tienda de standing desks premium con doble motor y tapas MDF en Argentina",
+                "Tienda de standing desks eléctricos con tapas MDF premium en Argentina. Motor simple y doble motor.",
               url: SITE_URL,
               logo: `${SITE_URL}/logo.png`,
               address: { "@type": "PostalAddress", addressCountry: "AR" },

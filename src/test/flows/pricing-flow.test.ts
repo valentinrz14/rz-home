@@ -12,6 +12,7 @@
 import { describe, expect, it } from "vitest";
 import {
   BUNDLE_PRICES,
+  COMPETITOR_PRICE,
   STRUCTURE_COLORS,
   STRUCTURE_PRICE,
   TABLE_COLORS,
@@ -138,7 +139,6 @@ describe("catalog price invariants", () => {
   });
 
   it("all prices are cheaper than competitor ($1,400,000)", () => {
-    const COMPETITOR_PRICE = 1_400_000;
     TABLE_SIZES.forEach((size) => {
       expect(BUNDLE_PRICES[size.id]).toBeLessThan(COMPETITOR_PRICE);
     });

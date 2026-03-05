@@ -11,6 +11,7 @@ import { getWhatsappNumber } from "@/lib/env";
 import { getPrices } from "@/lib/prices";
 import { TABLE_COLORS, TABLE_SIZES } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
+import { TABLE_SIZE } from "@/types";
 
 // ─── Componente de cierre de sesión (cliente) ─────────────────────────────────
 import { AdminLogoutButton } from "./LogoutButton";
@@ -71,12 +72,12 @@ export default async function AdminPage() {
             },
             {
               label: "Bundle transferencia desde",
-              value: formatPrice(prices.transfer.bundles["120x60"]),
+              value: formatPrice(prices.transfer.bundles[TABLE_SIZE.S]),
               icon: ShoppingCart,
             },
             {
               label: "Bundle MP desde",
-              value: formatPrice(prices.mp_one.bundles["120x60"]),
+              value: formatPrice(prices.mp_one.bundles[TABLE_SIZE.S]),
               icon: DollarSign,
             },
             { label: "Colores de tapa", value: `${TABLE_COLORS.length} opciones`, icon: Package },

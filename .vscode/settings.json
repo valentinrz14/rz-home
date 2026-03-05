@@ -15,5 +15,8 @@
   "[json]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "prettier.enable": false
+  "prettier.enable": false,
+  "chat.tools.terminal.autoApprove": {
+    "npx tsc": true
+  }
 }

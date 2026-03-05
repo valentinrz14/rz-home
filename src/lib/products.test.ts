@@ -4,6 +4,7 @@ import {
   BUNDLE_PRICES,
   BUNDLE_PRICES_SIMPLE,
   BUNDLE_PRICES_SIMPLE_MP,
+  COMPETITOR_PRICE,
   STRUCTURE_COLORS,
   STRUCTURE_PRICE,
   STRUCTURE_PRICE_SIMPLE,
@@ -91,7 +92,6 @@ describe("prices", () => {
   });
 
   it("all bundles are cheaper than competitor price ($1,400,000)", () => {
-    const COMPETITOR_PRICE = 1_400_000;
     Object.values(BUNDLE_PRICES).forEach((bundlePrice) => {
       expect(bundlePrice).toBeLessThan(COMPETITOR_PRICE);
     });

@@ -7,6 +7,7 @@ import type { PricesConfig } from "@/lib/prices";
 import { BUNDLE_PRICES_SIMPLE } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 import type { StructureColor } from "@/types";
+import { TABLE_SIZE } from "@/types";
 
 const productDefs = [
   {
@@ -15,9 +16,9 @@ const productDefs = [
     title: "Standing Desk Doble Motor",
     description:
       "La opción más potente y silenciosa. Disponible como escritorio completo, solo estructura o solo tapa.",
-    getPrice: (p: PricesConfig) => p.transfer.bundles["120x60"],
+    getPrice: (p: PricesConfig) => p.transfer.bundles[TABLE_SIZE.S],
     priceLabel: "completo desde",
-    href: "/productos?motor=doble",
+    href: "/products?motor=doble",
     highlight: true,
     illustration: {
       structureColor: "negro" as StructureColor,
@@ -38,9 +39,9 @@ const productDefs = [
     title: "Standing Desk Motor Simple",
     description:
       "La opción accesible para empezar con ergonomía ajustable. Completo, solo estructura o solo tapa.",
-    getPrice: (_p: PricesConfig) => BUNDLE_PRICES_SIMPLE["120x60"],
+    getPrice: (_p: PricesConfig) => BUNDLE_PRICES_SIMPLE[TABLE_SIZE.S],
     priceLabel: "completo desde",
-    href: "/productos?motor=simple",
+    href: "/products?motor=simple",
     highlight: false,
     illustration: {
       structureColor: "blanco" as StructureColor,
@@ -197,7 +198,7 @@ export function ProductShowcase({ prices }: Props) {
           {[
             {
               title: "Elegí el Doble Motor si…",
-              href: "/productos?motor=doble",
+              href: "/products?motor=doble",
               items: [
                 "Usás el escritorio 8+ horas por día",
                 "Tenés monitors pesados o múltiples periféricos",
@@ -209,7 +210,7 @@ export function ProductShowcase({ prices }: Props) {
             },
             {
               title: "Elegí el Motor Simple si…",
-              href: "/productos?motor=simple",
+              href: "/products?motor=simple",
               items: [
                 "Es tu primer standing desk",
                 "Usás monitor estándar y accesorios ligeros",

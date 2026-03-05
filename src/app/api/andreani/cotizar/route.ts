@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getAndreaniCredentials } from "@/lib/env";
 import type { MotorType, ProductType, TableSize } from "@/types";
+import { TABLE_SIZE } from "@/types";
 
 // ── Peso y dimensiones estimadas por tipo/tamaño de producto ─────────────────
 
@@ -34,9 +35,9 @@ const ESTRUCTURA_SPEC_BASE = { kilos: 35, largo: 125, ancho: 65, alto: 25 };
 const ESTRUCTURA_SPEC_SIMPLE = { kilos: 20, largo: 125, ancho: 65, alto: 25 };
 const TABLA_DIMS: Record<TableSize, { kilos: number; largo: number; ancho: number; alto: number }> =
   {
-    "120x60": { kilos: 18, largo: 125, ancho: 65, alto: 8 },
-    "140x70": { kilos: 22, largo: 145, ancho: 75, alto: 8 },
-    "160x80": { kilos: 30, largo: 165, ancho: 85, alto: 8 },
+    [TABLE_SIZE.S]: { kilos: 18, largo: 125, ancho: 65, alto: 8 },
+    [TABLE_SIZE.M]: { kilos: 22, largo: 145, ancho: 75, alto: 8 },
+    [TABLE_SIZE.L]: { kilos: 30, largo: 165, ancho: 85, alto: 8 },
   };
 
 interface CartItemInput {
@@ -49,7 +50,7 @@ interface CartItemInput {
 
 function buildBultos(items: CartItemInput[]): BultoSpec[] {
   return items.flatMap((item) => {
-    const size = item.size ?? "140x70";
+    const size = item.size ?? TABLE_SIZE.M;
     const bultos: BultoSpec[] = [];
 
     for (let i = 0; i < item.quantity; i++) {

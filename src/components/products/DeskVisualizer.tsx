@@ -2,6 +2,7 @@
 
 import { STRUCTURE_COLORS, TABLE_COLORS } from "@/lib/products";
 import type { StructureColor, TableColor, TableSize } from "@/types";
+import { TABLE_SIZE } from "@/types";
 
 interface Props {
   tableColor: TableColor;
@@ -23,12 +24,12 @@ export function DeskVisualizer({
 
   // Ancho proporcional al tamaño elegido
   const sizeWidths: Record<TableSize, number> = {
-    "120x60": 240,
-    "140x70": 280,
-    "160x80": 320,
+    [TABLE_SIZE.S]: 240,
+    [TABLE_SIZE.M]: 280,
+    [TABLE_SIZE.L]: 320,
   };
   const tableWidth = sizeWidths[tableSize];
-  const tableDepth = tableSize.includes("80") ? 80 : tableSize.includes("70") ? 70 : 60;
+  const tableDepth = tableSize === TABLE_SIZE.L ? 80 : tableSize === TABLE_SIZE.M ? 70 : 60;
   // Representación 3/4 view: profundidad visual
   const tableVisualDepth = Math.round(tableDepth * 0.35);
 
