@@ -12,7 +12,8 @@ export async function GET() {
   const stock = await getStock();
   return NextResponse.json(stock, {
     headers: {
-      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+      // No CDN caching — overrides must take effect immediately
+      "Cache-Control": "no-store",
     },
   });
 }

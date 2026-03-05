@@ -1,6 +1,7 @@
 import { Redis } from "@upstash/redis";
 
 const STOCK_KEY = "stock:status";
+const OVERRIDES_KEY = "stock:overrides";
 const CACHE_TTL_SECONDS = 60 * 60 * 2; // 2 h — safety net if cron misses
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -28,69 +29,52 @@ export const STOCK_DEFAULT: StockStatus = {
   simple: { negro: null },
 };
 
-// ─── Amazon URLs (configurable via env) ───────────────────────────────────────
-
-function amazonUrls() {
-  return {
-    simpleNegro:
-      process.env.AMAZON_SIMPLE_NEGRO_URL ?? "https://www.amazon.com/-/es/dp/B0DL589QC3?th=1",
-    dobleNegro:
-      process.env.AMAZON_DOBLE_NEGRO_URL ?? "https://www.amazon.com/-/es/dp/B0DL58KZWN?th=1",
-    // White variant URL — set AMAZON_DOBLE_BLANCO_URL in env with the correct th= value
-    dobleBlanco: process.env.AMAZON_DOBLE_BLANCO_URL ?? "",
-  };
+/**
+ * Manual overrides set from the admin panel.
+ * null  → use scraped value (auto)
+ * true  → force in stock
+ * false → force out of stock
+ */
+export interface StockOverrides {
+  doble_negro: boolean | null;
+  doble_blanco: boolean | null;
+  simple_negro: boolean | null;
 }
+
+export const OVERRIDES_DEFAULT: StockOverrides = {
+  doble_negro: null,
+  doble_blanco: null,
+  simple_negro: null,
+};
+
+// ─── Amazon ASINs ─────────────────────────────────────────────────────────────
+
+const AMAZON_URLS = {
+  simpleNegro: "https://www.amazon.com/-/es/dp/B0DL589QC3?th=1",
+  dobleNegro: "https://www.amazon.com/-/es/dp/B0DL58KZWN?th=1",
+  dobleBlanco: "https://www.amazon.com/-/es/dp/B0DL59HC2G",
+};
 
 // ─── Scraper ──────────────────────────────────────────────────────────────────
 
 async function fetchAmazonStock(url: string): Promise<boolean | null> {
   if (!url) return null;
 
-  try {
-    const res = await fetch(url, {
-      // Realistic desktop browser headers to reduce block rate
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "es-AR,es;q=0.9,en-US;q=0.8,en;q=0.7",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-      },
-      // Disable Next.js fetch cache
-      cache: "no-store",
-    });
+  const key = process.env.SCRAPER_API_KEY;
+  const fetchUrl = `http://api.scraperapi.com?api_key=${key}&url=${encodeURIComponent(url)}&country_code=us`;
 
+  try {
+    const res = await fetch(fetchUrl, { cache: "no-store" });
     if (!res.ok) return null;
 
     const html = await res.text();
 
-    // If Amazon is blocking us (CAPTCHA page or empty response) → unknown
-    if (
-      html.length < 5_000 ||
-      html.includes("api-services-support@amazon.com") ||
-      html.includes("Enter the characters you see below") ||
-      html.includes("automated access") ||
-      html.includes("robot check")
-    ) {
-      return null;
-    }
-
-    // Extract the availability section (most reliable signal)
+    // Extract the availability section
     const availMatch = html.match(/<div[^>]+id="availability"[^>]*>([\s\S]*?)<\/div>/i);
     const availText = availMatch?.[1] ?? html;
 
-    // "No disponible por el momento. No sabemos si este producto volverá a estar
-    // disponible, ni cuándo." — permanently discontinued, check full HTML too
-    const discontinuedInHtml =
-      /no sabemos si este producto volverá a estar disponible/i.test(html) ||
-      /we don't know when or if this item will be back in stock/i.test(html);
-
     const outOfStock =
-      discontinuedInHtml ||
-      /actualmente no disponible|no disponible|sin existencias|currently unavailable|out of stock|temporalmente no disponible/i.test(
+      /no sabemos si este producto volverá a estar disponible|we don't know when or if this item will be back in stock|actualmente no disponible|no disponible|sin existencias|currently unavailable|out of stock|temporalmente no disponible/i.test(
         availText
       );
 
@@ -112,42 +96,80 @@ function getRedis() {
   return Redis.fromEnv();
 }
 
+/** Merges manual overrides on top of a scraped status (override wins when not null). */
+function applyOverrides(status: StockStatus, overrides: StockOverrides): StockStatus {
+  return {
+    ...status,
+    doble: {
+      negro: overrides.doble_negro !== null ? overrides.doble_negro : status.doble.negro,
+      blanco: overrides.doble_blanco !== null ? overrides.doble_blanco : status.doble.blanco,
+    },
+    simple: {
+      negro: overrides.simple_negro !== null ? overrides.simple_negro : status.simple.negro,
+    },
+  };
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /** Fetches Amazon pages and stores the result in Redis. Called by the cron job. */
 export async function refreshStock(): Promise<StockStatus> {
-  const urls = amazonUrls();
-
   const [simpleNegro, dobleNegro, dobleBlanco] = await Promise.all([
-    fetchAmazonStock(urls.simpleNegro),
-    fetchAmazonStock(urls.dobleNegro),
-    fetchAmazonStock(urls.dobleBlanco),
+    fetchAmazonStock(AMAZON_URLS.simpleNegro),
+    fetchAmazonStock(AMAZON_URLS.dobleNegro),
+    fetchAmazonStock(AMAZON_URLS.dobleBlanco),
   ]);
 
-  const status: StockStatus = {
+  const scraped: StockStatus = {
     lastChecked: new Date().toISOString(),
     simple: { negro: simpleNegro },
     doble: { negro: dobleNegro, blanco: dobleBlanco },
   };
 
   try {
-    await getRedis().set(STOCK_KEY, status, { ex: CACHE_TTL_SECONDS });
+    const redis = getRedis();
+    await redis.set(STOCK_KEY, scraped, { ex: CACHE_TTL_SECONDS });
   } catch {
     // Redis unavailable (e.g. local dev without credentials) — continue
   }
 
-  return status;
+  return scraped;
 }
 
-/** Returns the last known stock status from Redis, or STOCK_DEFAULT if unavailable. */
+/** Returns the last known stock status from Redis with overrides applied. */
 export async function getStock(): Promise<StockStatus> {
   try {
-    const cached = await getRedis().get<StockStatus>(STOCK_KEY);
-    if (cached) return cached;
+    const redis = getRedis();
+    const [cached, overrides] = await Promise.all([
+      redis.get<StockStatus>(STOCK_KEY),
+      redis.get<StockOverrides>(OVERRIDES_KEY),
+    ]);
+    const status = cached ?? STOCK_DEFAULT;
+    return applyOverrides(status, overrides ?? OVERRIDES_DEFAULT);
   } catch {
     // Redis unavailable
   }
   return STOCK_DEFAULT;
+}
+
+/** Returns the current manual overrides from Redis. */
+export async function getStockOverrides(): Promise<StockOverrides> {
+  try {
+    const overrides = await getRedis().get<StockOverrides>(OVERRIDES_KEY);
+    return { ...OVERRIDES_DEFAULT, ...overrides };
+  } catch {
+    return OVERRIDES_DEFAULT;
+  }
+}
+
+/** Persists a single override. Pass null to remove (revert to auto/scraped). */
+export async function setStockOverride(
+  variant: keyof StockOverrides,
+  value: boolean | null
+): Promise<void> {
+  const redis = getRedis();
+  const current = await getStockOverrides();
+  await redis.set(OVERRIDES_KEY, { ...current, [variant]: value });
 }
 
 // ─── Stock check helpers (shared between server and client logic) ─────────────

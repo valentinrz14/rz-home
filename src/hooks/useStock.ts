@@ -9,7 +9,7 @@ export function useStock(): { stock: StockStatus; loading: boolean } {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/stock")
+    fetch("/api/stock", { cache: "no-store" })
       .then((r) => (r.ok ? (r.json() as Promise<StockStatus>) : null))
       .then((data) => {
         if (data) setStock(data);

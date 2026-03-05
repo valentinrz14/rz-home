@@ -48,7 +48,7 @@ const productDefs = [
     href: "/products?motor=simple",
     highlight: false,
     illustration: {
-      structureColor: "blanco" as StructureColor,
+      structureColor: "negro" as StructureColor,
       withTabletop: true,
       tableColorHex: HICKORY_HEX,
     },

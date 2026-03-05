@@ -207,27 +207,28 @@ export function ProductConfigurator({
             {availableStructureColors.map((color) => {
               const colorOOS =
                 motorType === "doble" && stock?.doble[color.id as "negro" | "blanco"] === false;
+              const isSelected = structureColor === color.id;
               return (
                 <button
                   key={color.id}
                   type="button"
                   onClick={() => {
-                    if (colorOOS) return;
                     setStructureColor(color.id);
                     onStructureColorChange?.(color.id);
                   }}
                   title={colorOOS ? `${color.name} — Sin stock` : color.name}
-                  disabled={colorOOS}
                   className={`relative flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all ${
-                    colorOOS
-                      ? "cursor-not-allowed opacity-40"
-                      : structureColor === color.id
-                        ? "border-brand-500 scale-110"
-                        : "border-zinc-200 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-500"
+                    colorOOS && isSelected
+                      ? "scale-110 border-red-500"
+                      : colorOOS
+                        ? "border-red-400/50 opacity-70 hover:opacity-100"
+                        : isSelected
+                          ? "scale-110 border-brand-500"
+                          : "border-zinc-200 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-500"
                   }`}
                   style={{ backgroundColor: color.hex }}
                 >
-                  {structureColor === color.id && !colorOOS && (
+                  {isSelected && !colorOOS && (
                     <Check
                       size={16}
                       className={color.id === "blanco" ? "text-zinc-900" : "text-white"}
