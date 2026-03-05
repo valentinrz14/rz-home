@@ -1,11 +1,11 @@
 /**
  * checkout-flow.test.ts
  *
- * Flujos de checkout de punta a punta:
- * - Llamada a la API /api/mercadopago/preference (mock)
- * - Validación de los datos enviados
- * - Respuesta correcta / manejo de errores
- * - Construcción del payload desde el estado del carrito
+ * End-to-end checkout flows:
+ * - POST /api/mercadopago/preference API call (mock)
+ * - Validation of sent data
+ * - Successful response / error handling
+ * - Payload construction from cart state
  */
 
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from "vitest";
@@ -41,7 +41,7 @@ const DEFAULT_PAYER = {
   address: { street_name: "Av. Corrientes 1234", street_number: "0", zip_code: "1043" },
 };
 
-// ─── Mock de fetch ────────────────────────────────────────────────────────────
+// ─── Fetch mock ───────────────────────────────────────────────────────────────
 
 let fetchMock: MockInstance;
 
@@ -55,11 +55,11 @@ afterEach(() => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 1. CONSTRUCCIÓN DEL PAYLOAD
+// 1. PAYLOAD CONSTRUCTION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("construcción del payload de checkout", () => {
-  it("items del carrito se mapean correctamente al formato MercadoPago", () => {
+describe("checkout payload construction", () => {
+  it("cart items are correctly mapped to MercadoPago format", () => {
     useCartStore.getState().addItem({
       type: "completo",
       tableSize: "160x80",
@@ -80,7 +80,7 @@ describe("construcción del payload de checkout", () => {
     });
   });
 
-  it("precio unitario en el payload coincide con el catálogo", () => {
+  it("unit price in payload matches catalog", () => {
     useCartStore.getState().addItem({
       type: "completo",
       tableSize: "160x80",
@@ -92,13 +92,13 @@ describe("construcción del payload de checkout", () => {
     expect(item?.unit_price).toBe(BUNDLE_PRICES["160x80"]);
   });
 
-  it("estructura sola tiene el precio correcto en el payload", () => {
+  it("structure alone has correct price in payload", () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
     const [item] = buildMpItems();
     expect(item?.unit_price).toBe(STRUCTURE_PRICE);
   });
 
-  it("tapa sola tiene precio correcto para cada medida", () => {
+  it("table alone has correct price for each size", () => {
     const sizes: TableSize[] = ["120x60", "140x70", "160x80"];
     sizes.forEach((size) => {
       resetCart();
@@ -108,7 +108,7 @@ describe("construcción del payload de checkout", () => {
     });
   });
 
-  it("cantidad en el payload refleja la cantidad del carrito", () => {
+  it("quantity in payload reflects cart quantity", () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
@@ -117,10 +117,10 @@ describe("construcción del payload de checkout", () => {
     expect(item?.quantity).toBe(3);
   });
 
-  it("payload total suma correctamente múltiples ítems con distintas cantidades", () => {
+  it("payload total correctly sums multiple items with different quantities", () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
-    const estructuraId = useCartStore.getState().items[0]!.id;
-    useCartStore.getState().updateQuantity(estructuraId, 2);
+    const structureId = useCartStore.getState().items[0]!.id;
+    useCartStore.getState().updateQuantity(structureId, 2);
 
     useCartStore.getState().addItem({
       type: "completo",
@@ -136,11 +136,11 @@ describe("construcción del payload de checkout", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 2. LLAMADA A LA API (mock fetch)
+// 2. API CALL (mock fetch)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("llamada a la API de preferencia", () => {
-  it("llama a POST /api/mercadopago/preference con body correcto", async () => {
+describe("preference API call", () => {
+  it("calls POST /api/mercadopago/preference with correct body", async () => {
     useCartStore.getState().addItem({
       type: "completo",
       tableSize: "160x80",
@@ -187,7 +187,7 @@ describe("llamada a la API de preferencia", () => {
     expect(body.payer.email).toBe("juan.perez@test.com");
   });
 
-  it("devuelve preferenceId e initPoint en respuesta exitosa", async () => {
+  it("returns preferenceId and initPoint on successful response", async () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
 
     const mockResponse = {
@@ -208,7 +208,7 @@ describe("llamada a la API de preferencia", () => {
     expect(data.initPoint).toContain("mercadopago");
   });
 
-  it("maneja errores del servidor correctamente (500)", async () => {
+  it("handles server errors correctly (500)", async () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
 
     fetchMock.mockResolvedValueOnce(
@@ -230,7 +230,7 @@ describe("llamada a la API de preferencia", () => {
     expect(data.error).toBeTruthy();
   });
 
-  it("maneja error de red (fetch falla)", async () => {
+  it("handles network error (fetch throws)", async () => {
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
 
     fetchMock.mockRejectedValueOnce(new Error("Network error"));
@@ -250,8 +250,8 @@ describe("llamada a la API de preferencia", () => {
     expect(caught?.message).toBe("Network error");
   });
 
-  it("no llama a la API si el carrito está vacío (validación de frontend)", () => {
-    // El carrito está vacío, el frontend no debería llamar a la API
+  it("does not call the API if cart is empty (frontend validation)", () => {
+    // Cart is empty, frontend should not call the API
     const mpItems = buildMpItems();
     expect(mpItems).toHaveLength(0);
     expect(fetchMock).not.toHaveBeenCalled();
@@ -259,11 +259,11 @@ describe("llamada a la API de preferencia", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 3. VALIDACIÓN DE DATOS DEL COMPRADOR
+// 3. BUYER DATA VALIDATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("validación de datos del comprador", () => {
-  it("datos del comprador tienen todos los campos requeridos", () => {
+describe("buyer data validation", () => {
+  it("buyer data has all required fields", () => {
     const payer = buildPayer();
 
     expect(payer.name).toBeTruthy();
@@ -275,21 +275,21 @@ describe("validación de datos del comprador", () => {
     expect(payer.address.zip_code).toBeTruthy();
   });
 
-  it("email inválido no pasa validación básica", () => {
+  it("invalid email does not pass basic validation", () => {
     const invalidEmails = ["noarroba", "falta@", "@sindominio", ""];
     invalidEmails.forEach((email) => {
       expect(email).not.toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
     });
   });
 
-  it("email válido pasa validación básica", () => {
+  it("valid email passes basic validation", () => {
     const validEmails = ["juan@ejemplo.com", "maria.garcia@empresa.com.ar", "test+tag@domain.org"];
     validEmails.forEach((email) => {
       expect(email).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
     });
   });
 
-  it("payer con email de comprador de prueba MP es válido", () => {
+  it("payer with MP test buyer email is valid", () => {
     const testBuyerEmail = "test_user_123456@testuser.com";
     const payer = buildPayer({ email: testBuyerEmail });
     expect(payer.email).toBe(testBuyerEmail);
@@ -298,12 +298,12 @@ describe("validación de datos del comprador", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 4. FLUJO COMPLETO: carrito → payload → API → redirección
+// 4. FULL FLOW: cart → payload → API → redirect
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("flujo completo checkout de punta a punta", () => {
-  it("flujo: agrega bundle + estructura → construye payload → llama API → recibe initPoint", async () => {
-    // 1. Usuario agrega productos
+describe("full end-to-end checkout flow", () => {
+  it("flow: add bundle + structure → build payload → call API → receive initPoint", async () => {
+    // 1. User adds products
     useCartStore.getState().addItem({
       type: "completo",
       tableSize: "160x80",
@@ -315,13 +315,13 @@ describe("flujo completo checkout de punta a punta", () => {
     const items = useCartStore.getState().items;
     expect(items).toHaveLength(2);
 
-    // 2. Construir payload
+    // 2. Build payload
     const mpItems = buildMpItems();
     expect(mpItems).toHaveLength(2);
     expect(mpItems[0]?.unit_price).toBe(BUNDLE_PRICES["160x80"]);
     expect(mpItems[1]?.unit_price).toBe(STRUCTURE_PRICE);
 
-    // 3. Llamada a la API
+    // 3. API call
     const mockInitPoint =
       "https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=test-123";
     fetchMock.mockResolvedValueOnce(
@@ -336,21 +336,21 @@ describe("flujo completo checkout de punta a punta", () => {
       body: JSON.stringify({ items: mpItems, payer: buildPayer() }),
     });
 
-    // 4. Verificar respuesta
+    // 4. Verify response
     expect(res.ok).toBe(true);
     const { initPoint } = (await res.json()) as { initPoint: string };
     expect(initPoint).toBe(mockInitPoint);
 
-    // 5. Verificar que el initPoint es una URL válida
+    // 5. Verify initPoint is a valid URL
     expect(() => new URL(initPoint)).not.toThrow();
     expect(new URL(initPoint).hostname).toContain("mercadopago");
   });
 
-  it("flujo: carrito con múltiples cantidades → total correcto en payload", async () => {
-    // Estructura x2
+  it("flow: cart with multiple quantities → correct total in payload", async () => {
+    // Structure x2
     useCartStore.getState().addItem({ type: "estructura", structureColor: "negro" });
-    const estructuraId = useCartStore.getState().items[0]!.id;
-    useCartStore.getState().updateQuantity(estructuraId, 2);
+    const structureId = useCartStore.getState().items[0]!.id;
+    useCartStore.getState().updateQuantity(structureId, 2);
 
     // Bundle x1
     useCartStore.getState().addItem({
@@ -366,7 +366,7 @@ describe("flujo completo checkout de punta a punta", () => {
     const expectedTotal = STRUCTURE_PRICE * 2 + BUNDLE_PRICES["120x60"];
     expect(totalPayload).toBe(expectedTotal);
 
-    // API responde con preferencia
+    // API responds with preference
     fetchMock.mockResolvedValueOnce(
       new Response(
         JSON.stringify({

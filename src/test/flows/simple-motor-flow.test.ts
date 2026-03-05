@@ -1,12 +1,12 @@
 /**
  * simple-motor-flow.test.ts
  *
- * Flujos de punta a punta para el producto Standing Desk Motor Simple:
- * - Precios transfer y MercadoPago
- * - Carrito: agregar, deduplicar, totales
- * - IDs únicos: motor simple vs doble no colisionan
- * - Nombres de producto
- * - Invariantes de negocio específicos del motor simple
+ * End-to-end flows for the Standing Desk Single Motor product:
+ * - Transfer and MercadoPago prices
+ * - Cart: add, deduplication, totals
+ * - Unique IDs: single motor vs dual motor do not collide
+ * - Product names
+ * - Business invariants specific to single motor
  */
 
 import { beforeEach, describe, expect, it } from "vitest";
@@ -54,7 +54,7 @@ function addSimpleStructure(color: StructureColor = "negro") {
     .addItem({ type: "estructura", motorType: "simple", structureColor: color });
 }
 
-function addDobleBundle(
+function addDualBundle(
   size: "120x60" | "140x70",
   structureColor: StructureColor = "negro",
   tableColor: TableColor = "hickory"
@@ -69,48 +69,48 @@ function addDobleBundle(
 beforeEach(resetCart);
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 1. PRECIOS TRANSFER
+// 1. TRANSFER PRICES
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("getProductPrice — motor simple (transfer)", () => {
-  it("estructura motor simple tiene precio STRUCTURE_PRICE_SIMPLE", () => {
+describe("getProductPrice — single motor (transfer)", () => {
+  it("single motor structure has STRUCTURE_PRICE_SIMPLE price", () => {
     expect(getProductPrice({ type: "estructura", motorType: "simple" })).toBe(
       STRUCTURE_PRICE_SIMPLE
     );
   });
 
-  it("estructura motor simple es más barata que doble motor", () => {
+  it("single motor structure is cheaper than dual motor", () => {
     const simple = getProductPrice({ type: "estructura", motorType: "simple" });
-    const doble = getProductPrice({ type: "estructura", motorType: "doble" });
-    expect(simple).toBeLessThan(doble);
+    const dual = getProductPrice({ type: "estructura", motorType: "doble" });
+    expect(simple).toBeLessThan(dual);
   });
 
-  it("bundle 120x60 motor simple tiene precio correcto", () => {
+  it("120x60 single motor bundle has correct price", () => {
     expect(getProductPrice({ type: "completo", motorType: "simple", tableSize: "120x60" })).toBe(
       BUNDLE_PRICES_SIMPLE["120x60"]
     );
   });
 
-  it("bundle 140x70 motor simple tiene precio correcto", () => {
+  it("140x70 single motor bundle has correct price", () => {
     expect(getProductPrice({ type: "completo", motorType: "simple", tableSize: "140x70" })).toBe(
       BUNDLE_PRICES_SIMPLE["140x70"]
     );
   });
 
-  it("tapa motor simple tiene el mismo precio que doble motor (tapas compartidas)", () => {
-    const sizesPairs: Array<"120x60" | "140x70"> = ["120x60", "140x70"];
-    sizesPairs.forEach((size) => {
+  it("single motor table has the same price as dual motor (shared tables)", () => {
+    const sizes: Array<"120x60" | "140x70"> = ["120x60", "140x70"];
+    sizes.forEach((size) => {
       expect(getProductPrice({ type: "tabla", motorType: "simple", tableSize: size })).toBe(
         TABLE_PRICES[size]
       );
     });
   });
 
-  it("devuelve 0 para bundle simple sin medida", () => {
+  it("returns 0 for single motor bundle without size", () => {
     expect(getProductPrice({ type: "completo", motorType: "simple" })).toBe(0);
   });
 
-  it("el precio no cambia con distintos colores de estructura o tapa", () => {
+  it("price does not change with different structure or table colors", () => {
     const structureColors: StructureColor[] = ["negro", "blanco"];
     const tableColors: TableColor[] = ["hickory", "negro", "blanco"];
     structureColors.forEach((sc) => {
@@ -130,39 +130,39 @@ describe("getProductPrice — motor simple (transfer)", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 2. PRECIOS MERCADOPAGO
+// 2. MERCADOPAGO PRICES
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("getProductPrice — motor simple (MercadoPago)", () => {
+describe("getProductPrice — single motor (MercadoPago)", () => {
   const mpTier = {
     structure: STRUCTURE_PRICE + 1,
     tables: TABLE_PRICES,
     bundles: BUNDLE_PRICES,
   };
 
-  it("estructura motor simple con tier MP devuelve STRUCTURE_PRICE_SIMPLE_MP", () => {
+  it("single motor structure with MP tier returns STRUCTURE_PRICE_SIMPLE_MP", () => {
     expect(getProductPrice({ type: "estructura", motorType: "simple" }, mpTier)).toBe(
       STRUCTURE_PRICE_SIMPLE_MP
     );
   });
 
-  it("STRUCTURE_PRICE_SIMPLE_MP es mayor que STRUCTURE_PRICE_SIMPLE", () => {
+  it("STRUCTURE_PRICE_SIMPLE_MP is greater than STRUCTURE_PRICE_SIMPLE", () => {
     expect(STRUCTURE_PRICE_SIMPLE_MP).toBeGreaterThan(STRUCTURE_PRICE_SIMPLE);
   });
 
-  it("bundle 120x60 motor simple con tier MP devuelve precio MP correcto", () => {
+  it("120x60 single motor bundle with MP tier returns correct MP price", () => {
     expect(
       getProductPrice({ type: "completo", motorType: "simple", tableSize: "120x60" }, mpTier)
     ).toBe(BUNDLE_PRICES_SIMPLE_MP["120x60"]);
   });
 
-  it("bundle 140x70 motor simple con tier MP devuelve precio MP correcto", () => {
+  it("140x70 single motor bundle with MP tier returns correct MP price", () => {
     expect(
       getProductPrice({ type: "completo", motorType: "simple", tableSize: "140x70" }, mpTier)
     ).toBe(BUNDLE_PRICES_SIMPLE_MP["140x70"]);
   });
 
-  it("precio MP simple es siempre mayor que precio transfer simple", () => {
+  it("single motor MP price is always greater than transfer price", () => {
     expect(STRUCTURE_PRICE_SIMPLE_MP).toBeGreaterThan(STRUCTURE_PRICE_SIMPLE);
     expect(BUNDLE_PRICES_SIMPLE_MP["120x60"]).toBeGreaterThan(BUNDLE_PRICES_SIMPLE["120x60"]);
     expect(BUNDLE_PRICES_SIMPLE_MP["140x70"]).toBeGreaterThan(BUNDLE_PRICES_SIMPLE["140x70"]);
@@ -170,11 +170,11 @@ describe("getProductPrice — motor simple (MercadoPago)", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 3. NOMBRES DE PRODUCTO
+// 3. PRODUCT NAMES
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("getProductName — motor simple", () => {
-  it("estructura motor simple contiene 'Motor Simple'", () => {
+describe("getProductName — single motor", () => {
+  it("single motor structure contains 'Motor Simple'", () => {
     const name = getProductName({
       type: "estructura",
       motorType: "simple",
@@ -184,7 +184,7 @@ describe("getProductName — motor simple", () => {
     expect(name).toContain("Negro");
   });
 
-  it("bundle motor simple contiene 'Motor Simple' y la medida", () => {
+  it("single motor bundle contains 'Motor Simple' and the size", () => {
     const name = getProductName({
       type: "completo",
       motorType: "simple",
@@ -196,27 +196,27 @@ describe("getProductName — motor simple", () => {
     expect(name).toContain("Blanca");
   });
 
-  it("nombre motor simple es distinto al de doble motor", () => {
+  it("single motor name is different from dual motor name", () => {
     const simple = getProductName({
       type: "estructura",
       motorType: "simple",
       structureColor: "negro",
     });
-    const doble = getProductName({
+    const dual = getProductName({
       type: "estructura",
       motorType: "doble",
       structureColor: "negro",
     });
-    expect(simple).not.toBe(doble);
+    expect(simple).not.toBe(dual);
   });
 
-  it("tapa sigue siendo la misma para ambos motores", () => {
-    const conSimple = getProductName({ type: "tabla", motorType: "simple", tableSize: "140x70" });
-    const conDoble = getProductName({ type: "tabla", motorType: "doble", tableSize: "140x70" });
-    expect(conSimple).toBe(conDoble);
+  it("table name is the same for both motor types", () => {
+    const withSimple = getProductName({ type: "tabla", motorType: "simple", tableSize: "140x70" });
+    const withDual = getProductName({ type: "tabla", motorType: "doble", tableSize: "140x70" });
+    expect(withSimple).toBe(withDual);
   });
 
-  it("nombres son strings no vacíos para todas las configs válidas de motor simple", () => {
+  it("names are non-empty strings for all valid single motor configs", () => {
     const configs: CartItemConfig[] = [
       { type: "estructura", motorType: "simple", structureColor: "negro" },
       { type: "estructura", motorType: "simple", structureColor: "blanco" },
@@ -244,25 +244,25 @@ describe("getProductName — motor simple", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 4. IDs ÚNICOS: MOTOR SIMPLE ≠ DOBLE MOTOR
+// 4. UNIQUE IDs: SINGLE MOTOR ≠ DUAL MOTOR
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("generateCartItemId — motor simple vs doble", () => {
-  it("estructura simple y estructura doble tienen IDs distintos", () => {
+describe("generateCartItemId — single motor vs dual motor", () => {
+  it("single motor structure and dual motor structure have different IDs", () => {
     const simple = generateCartItemId({
       type: "estructura",
       motorType: "simple",
       structureColor: "negro",
     });
-    const doble = generateCartItemId({
+    const dual = generateCartItemId({
       type: "estructura",
       motorType: "doble",
       structureColor: "negro",
     });
-    expect(simple).not.toBe(doble);
+    expect(simple).not.toBe(dual);
   });
 
-  it("bundle 120x60 simple y doble tienen IDs distintos", () => {
+  it("120x60 single and dual bundles have different IDs", () => {
     const simple = generateCartItemId({
       type: "completo",
       motorType: "simple",
@@ -270,17 +270,17 @@ describe("generateCartItemId — motor simple vs doble", () => {
       structureColor: "negro",
       tableColor: "hickory",
     });
-    const doble = generateCartItemId({
+    const dual = generateCartItemId({
       type: "completo",
       motorType: "doble",
       tableSize: "120x60",
       structureColor: "negro",
       tableColor: "hickory",
     });
-    expect(simple).not.toBe(doble);
+    expect(simple).not.toBe(dual);
   });
 
-  it("la misma config de motor simple siempre genera el mismo ID", () => {
+  it("same single motor config always generates the same ID", () => {
     const config: CartItemConfig = {
       type: "completo",
       motorType: "simple",
@@ -291,17 +291,17 @@ describe("generateCartItemId — motor simple vs doble", () => {
     expect(generateCartItemId(config)).toBe(generateCartItemId(config));
   });
 
-  it("config sin motorType y con motorType='doble' generan el mismo ID", () => {
-    const sinMotor = generateCartItemId({ type: "estructura", structureColor: "negro" });
-    const conDoble = generateCartItemId({
+  it("config without motorType and with motorType='doble' generate the same ID", () => {
+    const withoutMotor = generateCartItemId({ type: "estructura", structureColor: "negro" });
+    const withDual = generateCartItemId({
       type: "estructura",
       motorType: "doble",
       structureColor: "negro",
     });
-    expect(sinMotor).toBe(conDoble);
+    expect(withoutMotor).toBe(withDual);
   });
 
-  it("IDs de todas las configs de motor simple son únicos entre sí", () => {
+  it("IDs of all single motor configs are unique among themselves", () => {
     const configs: CartItemConfig[] = [
       { type: "estructura", motorType: "simple", structureColor: "negro" },
       { type: "estructura", motorType: "simple", structureColor: "blanco" },
@@ -340,11 +340,11 @@ describe("generateCartItemId — motor simple vs doble", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 5. CARRITO CON MOTOR SIMPLE
+// 5. CART WITH SINGLE MOTOR
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("carrito — productos motor simple", () => {
-  it("agrega estructura motor simple con precio correcto", () => {
+describe("cart — single motor products", () => {
+  it("adds single motor structure with correct price", () => {
     addSimpleStructure("negro");
     const items = getItems();
     expect(items).toHaveLength(1);
@@ -352,19 +352,19 @@ describe("carrito — productos motor simple", () => {
     expect(items[0]!.config.motorType).toBe("simple");
   });
 
-  it("agrega bundle simple 120x60 con precio correcto", () => {
+  it("adds single motor 120x60 bundle with correct price", () => {
     addSimpleBundle("120x60");
     const item = getItems()[0]!;
     expect(item.unitPrice).toBe(BUNDLE_PRICES_SIMPLE["120x60"]);
   });
 
-  it("agrega bundle simple 140x70 con precio correcto", () => {
+  it("adds single motor 140x70 bundle with correct price", () => {
     addSimpleBundle("140x70");
     const item = getItems()[0]!;
     expect(item.unitPrice).toBe(BUNDLE_PRICES_SIMPLE["140x70"]);
   });
 
-  it("agregar el mismo bundle simple 3 veces → 1 ítem con quantity 3", () => {
+  it("adding the same single motor bundle 3 times → 1 item with quantity 3", () => {
     addSimpleBundle("120x60");
     addSimpleBundle("120x60");
     addSimpleBundle("120x60");
@@ -373,7 +373,7 @@ describe("carrito — productos motor simple", () => {
     expect(items[0]!.quantity).toBe(3);
   });
 
-  it("todos los colores de tapa crean ítems distintos para motor simple", () => {
+  it("all table colors create distinct items for single motor", () => {
     TABLE_COLORS.forEach((color) => {
       useCartStore.getState().addItem({
         type: "completo",
@@ -388,24 +388,24 @@ describe("carrito — productos motor simple", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 6. CARRITO MIXTO: MOTOR SIMPLE + DOBLE MOTOR
+// 6. MIXED CART: SINGLE MOTOR + DUAL MOTOR
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("carrito mixto — motor simple y doble juntos", () => {
-  it("bundle simple y doble de la misma medida son ítems distintos", () => {
+describe("mixed cart — single motor and dual motor together", () => {
+  it("single and dual bundles of the same size are separate items", () => {
     addSimpleBundle("120x60");
-    addDobleBundle("120x60");
+    addDualBundle("120x60");
     expect(getItems()).toHaveLength(2);
   });
 
-  it("total del carrito mixto es correcto", () => {
+  it("mixed cart total is correct", () => {
     addSimpleBundle("120x60");
-    addDobleBundle("120x60");
+    addDualBundle("120x60");
     const expected = BUNDLE_PRICES_SIMPLE["120x60"] + BUNDLE_PRICES["120x60"];
     expect(getCartTotal(getItems())).toBe(expected);
   });
 
-  it("estructura simple y doble son ítems distintos", () => {
+  it("single and dual structures are separate items", () => {
     addSimpleStructure("negro");
     useCartStore
       .getState()
@@ -413,10 +413,10 @@ describe("carrito mixto — motor simple y doble juntos", () => {
     expect(getItems()).toHaveLength(2);
   });
 
-  it("carrito completo con 4 productos distintos calcula total correcto", () => {
+  it("full cart with 4 different products calculates correct total", () => {
     addSimpleBundle("120x60");
     addSimpleBundle("140x70");
-    addDobleBundle("120x60");
+    addDualBundle("120x60");
     addSimpleStructure();
 
     const expected =
@@ -429,22 +429,22 @@ describe("carrito mixto — motor simple y doble juntos", () => {
     expect(getCartTotal(getItems())).toBe(expected);
   });
 
-  it("el motor simple siempre es más barato que el doble para la misma medida", () => {
+  it("single motor is always cheaper than dual motor for the same size", () => {
     addSimpleBundle("120x60");
-    addDobleBundle("120x60");
+    addDualBundle("120x60");
     const items = getItems();
     const simple = items.find((i) => i.config.motorType === "simple")!;
-    const doble = items.find((i) => i.config.motorType === "doble")!;
-    expect(simple.unitPrice).toBeLessThan(doble.unitPrice);
+    const dual = items.find((i) => i.config.motorType === "doble")!;
+    expect(simple.unitPrice).toBeLessThan(dual.unitPrice);
   });
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 7. INVARIANTES DE NEGOCIO — MOTOR SIMPLE
+// 7. BUSINESS INVARIANTS — SINGLE MOTOR
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("invariantes de negocio — motor simple", () => {
-  it("el bundle simple es mayor o igual a estructura simple + tapa (por medida)", () => {
+describe("business invariants — single motor", () => {
+  it("single motor bundle is greater than or equal to simple structure + table (by size)", () => {
     (["120x60", "140x70"] as const).forEach((size) => {
       const bundle = BUNDLE_PRICES_SIMPLE[size];
       const separate = STRUCTURE_PRICE_SIMPLE + TABLE_PRICES[size];
@@ -452,7 +452,7 @@ describe("invariantes de negocio — motor simple", () => {
     });
   });
 
-  it("precio en el carrito coincide con el catálogo", () => {
+  it("cart price matches catalog", () => {
     addSimpleStructure("negro");
     addSimpleBundle("120x60", "negro", "hickory");
     useCartStore
@@ -460,16 +460,16 @@ describe("invariantes de negocio — motor simple", () => {
       .addItem({ type: "tabla", motorType: "simple", tableSize: "140x70", tableColor: "hickory" });
 
     const items = getItems();
-    const estructura = items.find((i) => i.config.type === "estructura")!;
+    const structure = items.find((i) => i.config.type === "estructura")!;
     const bundle = items.find((i) => i.config.type === "completo")!;
-    const tabla = items.find((i) => i.config.type === "tabla")!;
+    const table = items.find((i) => i.config.type === "tabla")!;
 
-    expect(estructura.unitPrice).toBe(STRUCTURE_PRICE_SIMPLE);
+    expect(structure.unitPrice).toBe(STRUCTURE_PRICE_SIMPLE);
     expect(bundle.unitPrice).toBe(BUNDLE_PRICES_SIMPLE["120x60"]);
-    expect(tabla.unitPrice).toBe(TABLE_PRICES["140x70"]);
+    expect(table.unitPrice).toBe(TABLE_PRICES["140x70"]);
   });
 
-  it("el total del carrito escala linealmente con la cantidad para motor simple", () => {
+  it("cart total scales linearly with quantity for single motor", () => {
     addSimpleBundle("140x70");
     const itemId = getItems()[0]!.id;
     const unitPrice = BUNDLE_PRICES_SIMPLE["140x70"];

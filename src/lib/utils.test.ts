@@ -19,17 +19,17 @@ import {
 
 // ─── formatPrice ──────────────────────────────────────────────────────────────
 describe("formatPrice", () => {
-  it("formatea en ARS con símbolo $", () => {
+  it("formats in ARS with $ symbol", () => {
     const result = formatPrice(799_000);
     expect(result).toContain("$");
     expect(result).toContain("799");
   });
 
-  it("formatea cero", () => {
+  it("formats zero", () => {
     expect(formatPrice(0)).toContain("0");
   });
 
-  it("no incluye decimales", () => {
+  it("does not include decimals", () => {
     const result = formatPrice(149_000);
     expect(result).not.toMatch(/[.,]\d{2}$/);
   });
@@ -37,17 +37,17 @@ describe("formatPrice", () => {
 
 // ─── getProductPrice ──────────────────────────────────────────────────────────
 describe("getProductPrice", () => {
-  it("retorna el precio de la estructura", () => {
+  it("returns structure price", () => {
     expect(getProductPrice({ type: "estructura" })).toBe(STRUCTURE_PRICE);
   });
 
-  it("retorna el precio de la tapa por medida", () => {
+  it("returns table price by size", () => {
     expect(getProductPrice({ type: "tabla", tableSize: "120x60" })).toBe(TABLE_PRICES["120x60"]);
     expect(getProductPrice({ type: "tabla", tableSize: "140x70" })).toBe(TABLE_PRICES["140x70"]);
     expect(getProductPrice({ type: "tabla", tableSize: "160x80" })).toBe(TABLE_PRICES["160x80"]);
   });
 
-  it("retorna el precio del bundle completo por medida", () => {
+  it("returns bundle price by size", () => {
     expect(getProductPrice({ type: "completo", tableSize: "120x60" })).toBe(
       BUNDLE_PRICES["120x60"]
     );
@@ -56,21 +56,21 @@ describe("getProductPrice", () => {
     );
   });
 
-  it("retorna 0 si falta la medida", () => {
+  it("returns 0 if size is missing", () => {
     expect(getProductPrice({ type: "tabla" })).toBe(0);
     expect(getProductPrice({ type: "completo" })).toBe(0);
   });
 });
 
-// ─── getProductPrice — motor simple ───────────────────────────────────────────
-describe("getProductPrice (motor simple)", () => {
-  it("retorna STRUCTURE_PRICE_SIMPLE para estructura sin tier", () => {
+// ─── getProductPrice — single motor ───────────────────────────────────────────
+describe("getProductPrice (single motor)", () => {
+  it("returns STRUCTURE_PRICE_SIMPLE for structure without tier", () => {
     expect(getProductPrice({ type: "estructura", motorType: "simple" })).toBe(
       STRUCTURE_PRICE_SIMPLE
     );
   });
 
-  it("retorna STRUCTURE_PRICE_SIMPLE_MP cuando el tier es MP", () => {
+  it("returns STRUCTURE_PRICE_SIMPLE_MP when tier is MP", () => {
     const mpTier = {
       structure: STRUCTURE_PRICE + 1,
       tables: TABLE_PRICES,
@@ -81,19 +81,19 @@ describe("getProductPrice (motor simple)", () => {
     );
   });
 
-  it("retorna bundle correcto para 120x60 (transfer)", () => {
+  it("returns correct bundle price for 120x60 (transfer)", () => {
     expect(getProductPrice({ type: "completo", motorType: "simple", tableSize: "120x60" })).toBe(
       BUNDLE_PRICES_SIMPLE["120x60"]
     );
   });
 
-  it("retorna bundle correcto para 140x70 (transfer)", () => {
+  it("returns correct bundle price for 140x70 (transfer)", () => {
     expect(getProductPrice({ type: "completo", motorType: "simple", tableSize: "140x70" })).toBe(
       BUNDLE_PRICES_SIMPLE["140x70"]
     );
   });
 
-  it("retorna bundle MP para 120x60", () => {
+  it("returns correct MP bundle price for 120x60", () => {
     const mpTier = {
       structure: STRUCTURE_PRICE + 1,
       tables: TABLE_PRICES,
@@ -104,32 +104,32 @@ describe("getProductPrice (motor simple)", () => {
     ).toBe(BUNDLE_PRICES_SIMPLE_MP["120x60"]);
   });
 
-  it("retorna precio de tapa igual al doble motor", () => {
+  it("returns same table price as dual motor", () => {
     expect(getProductPrice({ type: "tabla", motorType: "simple", tableSize: "120x60" })).toBe(
       TABLE_PRICES["120x60"]
     );
   });
 
-  it("retorna 0 si falta la medida en bundle simple", () => {
+  it("returns 0 if size is missing in simple bundle", () => {
     expect(getProductPrice({ type: "completo", motorType: "simple" })).toBe(0);
   });
 });
 
 // ─── getProductName ───────────────────────────────────────────────────────────
 describe("getProductName", () => {
-  it("incluye 'Estructura' y color para tipo estructura", () => {
+  it("includes 'Estructura' and color for structure type", () => {
     const name = getProductName({ type: "estructura", structureColor: "negro" });
     expect(name).toContain("Estructura");
     expect(name).toContain("Negro");
   });
 
-  it("incluye medida para tipo tabla", () => {
+  it("includes size for table type", () => {
     const name = getProductName({ type: "tabla", tableSize: "160x80" });
     expect(name).toContain("Tapa");
     expect(name).toContain("160x80");
   });
 
-  it("incluye medida y color de estructura para completo", () => {
+  it("includes size and structure color for bundle", () => {
     const name = getProductName({
       type: "completo",
       tableSize: "160x80",
@@ -141,9 +141,9 @@ describe("getProductName", () => {
   });
 });
 
-// ─── getProductName — motor simple ────────────────────────────────────────────
-describe("getProductName (motor simple)", () => {
-  it("incluye 'Motor Simple' en nombre de estructura", () => {
+// ─── getProductName — single motor ────────────────────────────────────────────
+describe("getProductName (single motor)", () => {
+  it("includes 'Motor Simple' in structure name", () => {
     const name = getProductName({
       type: "estructura",
       motorType: "simple",
@@ -153,7 +153,7 @@ describe("getProductName (motor simple)", () => {
     expect(name).toContain("Negro");
   });
 
-  it("incluye 'Motor Simple' en nombre de bundle", () => {
+  it("includes 'Motor Simple' in bundle name", () => {
     const name = getProductName({
       type: "completo",
       motorType: "simple",
@@ -164,7 +164,7 @@ describe("getProductName (motor simple)", () => {
     expect(name).toContain("120x60");
   });
 
-  it("NO incluye 'Motor Simple' cuando motorType es doble", () => {
+  it("does NOT include 'Motor Simple' when motorType is doble", () => {
     const name = getProductName({
       type: "estructura",
       motorType: "doble",
@@ -177,7 +177,7 @@ describe("getProductName (motor simple)", () => {
 
 // ─── getCartTotal ─────────────────────────────────────────────────────────────
 describe("getCartTotal", () => {
-  it("calcula el total correcto", () => {
+  it("calculates the correct total", () => {
     const items = [
       {
         id: "1",
@@ -197,11 +197,11 @@ describe("getCartTotal", () => {
     expect(getCartTotal(items)).toBe(520_000 + 149_000 * 2);
   });
 
-  it("retorna 0 para carrito vacío", () => {
+  it("returns 0 for empty cart", () => {
     expect(getCartTotal([])).toBe(0);
   });
 
-  it("respeta la cantidad de cada ítem", () => {
+  it("respects quantity of each item", () => {
     const items = [
       {
         id: "1",
@@ -217,13 +217,13 @@ describe("getCartTotal", () => {
 
 // ─── generateCartItemId ───────────────────────────────────────────────────────
 describe("generateCartItemId", () => {
-  it("genera ids distintos para configuraciones distintas", () => {
+  it("generates different ids for different configurations", () => {
     const id1 = generateCartItemId({ type: "estructura", structureColor: "negro" });
     const id2 = generateCartItemId({ type: "estructura", structureColor: "blanco" });
     expect(id1).not.toBe(id2);
   });
 
-  it("genera el mismo id para la misma configuración", () => {
+  it("generates the same id for the same configuration", () => {
     const config = {
       type: "completo" as const,
       tableSize: "160x80" as TableSize,
@@ -232,7 +232,7 @@ describe("generateCartItemId", () => {
     expect(generateCartItemId(config)).toBe(generateCartItemId(config));
   });
 
-  it("el id incluye el tipo de producto", () => {
+  it("id includes the product type", () => {
     const id = generateCartItemId({ type: "estructura", structureColor: "negro" });
     expect(id).toContain("estructura");
   });

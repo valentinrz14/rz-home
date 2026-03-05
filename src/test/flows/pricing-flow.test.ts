@@ -1,12 +1,12 @@
 /**
  * pricing-flow.test.ts
  *
- * Tests de precios y lógica de negocio de punta a punta:
- * - Invariantes de precios
- * - Todas las combinaciones de configuración
- * - Formateo de precios
- * - Descuentos del bundle vs. compra separada
- * - Nombres de producto generados
+ * End-to-end pricing and business logic tests:
+ * - Price invariants
+ * - All configuration combinations
+ * - Price formatting
+ * - Bundle discount vs separate purchase
+ * - Generated product names
  */
 
 import { describe, expect, it } from "vitest";
@@ -28,11 +28,11 @@ import {
 import type { CartItem, CartItemConfig, StructureColor, TableColor, TableSize } from "@/types";
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 1. PRECIOS POR TIPO DE PRODUCTO
+// 1. PRICES BY PRODUCT TYPE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("getProductPrice — todas las combinaciones", () => {
-  it("estructura siempre devuelve STRUCTURE_PRICE sin importar el color", () => {
+describe("getProductPrice — all combinations", () => {
+  it("structure always returns STRUCTURE_PRICE regardless of color", () => {
     STRUCTURE_COLORS.forEach((color) => {
       expect(
         getProductPrice({ type: "estructura", structureColor: color.id as StructureColor })
@@ -40,7 +40,7 @@ describe("getProductPrice — todas las combinaciones", () => {
     });
   });
 
-  it("tapa devuelve el precio correcto para cada medida y color", () => {
+  it("table returns the correct price for each size and color", () => {
     const sizes: TableSize[] = ["120x60", "140x70", "160x80"];
     const colors: TableColor[] = [
       "hickory",
@@ -60,7 +60,7 @@ describe("getProductPrice — todas las combinaciones", () => {
     });
   });
 
-  it("bundle devuelve el precio correcto para cada medida y combinación de colores", () => {
+  it("bundle returns the correct price for each size and color combination", () => {
     const sizes: TableSize[] = ["120x60", "140x70", "160x80"];
     const structureColors: StructureColor[] = ["negro", "blanco"];
     const tableColors: TableColor[] = ["hickory", "negro"];
@@ -80,23 +80,23 @@ describe("getProductPrice — todas las combinaciones", () => {
     });
   });
 
-  it("devuelve 0 para tapa sin medida", () => {
+  it("returns 0 for table without size", () => {
     expect(getProductPrice({ type: "tabla" })).toBe(0);
     expect(getProductPrice({ type: "tabla", tableColor: "hickory" })).toBe(0);
   });
 
-  it("devuelve 0 para bundle sin medida", () => {
+  it("returns 0 for bundle without size", () => {
     expect(getProductPrice({ type: "completo" })).toBe(0);
     expect(getProductPrice({ type: "completo", structureColor: "negro" })).toBe(0);
   });
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 2. INVARIANTES DE PRECIOS DEL CATÁLOGO
+// 2. CATALOG PRICE INVARIANTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("invariantes de precios del catálogo", () => {
-  it("los bundles son mayores o iguales a estructura + tapa (redondeados para arriba)", () => {
+describe("catalog price invariants", () => {
+  it("bundles are greater than or equal to structure + table (rounded up)", () => {
     TABLE_SIZES.forEach((size) => {
       const bundlePrice = BUNDLE_PRICES[size.id];
       const separateTotal = STRUCTURE_PRICE + TABLE_PRICES[size.id];
@@ -105,27 +105,27 @@ describe("invariantes de precios del catálogo", () => {
     });
   });
 
-  it("la estructura cuesta más que cualquier tapa individualmente", () => {
+  it("structure costs more than any individual table", () => {
     TABLE_SIZES.forEach((size) => {
       expect(STRUCTURE_PRICE).toBeGreaterThan(TABLE_PRICES[size.id]);
     });
   });
 
-  it("los bundles más grandes cuestan más que los más chicos", () => {
+  it("larger bundles cost more than smaller ones", () => {
     const bundlePrices = TABLE_SIZES.map((s) => BUNDLE_PRICES[s.id]);
     for (let i = 1; i < bundlePrices.length; i++) {
       expect(bundlePrices[i]!).toBeGreaterThan(bundlePrices[i - 1]!);
     }
   });
 
-  it("las tapas más grandes cuestan más que las más chicas", () => {
+  it("larger tables cost more than smaller ones", () => {
     const tablePrices = TABLE_SIZES.map((s) => TABLE_PRICES[s.id]);
     for (let i = 1; i < tablePrices.length; i++) {
       expect(tablePrices[i]!).toBeGreaterThan(tablePrices[i - 1]!);
     }
   });
 
-  it("todos los precios son números positivos enteros", () => {
+  it("all prices are positive integers", () => {
     expect(STRUCTURE_PRICE).toBeGreaterThan(0);
     expect(Number.isInteger(STRUCTURE_PRICE)).toBe(true);
 
@@ -137,14 +137,14 @@ describe("invariantes de precios del catálogo", () => {
     });
   });
 
-  it("todos los precios son más baratos que la competencia ($1.400.000)", () => {
+  it("all prices are cheaper than competitor ($1,400,000)", () => {
     const COMPETITOR_PRICE = 1_400_000;
     TABLE_SIZES.forEach((size) => {
       expect(BUNDLE_PRICES[size.id]).toBeLessThan(COMPETITOR_PRICE);
     });
   });
 
-  it("el precio del bundle incluye estructura y tapa", () => {
+  it("bundle price includes both structure and table", () => {
     TABLE_SIZES.forEach((size) => {
       const bundlePrice = BUNDLE_PRICES[size.id];
       expect(bundlePrice).toBeGreaterThan(STRUCTURE_PRICE);
@@ -154,22 +154,22 @@ describe("invariantes de precios del catálogo", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 3. GENERACIÓN DE NOMBRES
+// 3. NAME GENERATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("getProductName — generación de nombres", () => {
-  it("estructura negro incluye 'Negro' en el nombre", () => {
+describe("getProductName — name generation", () => {
+  it("black structure includes 'Negro' in the name", () => {
     const name = getProductName({ type: "estructura", structureColor: "negro" });
     expect(name).toContain("Estructura");
     expect(name).toContain("Negro");
   });
 
-  it("estructura blanco incluye 'Blanco' en el nombre", () => {
+  it("white structure includes 'Blanco' in the name", () => {
     const name = getProductName({ type: "estructura", structureColor: "blanco" });
     expect(name).toContain("Blanco");
   });
 
-  it("tapa incluye la medida correcta", () => {
+  it("table includes the correct size", () => {
     const sizes: TableSize[] = ["120x60", "140x70", "160x80"];
     sizes.forEach((size) => {
       const name = getProductName({ type: "tabla", tableSize: size });
@@ -178,7 +178,7 @@ describe("getProductName — generación de nombres", () => {
     });
   });
 
-  it("bundle incluye medida y color de estructura", () => {
+  it("bundle includes size and structure color", () => {
     const name = getProductName({
       type: "completo",
       tableSize: "160x80",
@@ -189,7 +189,7 @@ describe("getProductName — generación de nombres", () => {
     expect(name).toContain("Negra");
   });
 
-  it("bundle con estructura blanca incluye 'Blanca'", () => {
+  it("bundle with white structure includes 'Blanca'", () => {
     const name = getProductName({
       type: "completo",
       tableSize: "120x60",
@@ -199,7 +199,7 @@ describe("getProductName — generación de nombres", () => {
     expect(name).toContain("120x60");
   });
 
-  it("nombres son strings no vacíos para todas las combinaciones válidas", () => {
+  it("names are non-empty strings for all valid combinations", () => {
     const configs: CartItemConfig[] = [
       { type: "estructura", structureColor: "negro" },
       { type: "estructura", structureColor: "blanco" },
@@ -217,11 +217,11 @@ describe("getProductName — generación de nombres", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 4. IDS DE ÍTEMS DEL CARRITO
+// 4. CART ITEM IDs
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("generateCartItemId — unicidad e idempotencia", () => {
-  it("la misma configuración siempre genera el mismo id", () => {
+describe("generateCartItemId — uniqueness and idempotency", () => {
+  it("same configuration always generates the same id", () => {
     const config: CartItemConfig = {
       type: "completo",
       tableSize: "160x80",
@@ -232,7 +232,7 @@ describe("generateCartItemId — unicidad e idempotencia", () => {
     expect(generateCartItemId(config)).toBe(generateCartItemId(config));
   });
 
-  it("configuraciones distintas generan ids distintos", () => {
+  it("different configurations generate different ids", () => {
     const configs: CartItemConfig[] = [
       { type: "estructura", structureColor: "negro" },
       { type: "estructura", structureColor: "blanco" },
@@ -249,23 +249,23 @@ describe("generateCartItemId — unicidad e idempotencia", () => {
     expect(uniqueIds.size).toBe(ids.length);
   });
 
-  it("el id incluye el tipo de producto", () => {
-    const estructuraId = generateCartItemId({ type: "estructura", structureColor: "negro" });
-    const tablaId = generateCartItemId({ type: "tabla", tableSize: "120x60" });
-    const completoId = generateCartItemId({ type: "completo", tableSize: "120x60" });
+  it("id includes the product type", () => {
+    const structureId = generateCartItemId({ type: "estructura", structureColor: "negro" });
+    const tableId = generateCartItemId({ type: "tabla", tableSize: "120x60" });
+    const bundleId = generateCartItemId({ type: "completo", tableSize: "120x60" });
 
-    expect(estructuraId).toContain("estructura");
-    expect(tablaId).toContain("tabla");
-    expect(completoId).toContain("completo");
+    expect(structureId).toContain("estructura");
+    expect(tableId).toContain("tabla");
+    expect(bundleId).toContain("completo");
   });
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 5. FORMATEO DE PRECIOS
+// 5. PRICE FORMATTING
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("formatPrice — formateo de todos los precios del catálogo", () => {
-  it("todos los precios del catálogo se formatean con símbolo $", () => {
+describe("formatPrice — formatting all catalog prices", () => {
+  it("all catalog prices are formatted with $ symbol", () => {
     const allPrices = [
       STRUCTURE_PRICE,
       ...TABLE_SIZES.map((s) => TABLE_PRICES[s.id]),
@@ -280,28 +280,28 @@ describe("formatPrice — formateo de todos los precios del catálogo", () => {
     });
   });
 
-  it("precios grandes incluyen separador de miles", () => {
+  it("large prices include thousands separator", () => {
     const formatted = formatPrice(STRUCTURE_PRICE);
     expect(formatted).toMatch(/650/);
   });
 
-  it("precio cero se formatea correctamente", () => {
+  it("zero price formats correctly", () => {
     const formatted = formatPrice(0);
     expect(formatted).toContain("$");
     expect(formatted).toContain("0");
   });
 
-  it("el bundle 160x80 se muestra como $790.XXX", () => {
+  it("160x80 bundle displays as $790.XXX", () => {
     const formatted = formatPrice(BUNDLE_PRICES["160x80"]);
     expect(formatted).toContain("790");
   });
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 6. TOTAL DEL CARRITO — ESCENARIOS COMPLEJOS
+// 6. CART TOTAL — COMPLEX SCENARIOS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("getCartTotal — escenarios complejos", () => {
+describe("getCartTotal — complex scenarios", () => {
   function makeItem(config: CartItemConfig, quantity = 1): CartItem {
     return {
       id: generateCartItemId(config),
@@ -312,7 +312,7 @@ describe("getCartTotal — escenarios complejos", () => {
     };
   }
 
-  it("carrito con todos los tamaños de tapa calcula total correcto", () => {
+  it("cart with all table sizes calculates correct total", () => {
     const items: CartItem[] = TABLE_SIZES.map((size) =>
       makeItem({ type: "tabla", tableSize: size.id, tableColor: "hickory" })
     );
@@ -321,7 +321,7 @@ describe("getCartTotal — escenarios complejos", () => {
     expect(getCartTotal(items)).toBe(expected);
   });
 
-  it("carrito con todos los bundles calcula total correcto", () => {
+  it("cart with all bundles calculates correct total", () => {
     const items: CartItem[] = TABLE_SIZES.map((size) =>
       makeItem({
         type: "completo",
@@ -335,7 +335,7 @@ describe("getCartTotal — escenarios complejos", () => {
     expect(getCartTotal(items)).toBe(expected);
   });
 
-  it("carrito con cantidades altas calcula total correcto", () => {
+  it("cart with high quantities calculates correct total", () => {
     const items: CartItem[] = [
       makeItem({ type: "estructura", structureColor: "negro" }, 10),
       makeItem({ type: "tabla", tableSize: "160x80", tableColor: "hickory" }, 5),
@@ -345,11 +345,11 @@ describe("getCartTotal — escenarios complejos", () => {
     expect(getCartTotal(items)).toBe(expected);
   });
 
-  it("carrito vacío devuelve 0", () => {
+  it("empty cart returns 0", () => {
     expect(getCartTotal([])).toBe(0);
   });
 
-  it("un solo ítem con cantidad 1 devuelve su precio unitario", () => {
+  it("single item with quantity 1 returns its unit price", () => {
     const item = makeItem({
       type: "completo",
       tableSize: "120x60",
@@ -359,7 +359,7 @@ describe("getCartTotal — escenarios complejos", () => {
     expect(getCartTotal([item])).toBe(BUNDLE_PRICES["120x60"]);
   });
 
-  it("el total nunca es negativo para configuraciones válidas", () => {
+  it("total is never negative for valid configurations", () => {
     const configs: CartItemConfig[] = [
       { type: "estructura", structureColor: "negro" },
       { type: "tabla", tableSize: "120x60", tableColor: "hickory" },
@@ -370,7 +370,7 @@ describe("getCartTotal — escenarios complejos", () => {
     expect(getCartTotal(items)).toBeGreaterThan(0);
   });
 
-  it("todos los colores de tabla resultan en el mismo precio por medida", () => {
+  it("all table colors result in the same price for the same size", () => {
     const size: TableSize = "160x80";
     TABLE_COLORS.forEach((color) => {
       const item = makeItem({ type: "tabla", tableSize: size, tableColor: color.id as TableColor });

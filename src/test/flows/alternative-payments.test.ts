@@ -1,20 +1,20 @@
 /**
  * alternative-payments.test.ts
  *
- * Tests para métodos de pago alternativos:
- * - Cálculo de precios ajustados (transferencia / cripto)
- * - Lógica de tipos y validaciones de órdenes
- * - Generación de IDs de orden
+ * Tests for alternative payment methods:
+ * - Adjusted price calculation (transfer / crypto)
+ * - Order type logic and validations
+ * - Order ID generation
  */
 
 import { describe, expect, it } from "vitest";
 import type { OrderStatus, PaymentMethod, PendingOrder } from "@/types/orders";
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 1. CÁLCULO DE PRECIOS AJUSTADOS
+// 1. ADJUSTED PRICE CALCULATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("ajuste de precios por método de pago", () => {
+describe("price adjustment by payment method", () => {
   function calcTransfer(total: number) {
     return Math.round(total * 0.9);
   }
@@ -23,26 +23,26 @@ describe("ajuste de precios por método de pago", () => {
     return Math.round(total * 0.9);
   }
 
-  it("transferencia aplica 10% de descuento", () => {
+  it("transfer applies 10% discount", () => {
     expect(calcTransfer(100_000)).toBe(90_000);
     expect(calcTransfer(500_000)).toBe(450_000);
     expect(calcTransfer(1_000_000)).toBe(900_000);
   });
 
-  it("cripto aplica 10% de descuento (igual que transferencia)", () => {
+  it("crypto applies 10% discount (same as transfer)", () => {
     expect(calcCrypto(100_000)).toBe(90_000);
     expect(calcCrypto(500_000)).toBe(450_000);
     expect(calcCrypto(1_000_000)).toBe(900_000);
   });
 
-  it("transferencia y cripto tienen el mismo descuento del 10%", () => {
+  it("transfer and crypto have the same 10% discount", () => {
     const totals = [100_000, 250_000, 500_000, 850_000, 1_200_000];
     totals.forEach((total) => {
       expect(calcTransfer(total)).toBe(calcCrypto(total));
     });
   });
 
-  it("ambos métodos siempre son más baratos que el precio original", () => {
+  it("both methods are always cheaper than the original price", () => {
     const totals = [100_000, 250_000, 500_000, 850_000, 1_200_000];
     totals.forEach((total) => {
       expect(calcTransfer(total)).toBeLessThan(total);
@@ -50,20 +50,20 @@ describe("ajuste de precios por método de pago", () => {
     });
   });
 
-  it("el resultado es siempre un número entero (Math.round)", () => {
-    // Total que no divide exactamente
+  it("result is always an integer (Math.round)", () => {
+    // Total that does not divide evenly
     const oddTotal = 333_333;
     expect(Number.isInteger(calcTransfer(oddTotal))).toBe(true);
     expect(Number.isInteger(calcCrypto(oddTotal))).toBe(true);
   });
 
-  it("el ahorro de transferencia es exactamente 10% redondeado", () => {
+  it("transfer savings are exactly 10% rounded", () => {
     const total = 750_000;
     const discount = total - calcTransfer(total);
     expect(discount).toBe(75_000);
   });
 
-  it("el descuento cripto es exactamente 10% redondeado", () => {
+  it("crypto discount is exactly 10% rounded", () => {
     const total = 750_000;
     const discount = total - calcCrypto(total);
     expect(discount).toBe(75_000);
@@ -71,10 +71,10 @@ describe("ajuste de precios por método de pago", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 2. TIPOS Y VALIDACIONES DE ORDEN
+// 2. ORDER TYPES AND VALIDATIONS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("tipos de PendingOrder", () => {
+describe("PendingOrder types", () => {
   const validMethods: PaymentMethod[] = [
     "transfer",
     "crypto_usdt_trc20",
@@ -84,7 +84,7 @@ describe("tipos de PendingOrder", () => {
 
   const validStatuses: OrderStatus[] = ["pending", "confirmed"];
 
-  it("todos los métodos de pago alternativos están definidos", () => {
+  it("all alternative payment methods are defined", () => {
     expect(validMethods).toHaveLength(4);
     expect(validMethods).toContain("transfer");
     expect(validMethods).toContain("crypto_usdt_trc20");
@@ -92,13 +92,13 @@ describe("tipos de PendingOrder", () => {
     expect(validMethods).toContain("crypto_ltc");
   });
 
-  it("los estados válidos son solo pending y confirmed", () => {
+  it("valid statuses are only pending and confirmed", () => {
     expect(validStatuses).toHaveLength(2);
     expect(validStatuses).toContain("pending");
     expect(validStatuses).toContain("confirmed");
   });
 
-  it("una orden puede construirse con todos sus campos", () => {
+  it("an order can be constructed with all its fields", () => {
     const order: PendingOrder = {
       id: "rz-1234567890",
       createdAt: new Date().toISOString(),
@@ -124,13 +124,13 @@ describe("tipos de PendingOrder", () => {
     expect(order.items).toHaveLength(2);
   });
 
-  it("finalAmount con transferencia es 90% del originalAmount", () => {
+  it("finalAmount with transfer is 90% of originalAmount", () => {
     const original = 865_000;
     const final = Math.round(original * 0.9);
     expect(final).toBe(778_500);
   });
 
-  it("finalAmount con cripto es 90% del originalAmount (10% descuento)", () => {
+  it("finalAmount with crypto is 90% of originalAmount (10% discount)", () => {
     const original = 865_000;
     const final = Math.round(original * 0.9);
     expect(final).toBe(778_500);
@@ -138,44 +138,44 @@ describe("tipos de PendingOrder", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 3. GENERACIÓN Y FORMATO DE IDs DE ORDEN
+// 3. ORDER ID GENERATION AND FORMAT
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("IDs de orden", () => {
+describe("order IDs", () => {
   function generateOrderId() {
     return `rz-${Date.now()}`;
   }
 
-  it("el ID siempre empieza con 'rz-'", () => {
+  it("ID always starts with 'rz-'", () => {
     const id = generateOrderId();
     expect(id).toMatch(/^rz-/);
   });
 
-  it("el ID contiene un timestamp numérico", () => {
+  it("ID contains a numeric timestamp", () => {
     const id = generateOrderId();
     const timestamp = id.replace("rz-", "");
     expect(Number.isInteger(Number(timestamp))).toBe(true);
     expect(Number(timestamp)).toBeGreaterThan(0);
   });
 
-  it("IDs generados en distintos momentos son únicos", async () => {
+  it("IDs generated at different moments are unique", async () => {
     const id1 = `rz-${Date.now()}`;
     await new Promise((r) => setTimeout(r, 2));
     const id2 = `rz-${Date.now()}`;
     expect(id1).not.toBe(id2);
   });
 
-  it("el formato del ID es consistente con el patrón esperado", () => {
+  it("ID format is consistent with the expected pattern", () => {
     const id = generateOrderId();
     expect(id).toMatch(/^rz-\d+$/);
   });
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 4. MÉTODO DE PAGO — CLASIFICACIÓN
+// 4. PAYMENT METHOD — CLASSIFICATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("clasificación de métodos de pago", () => {
+describe("payment method classification", () => {
   function isCrypto(method: string) {
     return method.startsWith("crypto_");
   }
@@ -188,7 +188,7 @@ describe("clasificación de métodos de pago", () => {
     return method === "mercadopago";
   }
 
-  it("los métodos cripto se identifican correctamente", () => {
+  it("crypto methods are correctly identified", () => {
     expect(isCrypto("crypto_usdt_trc20")).toBe(true);
     expect(isCrypto("crypto_usdt_polygon")).toBe(true);
     expect(isCrypto("crypto_ltc")).toBe(true);
@@ -196,19 +196,19 @@ describe("clasificación de métodos de pago", () => {
     expect(isCrypto("mercadopago")).toBe(false);
   });
 
-  it("transferencia se identifica correctamente", () => {
+  it("transfer is correctly identified", () => {
     expect(isTransfer("transfer")).toBe(true);
     expect(isTransfer("crypto_usdt_trc20")).toBe(false);
     expect(isTransfer("mercadopago")).toBe(false);
   });
 
-  it("MercadoPago se identifica correctamente", () => {
+  it("MercadoPago is correctly identified", () => {
     expect(isMercadoPago("mercadopago")).toBe(true);
     expect(isMercadoPago("transfer")).toBe(false);
     expect(isMercadoPago("crypto_ltc")).toBe(false);
   });
 
-  it("un método siempre pertenece a exactamente una categoría", () => {
+  it("a method always belongs to exactly one category", () => {
     const allMethods = [
       "mercadopago",
       "transfer",
@@ -226,10 +226,10 @@ describe("clasificación de métodos de pago", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 5. VALIDACIÓN DE CAMPOS DE ORDEN
+// 5. ORDER FIELD VALIDATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("validación de campos requeridos de orden", () => {
+describe("order required fields validation", () => {
   const requiredFields: (keyof PendingOrder)[] = [
     "buyerName",
     "buyerLastName",
@@ -243,7 +243,7 @@ describe("validación de campos requeridos de orden", () => {
     "finalAmount",
   ];
 
-  it("todos los campos requeridos están definidos en el tipo", () => {
+  it("all required fields are defined in the type", () => {
     const order: PendingOrder = {
       id: "rz-test",
       createdAt: new Date().toISOString(),
@@ -265,7 +265,7 @@ describe("validación de campos requeridos de orden", () => {
     });
   });
 
-  it("una orden sin items tiene array vacío, no undefined", () => {
+  it("an order without items has an empty array, not undefined", () => {
     const order: PendingOrder = {
       id: "rz-test",
       createdAt: new Date().toISOString(),
@@ -285,13 +285,13 @@ describe("validación de campos requeridos de orden", () => {
     expect(Array.isArray(order.items)).toBe(true);
   });
 
-  it("originalAmount es siempre mayor o igual que finalAmount en transferencia", () => {
+  it("originalAmount is always greater than or equal to finalAmount for transfer", () => {
     const original = 500_000;
     const final = Math.round(original * 0.9);
     expect(original).toBeGreaterThanOrEqual(final);
   });
 
-  it("finalAmount es menor que originalAmount en cripto (descuento 10%)", () => {
+  it("finalAmount is less than originalAmount for crypto (10% discount)", () => {
     const original = 500_000;
     const final = Math.round(original * 0.9);
     expect(final).toBeLessThan(original);
