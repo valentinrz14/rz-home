@@ -1,4 +1,3 @@
-import "server-only";
 import { Redis } from "@upstash/redis";
 
 const STOCK_KEY = "stock:status";
@@ -83,7 +82,14 @@ async function fetchAmazonStock(url: string): Promise<boolean | null> {
     const availMatch = html.match(/<div[^>]+id="availability"[^>]*>([\s\S]*?)<\/div>/i);
     const availText = availMatch?.[1] ?? html;
 
+    // "No disponible por el momento. No sabemos si este producto volverá a estar
+    // disponible, ni cuándo." — permanently discontinued, check full HTML too
+    const discontinuedInHtml =
+      /no sabemos si este producto volverá a estar disponible/i.test(html) ||
+      /we don't know when or if this item will be back in stock/i.test(html);
+
     const outOfStock =
+      discontinuedInHtml ||
       /actualmente no disponible|no disponible|sin existencias|currently unavailable|out of stock|temporalmente no disponible/i.test(
         availText
       );

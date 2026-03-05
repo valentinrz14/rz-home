@@ -3,13 +3,15 @@ import Link from "next/link";
 import { DersiteIllustration } from "@/components/products/DersiteIllustration";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { StockStatus } from "@/lib/amazon-stock";
-import { isMotorFullyOOS } from "@/lib/amazon-stock";
 import type { PricesConfig } from "@/lib/prices";
-import { BUNDLE_PRICES_SIMPLE } from "@/lib/products";
+import { BUNDLE_PRICES_SIMPLE, TABLE_COLORS } from "@/lib/products";
+import type { StockStatus } from "@/lib/stock-utils";
+import { isMotorFullyOOS } from "@/lib/stock-utils";
 import { formatPrice } from "@/lib/utils";
 import type { StructureColor } from "@/types";
 import { TABLE_SIZE } from "@/types";
+
+const HICKORY_HEX = TABLE_COLORS.find((c) => c.id === "hickory")!.hex;
 
 const productDefs = [
   {
@@ -25,7 +27,7 @@ const productDefs = [
     illustration: {
       structureColor: "negro" as StructureColor,
       withTabletop: true,
-      tableColorHex: "#9C6B3C",
+      tableColorHex: HICKORY_HEX,
     },
     specs: [
       "Doble motor silencioso (<50 dB)",
@@ -48,7 +50,7 @@ const productDefs = [
     illustration: {
       structureColor: "blanco" as StructureColor,
       withTabletop: true,
-      tableColorHex: "#9C6B3C",
+      tableColorHex: HICKORY_HEX,
     },
     specs: [
       "Motor silencioso (≤55 dB)",

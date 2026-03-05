@@ -2,6 +2,9 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { DersiteIllustration } from "@/components/products/DersiteIllustration";
 import { Button } from "@/components/ui/button";
+import { TABLE_COLORS } from "@/lib/products";
+
+const HICKORY_HEX = TABLE_COLORS.find((c) => c.id === "hickory")!.hex;
 
 export function Hero() {
   return (
@@ -21,7 +24,7 @@ export function Hero() {
         <DersiteIllustration
           withTabletop
           structureColor="negro"
-          tableColorHex="#9C6B3C"
+          tableColorHex={HICKORY_HEX}
           className="w-full"
         />
       </div>

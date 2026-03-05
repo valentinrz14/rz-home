@@ -1,3 +1,7 @@
+import { TABLE_COLORS } from "@/lib/products";
+
+const DEFAULT_TABLE_COLOR_HEX = TABLE_COLORS.find((c) => c.id === "hickory")!.hex;
+
 interface Props {
   structureColor?: "blanco" | "negro";
   /** Mostrar la tapa sobre la estructura */
@@ -17,7 +21,7 @@ export function DersiteIllustration({
   structureColor = "negro",
   withTabletop = false,
   withStructure = true,
-  tableColorHex = "#9C6B3C",
+  tableColorHex = DEFAULT_TABLE_COLOR_HEX,
   className = "",
 }: Props) {
   const isWhite = structureColor === "blanco";

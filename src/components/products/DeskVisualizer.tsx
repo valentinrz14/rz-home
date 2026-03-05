@@ -19,8 +19,10 @@ export function DeskVisualizer({
   showTable,
   showStructure,
 }: Props) {
-  const tColorHex = TABLE_COLORS.find((c) => c.id === tableColor)?.hex ?? "#9C6B3C";
-  const sColorHex = STRUCTURE_COLORS.find((c) => c.id === structureColor)?.hex ?? "#1A1A1A";
+  const tColorHex = TABLE_COLORS.find((c) => c.id === tableColor)?.hex ?? TABLE_COLORS[0]!.hex;
+  const sColorHex =
+    STRUCTURE_COLORS.find((c) => c.id === structureColor)?.hex ??
+    STRUCTURE_COLORS.find((c) => c.id === "negro")!.hex;
 
   // Ancho proporcional al tamaño elegido
   const sizeWidths: Record<TableSize, number> = {

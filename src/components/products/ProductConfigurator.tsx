@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { usePrices } from "@/hooks/usePrices";
 import { useStock } from "@/hooks/useStock";
-import { isConfigOOS } from "@/lib/amazon-stock";
 import { STRUCTURE_COLORS, TABLE_COLORS, TABLE_SIZES } from "@/lib/products";
+import { isConfigOOS } from "@/lib/stock-utils";
 import { formatPrice, getProductPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import type { MotorType, ProductType, StructureColor, TableColor, TableSize } from "@/types";
@@ -144,6 +144,7 @@ export function ProductConfigurator({
           ).map((opt) => (
             <button
               key={opt.id}
+              type="button"
               onClick={() => {
                 setMotorType(opt.id);
                 onMotorChange?.(opt.id);
@@ -209,6 +210,7 @@ export function ProductConfigurator({
               return (
                 <button
                   key={color.id}
+                  type="button"
                   onClick={() => {
                     if (colorOOS) return;
                     setStructureColor(color.id);
@@ -287,6 +289,7 @@ export function ProductConfigurator({
             {TABLE_COLORS.map((color) => (
               <button
                 key={color.id}
+                type="button"
                 onClick={() => {
                   setTableColor(color.id);
                   onTableColorChange?.(color.id);
