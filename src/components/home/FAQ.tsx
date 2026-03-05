@@ -25,8 +25,8 @@ const faqs = [
     a: "Enviamos a todo el país por Andreani. El costo se cotiza en el checkout según tu código postal. Tiempo estimado: 10 a 15 días hábiles.",
   },
   {
-    q: "¿Cuántas cuotas puedo elegir?",
-    a: "Aceptamos tarjetas de crédito con cuotas sin interés a través de MercadoPago. La cantidad de cuotas depende de tu banco y tarjeta.",
+    q: "¿Qué métodos de pago aceptan?",
+    a: "Aceptamos transferencia bancaria, MercadoPago (tarjeta de crédito o débito) y criptomonedas (USDT, LTC).",
   },
   {
     q: "¿Qué garantía tiene?",
@@ -42,15 +42,15 @@ export function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="bg-zinc-50 px-4 py-20 dark:bg-zinc-900/50">
+    <section id="faq" className="mt-14 border-t border-zinc-200 pt-10 dark:border-zinc-800">
       <div className="mx-auto max-w-3xl">
-        <div className="mb-12 text-center">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
-            FAQ
-          </p>
-          <h2 className="font-display text-4xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-5xl">
+        <div className="mb-8">
+          <h2 className="font-display text-3xl font-bold text-zinc-900 dark:text-white">
             Preguntas frecuentes
           </h2>
+          <p className="mt-1 text-base text-zinc-500 dark:text-zinc-400">
+            Resolvé tus dudas antes de comprar
+          </p>
         </div>
 
         <div className="space-y-3">

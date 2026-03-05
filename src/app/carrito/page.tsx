@@ -139,7 +139,6 @@ export default function CarritoPage() {
                 </span>
               ))}
             </div>
-            <p className="mt-2 text-center text-sm text-zinc-400">Pagá en cuotas sin interés</p>
           </div>
         </div>
       </div>

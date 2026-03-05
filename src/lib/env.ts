@@ -66,3 +66,39 @@ export const EMAIL_FROM = optional("EMAIL_FROM", "pedidos@rzroom.com.ar");
 
 /** Email del vendedor para notificaciones de nuevos pedidos */
 export const EMAIL_NOTIFY = optional("EMAIL_NOTIFY", "");
+
+// ── Métodos de pago alternativos ───────────────────────────────────────────────
+
+/** Número de WhatsApp con código de país, sin + (ej: 5491122334455) */
+export function getWhatsappNumber() {
+  return optional("WHATSAPP_NUMBER");
+}
+
+/** Datos bancarios para transferencia */
+export function getBankDetails() {
+  return {
+    cbu: optional("CBU"),
+    alias: optional("ALIAS_BANCO"),
+    titular: optional("TITULAR_BANCO"),
+    number_of_account: optional("NRO_CUENTA"),
+  };
+}
+
+/** Wallets de cripto para pagos alternativos */
+export function getCryptoWallets() {
+  return {
+    usdt_trc20: optional("CRYPTO_WALLET_USDT_TRC20"),
+    usdt_polygon: optional("CRYPTO_WALLET_USDT_POLYGON"),
+    ltc: optional("CRYPTO_WALLET_LTC"),
+  };
+}
+
+/** Dirección de retiro en local */
+export function getPickupAddress() {
+  return {
+    zona: optional("PICKUP_ZONA", "Buenos Aires, Ituzaingó"),
+    completa: optional("PICKUP_ADDRESS", "Buenos Aires, Ituzaingó, Cerrito 1696"),
+  };
+}
+
+// Upstash Redis — usadas por @upstash/redis via UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN

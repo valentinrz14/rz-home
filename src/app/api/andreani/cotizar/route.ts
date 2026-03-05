@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getAndreaniCredentials } from "@/lib/env";
-import type { ProductType, TableSize } from "@/types";
+import type { MotorType, ProductType, TableSize } from "@/types";
 
 // ── Peso y dimensiones estimadas por tipo/tamaño de producto ─────────────────
 
@@ -31,16 +31,17 @@ function makeBulto(
 }
 
 const ESTRUCTURA_SPEC_BASE = { kilos: 35, largo: 125, ancho: 65, alto: 25 };
+const ESTRUCTURA_SPEC_SIMPLE = { kilos: 20, largo: 125, ancho: 65, alto: 25 };
 const TABLA_DIMS: Record<TableSize, { kilos: number; largo: number; ancho: number; alto: number }> =
   {
     "120x60": { kilos: 18, largo: 125, ancho: 65, alto: 8 },
     "140x70": { kilos: 22, largo: 145, ancho: 75, alto: 8 },
-    "150x70": { kilos: 25, largo: 155, ancho: 75, alto: 8 },
     "160x80": { kilos: 30, largo: 165, ancho: 85, alto: 8 },
   };
 
 interface CartItemInput {
   type: ProductType;
+  motorType?: MotorType;
   size?: TableSize;
   quantity: number;
   unitPrice: number;
@@ -55,7 +56,8 @@ function buildBultos(items: CartItemInput[]): BultoSpec[] {
       if (item.type === "estructura" || item.type === "completo") {
         const declared =
           item.type === "completo" ? Math.round(item.unitPrice * 0.55) : item.unitPrice;
-        const { kilos, largo, ancho, alto } = ESTRUCTURA_SPEC_BASE;
+        const spec = item.motorType === "simple" ? ESTRUCTURA_SPEC_SIMPLE : ESTRUCTURA_SPEC_BASE;
+        const { kilos, largo, ancho, alto } = spec;
         bultos.push(makeBulto(kilos, largo, ancho, alto, declared));
       }
 
@@ -156,11 +158,7 @@ async function fetchTarifa(
   const data: AndreaniTarifaResponse | AndreaniTarifaResponse[] = await res.json();
   const tarifa: AndreaniTarifaResponse = Array.isArray(data) ? (data[0] ?? {}) : data;
 
-  const costo =
-    tarifa.tarifa ??
-    tarifa.tarifaConImpuestos ??
-    tarifa.tarifaTotal ??
-    tarifa.total;
+  const costo = tarifa.tarifa ?? tarifa.tarifaConImpuestos ?? tarifa.tarifaTotal ?? tarifa.total;
 
   if (typeof costo !== "number") {
     throw new Error(`Andreani: respuesta inesperada: ${JSON.stringify(data)}`);
@@ -212,8 +210,7 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({ costo, plazo });
-  } catch (err) {
-    console.error("Andreani cotizar error:", err);
+  } catch {
     return NextResponse.json(
       { error: "No se pudo calcular el costo de envío. Intentá nuevamente." },
       { status: 502 }

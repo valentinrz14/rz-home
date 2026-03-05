@@ -1,16 +1,25 @@
-import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
+import { emailColors as c } from "@/lib/colors";
 import { formatPrice } from "@/lib/utils";
 
-// ── Cliente SendGrid ───────────────────────────────────────────────────────────
+// ── Cliente Nodemailer (Gmail SMTP) ───────────────────────────────────────────
 
-function initSendGrid(): void {
-  const key = process.env.SENDGRID_API_KEY;
-  if (!key) throw new Error("Variable de entorno faltante: SENDGRID_API_KEY");
-  sgMail.setApiKey(key);
+function createTransporter() {
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  if (!user || !pass) {
+    throw new Error("Variables de entorno faltantes: GMAIL_USER y/o GMAIL_APP_PASSWORD");
+  }
+  return nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: { user, pass },
+  });
 }
 
 function getEmailFrom(): string {
-  return process.env.EMAIL_FROM ?? "pedidos@rzroom.com.ar";
+  return process.env.GMAIL_USER ?? "ecomerce.rzhome@gmail.com";
 }
 
 function getEmailNotify(): string {
@@ -41,34 +50,35 @@ export interface OrderEmailData {
 // ── Estilos base del email ─────────────────────────────────────────────────────
 
 const BASE_STYLES = `
-  body { margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  body { margin: 0; padding: 0; background-color: ${c.pageBg}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
   .wrapper { max-width: 600px; margin: 0 auto; padding: 32px 16px; }
-  .card { background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-  .header { background: #18181b; padding: 28px 32px; text-align: center; }
-  .header-title { color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
-  .header-sub { color: #a1a1aa; font-size: 14px; margin: 6px 0 0; }
+  .card { background: ${c.cardBg}; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .header { background: ${c.headerBg}; padding: 28px 32px; text-align: center; }
+  .header-title { color: ${c.headerTitle}; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
+  .header-sub { color: ${c.headerSub}; font-size: 14px; margin: 6px 0 0; }
   .body { padding: 32px; }
-  .greeting { font-size: 18px; font-weight: 600; color: #18181b; margin: 0 0 8px; }
-  .text { font-size: 15px; color: #52525b; line-height: 1.6; margin: 0 0 24px; }
-  .badge { display: inline-block; background: #f0fdf4; color: #16a34a; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 99px; border: 1px solid #bbf7d0; margin-bottom: 24px; }
-  .section-title { font-size: 13px; font-weight: 600; color: #71717a; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 12px; }
-  table.items { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-  table.items th { font-size: 12px; font-weight: 600; color: #71717a; text-transform: uppercase; letter-spacing: 0.04em; padding: 8px 0; text-align: left; border-bottom: 1px solid #e4e4e7; }
-  table.items th.right { text-align: right; }
-  table.items td { font-size: 14px; color: #27272a; padding: 10px 0; border-bottom: 1px solid #f4f4f5; vertical-align: top; }
-  table.items td.right { text-align: right; font-weight: 500; }
-  table.items td.muted { color: #71717a; font-size: 13px; }
-  .total-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0 0; margin-top: 4px; border-top: 2px solid #18181b; }
-  .total-label { font-size: 16px; font-weight: 700; color: #18181b; }
-  .total-amount { font-size: 22px; font-weight: 700; color: #18181b; }
-  .info-box { background: #f4f4f5; border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
-  .info-row { display: flex; gap: 8px; font-size: 14px; color: #52525b; margin-bottom: 6px; }
+  .greeting { font-size: 18px; font-weight: 600; color: ${c.heading}; margin: 0 0 8px; }
+  .text { font-size: 15px; color: ${c.body}; line-height: 1.6; margin: 0 0 24px; }
+  .badge { display: inline-block; background: ${c.successBg}; color: ${c.successText}; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 99px; border: 1px solid ${c.successBorder}; margin-bottom: 24px; }
+  .section-title { font-size: 13px; font-weight: 600; color: ${c.sectionTitle}; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 12px; }
+  .item-list { margin-bottom: 16px; }
+  .item-card { background: ${c.itemCardBg}; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+  .item-card:last-child { margin-bottom: 0; }
+  .item-row { font-size: 14px; color: ${c.body}; margin: 0 0 5px; }
+  .item-row:last-child { margin-bottom: 0; }
+  .item-row-label { font-weight: 600; color: ${c.label}; }
+  .item-row-value { color: ${c.value}; }
+  .total-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0 0; margin-top: 4px; border-top: 2px solid ${c.heading}; }
+  .total-label { font-size: 16px; font-weight: 700; color: ${c.heading}; }
+  .total-amount { font-size: 22px; font-weight: 700; color: ${c.heading}; }
+  .info-box { background: ${c.infoBg}; border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .info-row { display: flex; gap: 8px; font-size: 14px; color: ${c.body}; margin-bottom: 6px; }
   .info-row:last-child { margin-bottom: 0; }
-  .info-label { font-weight: 600; color: #18181b; min-width: 80px; }
-  .divider { border: none; border-top: 1px solid #e4e4e7; margin: 24px 0; }
-  .footer { padding: 20px 32px; background: #fafafa; border-top: 1px solid #f4f4f5; text-align: center; }
-  .footer-text { font-size: 13px; color: #a1a1aa; line-height: 1.6; margin: 0; }
-  .footer-text a { color: #18181b; text-decoration: none; font-weight: 500; }
+  .info-label { font-weight: 600; color: ${c.label}; min-width: 80px; }
+  .divider { border: none; border-top: 1px solid ${c.divider}; margin: 24px 0; }
+  .footer { padding: 20px 32px; background: ${c.footerBg}; border-top: 1px solid ${c.footerBorder}; text-align: center; }
+  .footer-text { font-size: 13px; color: ${c.footerText}; line-height: 1.6; margin: 0; }
+  .footer-text a { color: ${c.footerLink}; text-decoration: none; font-weight: 500; }
 `;
 
 // ── Template: Confirmación al comprador ────────────────────────────────────────
@@ -77,11 +87,11 @@ function buyerConfirmationHtml(data: OrderEmailData): string {
   const itemsHtml = data.items
     .map(
       (item) => `
-      <tr>
-        <td>${item.title}</td>
-        <td class="right muted">${item.quantity}</td>
-        <td class="right">${formatPrice(item.unit_price * item.quantity)}</td>
-      </tr>`
+      <div class="item-card">
+        <p class="item-row"><span class="item-row-label">Producto:</span> <span class="item-row-value">${item.title}</span></p>
+        <p class="item-row"><span class="item-row-label">Cantidad:</span> <span class="item-row-value">${item.quantity}</span></p>
+        <p class="item-row"><span class="item-row-label">Precio:</span> <span class="item-row-value">${formatPrice(item.unit_price * item.quantity)}</span></p>
+      </div>`
     )
     .join("");
 
@@ -115,18 +125,9 @@ function buyerConfirmationHtml(data: OrderEmailData): string {
         </p>
 
         <p class="section-title">Detalle del pedido</p>
-        <table class="items">
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th class="right">Cant.</th>
-              <th class="right">Precio</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemsHtml}
-          </tbody>
-        </table>
+        <div class="item-list">
+          ${itemsHtml}
+        </div>
         <div class="total-row">
           <span class="total-label">Total pagado${installmentText}</span>
           <span class="total-amount">${formatPrice(data.totalAmount)}</span>
@@ -160,7 +161,7 @@ function buyerConfirmationHtml(data: OrderEmailData): string {
 
         <p class="text" style="margin-bottom:0;">
           ¿Tenés alguna duda? Escribinos a
-          <a href="mailto:hola@rzroom.com.ar" style="color:#18181b;font-weight:600;">hola@rzroom.com.ar</a>
+          <a href="mailto:ecomerce.rzhome@gmail.com" style="color:#18181b;font-weight:600;">ecomerce.rzhome@gmail.com</a>
           o por WhatsApp y te respondemos a la brevedad.
         </p>
       </div>
@@ -168,7 +169,7 @@ function buyerConfirmationHtml(data: OrderEmailData): string {
       <div class="footer">
         <p class="footer-text">
           RZ ROOM · Buenos Aires, Argentina<br />
-          <a href="https://rzroom.com.ar">rzroom.com.ar</a>
+          <a href="https://rz-home.vercel.app">rzroom.com.ar</a>
         </p>
       </div>
     </div>
@@ -183,11 +184,11 @@ function ownerNotificationHtml(data: OrderEmailData): string {
   const itemsHtml = data.items
     .map(
       (item) => `
-      <tr>
-        <td>${item.title}</td>
-        <td class="right muted">${item.quantity}</td>
-        <td class="right">${formatPrice(item.unit_price * item.quantity)}</td>
-      </tr>`
+      <div class="item-card">
+        <p class="item-row"><span class="item-row-label">Producto:</span> <span class="item-row-value">${item.title}</span></p>
+        <p class="item-row"><span class="item-row-label">Cantidad:</span> <span class="item-row-value">${item.quantity}</span></p>
+        <p class="item-row"><span class="item-row-label">Precio:</span> <span class="item-row-value">${formatPrice(item.unit_price * item.quantity)}</span></p>
+      </div>`
     )
     .join("");
 
@@ -202,7 +203,7 @@ function ownerNotificationHtml(data: OrderEmailData): string {
   <div class="wrapper">
     <div class="card">
       <div class="header">
-        <p class="header-title">Nuevo pedido 🛍️</p>
+        <p class="header-title">Nuevo pedido</p>
         <p class="header-sub">${formatPrice(data.totalAmount)} · ID ${data.paymentId}</p>
       </div>
 
@@ -217,18 +218,9 @@ function ownerNotificationHtml(data: OrderEmailData): string {
         </div>
 
         <p class="section-title">Productos</p>
-        <table class="items">
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th class="right">Cant.</th>
-              <th class="right">Precio</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemsHtml}
-          </tbody>
-        </table>
+        <div class="item-list">
+          ${itemsHtml}
+        </div>
         <div class="total-row">
           <span class="total-label">Total</span>
           <span class="total-amount">${formatPrice(data.totalAmount)}</span>
@@ -253,38 +245,24 @@ function ownerNotificationHtml(data: OrderEmailData): string {
 // ── Funciones públicas ─────────────────────────────────────────────────────────
 
 export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<void> {
-  initSendGrid();
-  const [error] = await sgMail
-    .send({
-      from: getEmailFrom(),
-      to: data.buyerEmail,
-      subject: "Pedido confirmado — RZ ROOM",
-      html: buyerConfirmationHtml(data),
-    })
-    .then(() => [null])
-    .catch((e: unknown) => [e]);
-
-  if (error) {
-    throw new Error(`SendGrid error (buyer): ${JSON.stringify(error)}`);
-  }
+  const transporter = createTransporter();
+  await transporter.sendMail({
+    from: `"RZ ROOM" <${getEmailFrom()}>`,
+    to: data.buyerEmail,
+    subject: "Pedido confirmado — RZ ROOM",
+    html: buyerConfirmationHtml(data),
+  });
 }
 
 export async function sendNewOrderNotificationEmail(data: OrderEmailData): Promise<void> {
   const notifyEmail = getEmailNotify();
   if (!notifyEmail) return; // No configurado, skip silencioso
 
-  initSendGrid();
-  const [error] = await sgMail
-    .send({
-      from: getEmailFrom(),
-      to: notifyEmail,
-      subject: `Nuevo pedido — ${data.buyerName} ${data.buyerLastName} · ${formatPrice(data.totalAmount)}`,
-      html: ownerNotificationHtml(data),
-    })
-    .then(() => [null])
-    .catch((e: unknown) => [e]);
-
-  if (error) {
-    throw new Error(`SendGrid error (owner): ${JSON.stringify(error)}`);
-  }
+  const transporter = createTransporter();
+  await transporter.sendMail({
+    from: `"RZ ROOM" <${getEmailFrom()}>`,
+    to: notifyEmail,
+    subject: `Nuevo pedido — ${data.buyerName} ${data.buyerLastName} · ${formatPrice(data.totalAmount)}`,
+    html: ownerNotificationHtml(data),
+  });
 }

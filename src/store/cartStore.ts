@@ -8,7 +8,7 @@ import type { CartItem, CartItemConfig } from "@/types";
 interface CartStore {
   items: CartItem[];
   isOpen: boolean;
-  addItem: (config: CartItemConfig) => void;
+  addItem: (config: CartItemConfig, unitPrice?: number) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -23,9 +23,9 @@ export const useCartStore = create<CartStore>()(
       items: [],
       isOpen: false,
 
-      addItem: (config) => {
+      addItem: (config, unitPrice) => {
         const id = generateCartItemId(config);
-        const unitPrice = getProductPrice(config);
+        const price = unitPrice ?? getProductPrice(config);
         const name = getProductName(config);
 
         set((state) => {
@@ -37,7 +37,7 @@ export const useCartStore = create<CartStore>()(
             };
           }
           return {
-            items: [...state.items, { id, config, quantity: 1, unitPrice, name }],
+            items: [...state.items, { id, config, quantity: 1, unitPrice: price, name }],
             isOpen: true,
           };
         });

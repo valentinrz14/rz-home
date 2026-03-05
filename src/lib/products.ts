@@ -1,27 +1,51 @@
 import type { StructureColorOption, TableColorOption, TableSize, TableSizeOption } from "@/types";
 
-// ─── Precios ──────────────────────────────────────────────────────────────────
-//
-// Costos de producción (ARS):
-//   Tabla 160x80: $153.800  |  Estructura doble motor: $376.000
-//
-// Estrategia: margen ~70-90% sobre costo, siempre más barato que competencia.
-// Competencia referencia: JUST.ERGONOMICS cobra $2.240.000 el bundle completo.
-//
-export const STRUCTURE_PRICE = 699_000; // Solo estructura doble motor
+// ─── Precios transferencia / cripto ───────────────────────────────────────────
+export const STRUCTURE_PRICE = 650_000;
 
+// Redondeado para arriba al próximo múltiplo de $5.000
 export const TABLE_PRICES: Record<TableSize, number> = {
-  "120x60": 149_000,
-  "140x70": 179_000,
-  "150x70": 199_000,
-  "160x80": 249_000,
+  "120x60": 100_000,
+  "140x70": 120_000,
+  "160x80": 140_000,
 };
 
+// Redondeado para arriba al próximo múltiplo de $5.000
 export const BUNDLE_PRICES: Record<TableSize, number> = {
-  "120x60": 799_000,
-  "140x70": 829_000,
-  "150x70": 849_000,
-  "160x80": 899_000,
+  "120x60": 750_000,
+  "140x70": 770_000,
+  "160x80": 790_000,
+};
+
+// ─── Precios MercadoPago 1 pago ────────────────────────────────────────────────
+export const STRUCTURE_PRICE_MP = 722_000;
+
+// Redondeado para arriba al próximo múltiplo de $5.000
+export const TABLE_PRICES_MP: Record<TableSize, number> = {
+  "120x60": 110_000,
+  "140x70": 130_000,
+  "160x80": 155_000,
+};
+
+// Redondeado para arriba al próximo múltiplo de $5.000
+export const BUNDLE_PRICES_MP: Record<TableSize, number> = {
+  "120x60": 835_000,
+  "140x70": 855_000,
+  "160x80": 880_000,
+};
+
+// ─── Precios motor simple (transferencia / cripto) ────────────────────────────
+export const STRUCTURE_PRICE_SIMPLE = 320_000;
+export const BUNDLE_PRICES_SIMPLE: Record<"120x60" | "140x70", number> = {
+  "120x60": 420_000,
+  "140x70": 459_000,
+};
+
+// ─── Precios motor simple MercadoPago 1 pago ──────────────────────────────────
+export const STRUCTURE_PRICE_SIMPLE_MP = 326_400; // 320k * 1.02
+export const BUNDLE_PRICES_SIMPLE_MP: Record<"120x60" | "140x70", number> = {
+  "120x60": 428_400, // 420k * 1.02
+  "140x70": 468_180, // 459k * 1.02
 };
 
 // ─── Opciones de colores de tabla ─────────────────────────────────────────────
@@ -80,14 +104,6 @@ export const TABLE_SIZES: TableSizeOption[] = [
     bundlePrice: BUNDLE_PRICES["140x70"],
   },
   {
-    id: "150x70",
-    label: "150 × 70 cm",
-    width: 150,
-    depth: 70,
-    price: TABLE_PRICES["150x70"],
-    bundlePrice: BUNDLE_PRICES["150x70"],
-  },
-  {
     id: "160x80",
     label: "160 × 80 cm",
     width: 160,
@@ -127,6 +143,21 @@ export const DESK_SPECS = {
     "Tornillería completa + llave Allen",
     "Manual de instalación",
   ],
+} as const;
+
+// ─── Specs del standing desk motor simple (DERSITE KD02) ──────────────────────
+export const DESK_SPECS_SIMPLE = {
+  heightRange: { min: 71, max: 119 },
+  weightCapacity: 80,
+  motors: 1,
+  noiseLevel: 55,
+  memoryPresets: 3,
+  speed: 20, // mm/seg
+  warranty: 12,
+  tableThickness: 36,
+  compatibleWidth: { min: 101, max: 160 },
+  voltage: "100V – 240V",
+  assemblyTime: 20,
 } as const;
 
 // ─── Features para marketing ──────────────────────────────────────────────────

@@ -1,62 +1,104 @@
 "use client";
 
 import { Check, ShoppingCart } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  BUNDLE_PRICES,
-  STRUCTURE_COLORS,
-  STRUCTURE_PRICE,
-  TABLE_COLORS,
-  TABLE_PRICES,
-  TABLE_SIZES,
-} from "@/lib/products";
-import { formatPrice } from "@/lib/utils";
+import { usePrices } from "@/hooks/usePrices";
+import { STRUCTURE_COLORS, TABLE_COLORS, TABLE_SIZES } from "@/lib/products";
+import { formatPrice, getProductPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
-import type { ProductType, StructureColor, TableColor, TableSize } from "@/types";
+import type { MotorType, ProductType, StructureColor, TableColor, TableSize } from "@/types";
 
 interface Props {
   defaultType?: ProductType;
+  defaultMotor?: MotorType;
+  onTypeChange?: (t: ProductType) => void;
+  onMotorChange?: (m: MotorType) => void;
   onStructureColorChange?: (c: StructureColor) => void;
   onTableColorChange?: (c: TableColor) => void;
 }
 
 export function ProductConfigurator({
   defaultType = "completo",
+  defaultMotor = "doble",
+  onTypeChange,
+  onMotorChange,
   onStructureColorChange,
   onTableColorChange,
 }: Props) {
   const [productType, setProductType] = useState<ProductType>(defaultType);
+  const [motorType, setMotorType] = useState<MotorType>(defaultMotor);
   const [tableSize, setTableSize] = useState<TableSize>("140x70");
   const [tableColor, setTableColor] = useState<TableColor>("hickory");
   const [structureColor, setStructureColor] = useState<StructureColor>("negro");
   const [added, setAdded] = useState(false);
 
+  // Reset 160x80 when switching to simple motor (only 120x60 and 140x70 available)
+  useEffect(() => {
+    if (motorType === "simple" && tableSize === "160x80") {
+      setTableSize("140x70");
+    }
+  }, [motorType, tableSize]);
+
   const { addItem } = useCartStore();
+  const prices = usePrices();
 
-  const price =
-    productType === "estructura"
-      ? STRUCTURE_PRICE
-      : productType === "tabla"
-        ? TABLE_PRICES[tableSize]
-        : BUNDLE_PRICES[tableSize];
+  const availableSizes =
+    motorType === "simple" ? TABLE_SIZES.filter((s) => s.id !== "160x80") : TABLE_SIZES;
 
-  const INSTALLMENTS = 12;
-  const installmentPrice = Math.ceil(price / INSTALLMENTS);
+  const config = {
+    type: productType,
+    motorType,
+    structureColor: productType !== "tabla" ? structureColor : undefined,
+    tableSize: productType !== "estructura" ? tableSize : undefined,
+    tableColor: productType !== "estructura" ? tableColor : undefined,
+  };
+
+  const price = getProductPrice(config, prices.transfer);
 
   function handleAdd() {
-    addItem({
-      type: productType,
-      structureColor: productType !== "tabla" ? structureColor : undefined,
-      tableSize: productType !== "estructura" ? tableSize : undefined,
-      tableColor: productType !== "estructura" ? tableColor : undefined,
-    });
+    addItem(config, price);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
 
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      {/* Motor type */}
+      <div className="mb-5">
+        <label className="mb-2 block text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          Tipo de motor
+        </label>
+        <div className="grid grid-cols-2 gap-2">
+          {(
+            [
+              { id: "doble", label: "Doble motor", sub: "120 kg · <50 dB" },
+              { id: "simple", label: "Motor simple", sub: "80 kg · ≤55 dB" },
+            ] as { id: MotorType; label: string; sub: string }[]
+          ).map((opt) => (
+            <button
+              key={opt.id}
+              onClick={() => {
+                setMotorType(opt.id);
+                onMotorChange?.(opt.id);
+              }}
+              className={`flex flex-col items-center rounded-lg border px-3 py-3 text-sm font-medium transition-all ${
+                motorType === opt.id
+                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                  : "border-zinc-200 bg-zinc-50 text-zinc-700 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600"
+              }`}
+            >
+              <span className="font-semibold">{opt.label}</span>
+              <span
+                className={`mt-0.5 text-xs ${motorType === opt.id ? "opacity-60" : "text-zinc-400 dark:text-zinc-500"}`}
+              >
+                {opt.sub}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Tipo de producto */}
       <div className="mb-5">
         <label className="mb-2 block text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -72,7 +114,10 @@ export function ProductConfigurator({
           ).map((opt) => (
             <button
               key={opt.id}
-              onClick={() => setProductType(opt.id)}
+              onClick={() => {
+                setProductType(opt.id);
+                onTypeChange?.(opt.id);
+              }}
               className={`rounded-lg border px-3 py-3 text-sm font-medium transition-all ${
                 productType === opt.id
                   ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
@@ -129,7 +174,7 @@ export function ProductConfigurator({
             Medida de la tapa
           </label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {TABLE_SIZES.map((size) => (
+            {availableSizes.map((size) => (
               <button
                 key={size.id}
                 onClick={() => setTableSize(size.id)}
@@ -144,7 +189,7 @@ export function ProductConfigurator({
                   <span
                     className={`mt-0.5 text-xs ${tableSize === size.id ? "text-zinc-400 dark:text-zinc-500" : "text-zinc-500 dark:text-zinc-400"}`}
                   >
-                    {formatPrice(size.price)}
+                    {formatPrice(prices.transfer.tables[size.id])}
                   </span>
                 )}
               </button>
@@ -200,16 +245,9 @@ export function ProductConfigurator({
       <div className="rounded-xl bg-zinc-50 p-4 dark:bg-zinc-800">
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">Precio total</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">Transferencia bancaria</p>
             <p className="font-display text-4xl font-bold text-zinc-900 dark:text-white">
               {formatPrice(price)}
-            </p>
-            <p className="mt-1 text-base text-zinc-500 dark:text-zinc-400">
-              ó {INSTALLMENTS} cuotas de{" "}
-              <span className="font-semibold text-zinc-700 dark:text-zinc-200">
-                {formatPrice(installmentPrice)}
-              </span>{" "}
-              sin interés
             </p>
           </div>
           <div className="text-right text-sm text-zinc-400">

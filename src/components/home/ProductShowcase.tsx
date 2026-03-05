@@ -1,22 +1,23 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
 import { DersiteIllustration } from "@/components/products/DersiteIllustration";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BUNDLE_PRICES, STRUCTURE_PRICE, TABLE_PRICES } from "@/lib/products";
+import type { PricesConfig } from "@/lib/prices";
+import { BUNDLE_PRICES_SIMPLE } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 import type { StructureColor } from "@/types";
 
-const products = [
+const productDefs = [
   {
-    id: "completo",
+    id: "doble",
     badge: "Más vendido",
-    title: "Standing Desk Completo",
+    title: "Standing Desk Doble Motor",
     description:
-      "Estructura doble motor rz room + tapa MDF premium 36mm. Elegí medida, color de tapa y color de estructura.",
-    price: BUNDLE_PRICES["120x60"],
-    priceLabel: "desde",
-    href: "/productos?tipo=completo",
+      "La opción más potente y silenciosa. Disponible como escritorio completo, solo estructura o solo tapa.",
+    getPrice: (p: PricesConfig) => p.transfer.bundles["120x60"],
+    priceLabel: "completo desde",
+    href: "/productos?motor=doble",
     highlight: true,
     illustration: {
       structureColor: "negro" as StructureColor,
@@ -24,45 +25,22 @@ const products = [
       tableColorHex: "#9C6B3C",
     },
     specs: [
-      "Estructura rz room doble motor",
-      "Tapa MDF 36mm con melamina",
-      "4 medidas · 6 colores de tapa",
-      "Estructura blanca o negra",
-      "3 memorias + anticolisión",
-    ],
-  },
-  {
-    id: "estructura",
-    badge: "Solo estructura",
-    title: "Estructura Doble Motor",
-    description:
-      "Estructura rz room regulable 71–119 cm con panel de control, 3 memorias, sensor anticolisión y bandeja pasacables.",
-    price: STRUCTURE_PRICE,
-    priceLabel: "",
-    href: "/productos?tipo=estructura",
-    highlight: false,
-    illustration: {
-      structureColor: "negro" as StructureColor,
-      withTabletop: false,
-      tableColorHex: "#9C6B3C",
-    },
-    specs: [
       "Doble motor silencioso (<50 dB)",
-      "Altura: 71 – 119 cm",
       "Capacidad 120 kg",
-      "3 memorias + display cm/in",
-      "Bandeja pasacables + gancho",
+      "3 medidas · 6 colores de tapa",
+      "3 memorias + anticolisión",
+      "Escritorio completo, estructura o tapa",
     ],
   },
   {
-    id: "tabla",
-    badge: "Solo tapa",
-    title: "Tapa de Escritorio",
+    id: "simple",
+    badge: "Nuevo · Accesible",
+    title: "Standing Desk Motor Simple",
     description:
-      "Tapa MDF alta densidad 36mm con terminación melamina y tapacanto profesional en todos los bordes.",
-    price: TABLE_PRICES["120x60"],
-    priceLabel: "desde",
-    href: "/productos?tipo=tabla",
+      "La opción accesible para empezar con ergonomía ajustable. Completo, solo estructura o solo tapa.",
+    getPrice: (_p: PricesConfig) => BUNDLE_PRICES_SIMPLE["120x60"],
+    priceLabel: "completo desde",
+    href: "/productos?motor=simple",
     highlight: false,
     illustration: {
       structureColor: "blanco" as StructureColor,
@@ -70,15 +48,21 @@ const products = [
       tableColorHex: "#9C6B3C",
     },
     specs: [
-      "MDF alta densidad 36mm",
-      "4 medidas disponibles",
-      "6 colores de melamina",
-      "Lista para instalar",
+      "Motor silencioso (≤55 dB)",
+      "Capacidad 80 kg",
+      "2 medidas · 6 colores de tapa",
+      "3 memorias + display digital",
+      "Escritorio completo, estructura o tapa",
     ],
   },
 ];
 
-export function ProductShowcase() {
+interface Props {
+  prices: PricesConfig;
+}
+
+export function ProductShowcase({ prices }: Props) {
+  const products = productDefs.map((p) => ({ ...p, price: p.getPrice(prices) }));
   return (
     <section id="productos-destacados" className="bg-zinc-50 px-4 py-20 dark:bg-zinc-900/50">
       <div className="mx-auto max-w-7xl">
@@ -94,7 +78,7 @@ export function ProductShowcase() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {products.map((product) => (
             <div
               key={product.id}
@@ -200,6 +184,82 @@ export function ProductShowcase() {
                 </Button>
               </div>
             </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── ¿Cuál te conviene? ───────────────────────────────────────── */}
+      <div className="mx-auto mt-10 max-w-4xl">
+        <p className="mb-6 text-center text-sm font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+          ¿No sabés cuál elegir?
+        </p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {[
+            {
+              title: "Elegí el Doble Motor si…",
+              href: "/productos?motor=doble",
+              items: [
+                "Usás el escritorio 8+ horas por día",
+                "Tenés monitors pesados o múltiples periféricos",
+                "Querés la mayor estabilidad posible",
+                "El espacio es compartido y el ruido importa",
+                "Buscás la opción más duradera a largo plazo",
+              ],
+              highlight: true,
+            },
+            {
+              title: "Elegí el Motor Simple si…",
+              href: "/productos?motor=simple",
+              items: [
+                "Es tu primer standing desk",
+                "Usás monitor estándar y accesorios ligeros",
+                "Buscás la opción más accesible en precio",
+                "Home office personal con uso moderado",
+                "Querés probar ergonomía ajustable sin invertir de más",
+              ],
+              highlight: false,
+            },
+          ].map((col) => (
+            <Link
+              key={col.title}
+              href={col.href}
+              className={`group block rounded-2xl border p-6 transition-all hover:shadow-md ${
+                col.highlight
+                  ? "border-zinc-800 bg-zinc-900 dark:border-zinc-600 dark:bg-zinc-800"
+                  : "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+              }`}
+            >
+              <p
+                className={`mb-4 text-base font-semibold ${
+                  col.highlight ? "text-white" : "text-zinc-900 dark:text-white"
+                }`}
+              >
+                {col.title}
+              </p>
+              <ul className="space-y-2.5">
+                {col.items.map((item) => (
+                  <li
+                    key={item}
+                    className={`flex items-start gap-2.5 text-sm ${
+                      col.highlight ? "text-zinc-400" : "text-zinc-500 dark:text-zinc-400"
+                    }`}
+                  >
+                    <Check
+                      size={15}
+                      className={`mt-0.5 shrink-0 ${col.highlight ? "text-brand-400" : "text-green-500"}`}
+                    />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p
+                className={`mt-5 flex items-center gap-1.5 text-sm font-medium transition-all group-hover:gap-2.5 ${
+                  col.highlight ? "text-brand-400" : "text-zinc-500 dark:text-zinc-400"
+                }`}
+              >
+                Ver producto <ArrowRight size={14} />
+              </p>
+            </Link>
           ))}
         </div>
       </div>

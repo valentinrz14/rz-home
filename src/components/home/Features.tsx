@@ -1,53 +1,38 @@
-import { Layers, Package, Plug, Ruler, Settings, Shield, Truck, Volume2, Zap } from "lucide-react";
+import { Layers, Package, Ruler, Settings, Truck, Zap } from "lucide-react";
 
 const iconMap = {
   zap: Zap,
-  shield: Shield,
   settings: Settings,
   layers: Layers,
   truck: Truck,
   package: Package,
-  volume: Volume2,
   ruler: Ruler,
-  plug: Plug,
 } as const;
 
 const features = [
   {
     icon: "zap" as const,
-    title: "Doble motor silencioso",
+    title: "Motor eléctrico silencioso",
     description:
-      "Sistema de elevación dual motor eléctrico. Ajuste suave, uniforme y rápido. Casi inaudible (<50 dB).",
-  },
-  {
-    icon: "shield" as const,
-    title: "Sensor anticolisión",
-    description:
-      "Detección inteligente de obstáculos con sensibilidad configurable. Se detiene y retrocede automáticamente.",
+      "Ajuste suave y silencioso en segundos. No interrumpe videollamadas ni reuniones. Disponible en simple o doble motor.",
   },
   {
     icon: "settings" as const,
     title: "3 memorias + display",
     description:
-      "Controlador con 3 memorias programables. Cambiá entre cm y pulgadas. Configurable según espesor de tapa.",
+      "Controlador con 3 alturas programables, pantalla digital y switch cm/pulgadas. Configurable según espesor de tapa.",
   },
   {
     icon: "layers" as const,
     title: "Tapa MDF premium 36mm",
     description:
-      "MDF alta densidad con melamina y tapacanto profesional en los 4 bordes. Resistente y duradera.",
+      "MDF alta densidad con melamina y tapacanto profesional en los 4 bordes. 6 colores disponibles.",
   },
   {
     icon: "ruler" as const,
     title: "Altura 71 – 119 cm",
     description:
-      "Rango ajustable de 71 a 119 cm. Compatible con tapas de 110 cm a 180 cm de ancho.",
-  },
-  {
-    icon: "plug" as const,
-    title: "100V – 240V universal",
-    description:
-      "Funciona con cualquier voltaje. Bandeja pasacables incluida + gancho para auriculares.",
+      "Rango ajustable de 71 a 119 cm. Compatible con personas sentadas o de pie de cualquier altura.",
   },
   {
     icon: "truck" as const,
@@ -60,12 +45,6 @@ const features = [
     title: "Armado fácil y probado",
     description:
       "Armado en ~20 min con instrucciones claras. Agujeros pre-perforados. Sale probado con manual incluido.",
-  },
-  {
-    icon: "volume" as const,
-    title: "Ultra silencioso",
-    description:
-      "No interrumpe videollamadas ni reuniones. Cambio de altura completo en segundos sin ruidos mecánicos.",
   },
 ] as const;
 
@@ -81,7 +60,7 @@ export function Features() {
             Todo lo que necesitás
           </h2>
           <p className="mt-4 text-lg text-zinc-500 dark:text-zinc-400">
-            Sistema de doble motor propio con tapas MDF de alta densidad.
+            Características incluidas en todos nuestros productos.
           </p>
         </div>
 

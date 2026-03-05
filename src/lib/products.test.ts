@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest";
 import type { TableSize } from "@/types";
 import {
   BUNDLE_PRICES,
+  BUNDLE_PRICES_SIMPLE,
+  BUNDLE_PRICES_SIMPLE_MP,
   STRUCTURE_COLORS,
   STRUCTURE_PRICE,
+  STRUCTURE_PRICE_SIMPLE,
+  STRUCTURE_PRICE_SIMPLE_MP,
   TABLE_COLORS,
   TABLE_PRICES,
   TABLE_SIZES,
@@ -35,8 +39,8 @@ describe("TABLE_COLORS", () => {
 
 // ─── Medidas de tapa ──────────────────────────────────────────────────────────
 describe("TABLE_SIZES", () => {
-  it("tiene exactamente 4 medidas", () => {
-    expect(TABLE_SIZES).toHaveLength(4);
+  it("tiene exactamente 3 medidas", () => {
+    expect(TABLE_SIZES).toHaveLength(3);
   });
 
   it("el precio del bundle siempre es mayor que el precio de la tapa sola", () => {
@@ -72,11 +76,11 @@ describe("STRUCTURE_COLORS", () => {
 
 // ─── Coherencia de precios ────────────────────────────────────────────────────
 describe("precios", () => {
-  it("el bundle es más barato que comprar por separado", () => {
+  it("el bundle es mayor o igual a estructura + tapa (puede estar redondeado para arriba)", () => {
     Object.entries(TABLE_PRICES).forEach(([size, tablePrice]) => {
       const bundlePrice = BUNDLE_PRICES[size as TableSize];
       const precioPorSeparado = STRUCTURE_PRICE + tablePrice;
-      expect(bundlePrice).toBeLessThan(precioPorSeparado);
+      expect(bundlePrice).toBeGreaterThanOrEqual(precioPorSeparado);
     });
   });
 
@@ -86,8 +90,8 @@ describe("precios", () => {
     });
   });
 
-  it("todos los bundles son más baratos que la competencia ($2.240.000)", () => {
-    const COMPETITOR_PRICE = 2_240_000;
+  it("todos los bundles son más baratos que la competencia ($1.400.000)", () => {
+    const COMPETITOR_PRICE = 1_400_000;
     Object.values(BUNDLE_PRICES).forEach((bundlePrice) => {
       expect(bundlePrice).toBeLessThan(COMPETITOR_PRICE);
     });
@@ -95,5 +99,70 @@ describe("precios", () => {
 
   it("el precio de la estructura es positivo", () => {
     expect(STRUCTURE_PRICE).toBeGreaterThan(0);
+  });
+});
+
+// ─── Motor simple: medidas disponibles ────────────────────────────────────────
+describe("BUNDLE_PRICES_SIMPLE — medidas", () => {
+  it("solo tiene 2 medidas: 120x60 y 140x70 (sin 160x80)", () => {
+    expect(Object.keys(BUNDLE_PRICES_SIMPLE)).toEqual(["120x60", "140x70"]);
+  });
+
+  it("la medida 140x70 cuesta más que 120x60", () => {
+    expect(BUNDLE_PRICES_SIMPLE["140x70"]).toBeGreaterThan(BUNDLE_PRICES_SIMPLE["120x60"]);
+  });
+
+  it("todos los precios son positivos e integers", () => {
+    Object.values(BUNDLE_PRICES_SIMPLE).forEach((price) => {
+      expect(price).toBeGreaterThan(0);
+      expect(Number.isInteger(price)).toBe(true);
+    });
+  });
+});
+
+// ─── Motor simple: invariantes de precio vs doble motor ───────────────────────
+describe("precios motor simple vs doble motor", () => {
+  it("STRUCTURE_PRICE_SIMPLE es más barato que STRUCTURE_PRICE", () => {
+    expect(STRUCTURE_PRICE_SIMPLE).toBeLessThan(STRUCTURE_PRICE);
+  });
+
+  it("los bundles simple son más baratos que los bundles doble para las mismas medidas", () => {
+    (["120x60", "140x70"] as const).forEach((size) => {
+      expect(BUNDLE_PRICES_SIMPLE[size]).toBeLessThan(BUNDLE_PRICES[size]);
+    });
+  });
+
+  it("STRUCTURE_PRICE_SIMPLE es mayor que cualquier tapa doble motor", () => {
+    Object.values(TABLE_PRICES).forEach((tablePrice) => {
+      expect(STRUCTURE_PRICE_SIMPLE).toBeGreaterThan(tablePrice);
+    });
+  });
+});
+
+// ─── Motor simple: precios MercadoPago (+2%) ──────────────────────────────────
+describe("precios MercadoPago motor simple", () => {
+  it("STRUCTURE_PRICE_SIMPLE_MP es exactamente 2% más que STRUCTURE_PRICE_SIMPLE", () => {
+    const expected = Math.round(STRUCTURE_PRICE_SIMPLE * 1.02);
+    expect(STRUCTURE_PRICE_SIMPLE_MP).toBe(expected);
+  });
+
+  it("BUNDLE_PRICES_SIMPLE_MP[120x60] es aprox. 2% más que transfer", () => {
+    const transfer = BUNDLE_PRICES_SIMPLE["120x60"];
+    expect(BUNDLE_PRICES_SIMPLE_MP["120x60"]).toBeGreaterThan(transfer);
+    expect(BUNDLE_PRICES_SIMPLE_MP["120x60"]).toBeLessThanOrEqual(Math.ceil(transfer * 1.02) + 1);
+  });
+
+  it("BUNDLE_PRICES_SIMPLE_MP[140x70] es aprox. 2% más que transfer", () => {
+    const transfer = BUNDLE_PRICES_SIMPLE["140x70"];
+    expect(BUNDLE_PRICES_SIMPLE_MP["140x70"]).toBeGreaterThan(transfer);
+    expect(BUNDLE_PRICES_SIMPLE_MP["140x70"]).toBeLessThanOrEqual(Math.ceil(transfer * 1.02) + 1);
+  });
+
+  it("todos los precios MP simple son positivos e integers", () => {
+    Object.values(BUNDLE_PRICES_SIMPLE_MP).forEach((price) => {
+      expect(price).toBeGreaterThan(0);
+      expect(Number.isInteger(price)).toBe(true);
+    });
+    expect(Number.isInteger(STRUCTURE_PRICE_SIMPLE_MP)).toBe(true);
   });
 });

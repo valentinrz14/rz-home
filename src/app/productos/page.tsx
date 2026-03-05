@@ -3,6 +3,7 @@
 import {
   Cable,
   CheckCircle2,
+  ChevronDown,
   Gauge,
   Headphones,
   Package,
@@ -16,11 +17,12 @@ import {
   Zap,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { FAQ } from "@/components/home/FAQ";
 import { DersiteIllustration } from "@/components/products/DersiteIllustration";
 import { ProductConfigurator } from "@/components/products/ProductConfigurator";
 import { STRUCTURE_COLORS, TABLE_COLORS } from "@/lib/products";
-import type { ProductType, StructureColor, TableColor } from "@/types";
+import type { MotorType, ProductType, StructureColor, TableColor } from "@/types";
 
 const DERSITE_SPECS = [
   { icon: Zap, label: "Motor", value: "Doble motor eléctrico independiente" },
@@ -33,6 +35,19 @@ const DERSITE_SPECS = [
   { icon: Plug, label: "Voltaje", value: "100V – 240V universal" },
   { icon: Ruler, label: "Ancho compatible de tapa", value: "110 – 183 cm" },
   { icon: Ruler, label: "Dimensiones estructura", value: "45 × 183 × 119 cm (max)" },
+  { icon: Wrench, label: "Tiempo de armado", value: "~20 minutos" },
+  { icon: Package, label: "Garantía", value: "12 meses estructura eléctrica" },
+];
+
+const DERSITE_SPECS_SIMPLE = [
+  { icon: Zap, label: "Motor", value: "Motor eléctrico simple" },
+  { icon: Ruler, label: "Rango de altura", value: "71 – 119 cm (ajustable)" },
+  { icon: Weight, label: "Capacidad de carga", value: "80 kg" },
+  { icon: Gauge, label: "Velocidad", value: "20 mm/seg (2 cm/seg)" },
+  { icon: Volume2, label: "Nivel de ruido", value: "≤ 55 dB (silencioso)" },
+  { icon: Settings, label: "Memorias", value: "3 posiciones + display cm/in" },
+  { icon: Plug, label: "Voltaje", value: "100V – 240V universal" },
+  { icon: Ruler, label: "Ancho compatible de tapa", value: "101 – 160 cm" },
   { icon: Wrench, label: "Tiempo de armado", value: "~20 minutos" },
   { icon: Package, label: "Garantía", value: "12 meses estructura eléctrica" },
 ];
@@ -54,15 +69,83 @@ const DERSITE_FEATURES = [
   "Instrucciones claras con piezas etiquetadas",
 ];
 
+const DERSITE_FEATURES_SIMPLE = [
+  "Sistema de elevación eléctrico silencioso (≤55 dB)",
+  "Controlador con display digital: 3 memorias, switch cm/pulgadas",
+  "Bloqueo de seguridad para evitar cambios de altura accidentales",
+  "Altura mín/máx configurable según preferencia personal",
+  "Configurable según espesor de tu tapa para lectura de altura precisa",
+  "Cambio de altura completo en segundos",
+  "Compatible con tapas de 101 cm a 160 cm de ancho",
+  "Capacidad de carga: 80 kg",
+  "Agujeros pre-perforados — armado fácil con herramientas incluidas",
+  "Tornillería completa + llave Allen incluidas",
+  "Instrucciones claras con piezas etiquetadas",
+];
+
 const TABLE_FEATURES = [
   "MDF alta densidad con 36mm de espesor total (doble capa)",
   "Terminación melamina premium resistente a rayones y humedad",
   "Tapacanto profesional de 0.45mm en los 4 bordes",
   "6 colores: Hickory, Roble Claro, Blanco, Gris Cemento, Nogal, Negro",
-  "4 medidas: 120×60 · 140×70 · 150×70 · 160×80 cm",
+  "3 medidas: 120×60 · 140×70 · 160×80 cm",
   "Cortes a medida precisos con acabado de fábrica",
   "Lista para instalar sobre la estructura",
 ];
+
+const TABLE_FEATURES_SIMPLE = [
+  "MDF alta densidad con 36mm de espesor total (doble capa)",
+  "Terminación melamina premium resistente a rayones y humedad",
+  "Tapacanto profesional de 0.45mm en los 4 bordes",
+  "6 colores: Hickory, Roble Claro, Blanco, Gris Cemento, Nogal, Negro",
+  "2 medidas: 120×60 · 140×70 cm",
+  "Cortes a medida precisos con acabado de fábrica",
+  "Lista para instalar sobre la estructura",
+];
+
+// ─── Acordeón para mobile ────────────────────────────────────────────────────
+function FeatureAccordion({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  title: string;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div>
+      {/* Header: botón en mobile, estático en desktop */}
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className="flex w-full items-center justify-between lg:pointer-events-none"
+      >
+        <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-zinc-900 dark:text-white">
+          <Icon size={24} className="text-brand-600 dark:text-brand-400" />
+          {title}
+        </h3>
+        <ChevronDown
+          size={22}
+          className={`shrink-0 text-zinc-400 transition-transform duration-200 lg:hidden ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {/* Contenido: colapsado en mobile, siempre visible en desktop */}
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-in-out lg:!grid-rows-[1fr] ${
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden">{children}</div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Vista interactiva del producto ───────────────────────────────────────────
 function ProductViewer({
@@ -74,9 +157,12 @@ function ProductViewer({
   structureColor: StructureColor;
   tableColor: TableColor;
 }) {
-  const [view, setView] = useState<"estructura" | "completo">(
-    tipo === "tabla" ? "completo" : tipo === "estructura" ? "estructura" : "completo"
-  );
+  const defaultView = tipo === "estructura" ? "estructura" : "completo";
+  const [view, setView] = useState<"estructura" | "completo">(defaultView);
+
+  useEffect(() => {
+    setView(tipo === "estructura" ? "estructura" : "completo");
+  }, [tipo]);
 
   const tableColorHex = TABLE_COLORS.find((c) => c.id === tableColor)?.hex ?? "#9C6B3C";
 
@@ -97,6 +183,7 @@ function ProductViewer({
         <div className="mb-4 flex gap-2">
           {tabs.map((tab) => (
             <button
+              type="button"
               key={tab.id}
               onClick={() => setView(tab.id)}
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
@@ -114,7 +201,8 @@ function ProductViewer({
       {/* Ilustración SVG de la estructura */}
       <DersiteIllustration
         structureColor={structureColor}
-        withTabletop={view === "completo"}
+        withTabletop={view === "completo" || tipo === "tabla"}
+        withStructure={tipo !== "tabla"}
         tableColorHex={tableColorHex}
         className="w-full"
       />
@@ -143,11 +231,21 @@ function ProductViewer({
 // ─── Página principal ─────────────────────────────────────────────────────────
 function ProductsContent() {
   const searchParams = useSearchParams();
-  const tipo = (searchParams.get("tipo") ?? "completo") as ProductType;
+  const [tipo, setTipo] = useState<ProductType>(
+    (searchParams.get("tipo") ?? "completo") as ProductType
+  );
+  const [motorType, setMotorType] = useState<MotorType>(
+    (searchParams.get("motor") ?? "doble") as MotorType
+  );
 
   // Estado compartido entre el viewer y el configurador
   const [structureColor, setStructureColor] = useState<StructureColor>("negro");
   const [tableColor, setTableColor] = useState<TableColor>("hickory");
+
+  const isSimple = motorType === "simple";
+  const activeSpecs = isSimple ? DERSITE_SPECS_SIMPLE : DERSITE_SPECS;
+  const activeFeatures = isSimple ? DERSITE_FEATURES_SIMPLE : DERSITE_FEATURES;
+  const activeTableFeatures = isSimple ? TABLE_FEATURES_SIMPLE : TABLE_FEATURES;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -169,15 +267,25 @@ function ProductsContent() {
         {/* Columna derecha: título + configurador */}
         <div>
           <h1 className="font-display text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">
-            {tipo === "completo" && "Standing Desk Completo"}
-            {tipo === "estructura" && "Estructura Doble Motor rz room"}
+            {tipo === "completo" && !isSimple && "Standing Desk Doble Motor"}
+            {tipo === "completo" && isSimple && "Standing Desk Motor Simple"}
+            {tipo === "estructura" && !isSimple && "Estructura Doble Motor rz room"}
+            {tipo === "estructura" && isSimple && "Estructura Motor Simple rz room"}
             {tipo === "tabla" && "Tapa de Escritorio Premium"}
           </h1>
           <p className="mt-2 text-lg text-zinc-500 dark:text-zinc-400">
             {tipo === "completo" &&
+              !isSimple &&
               "Personalizá tu escritorio ideal: estructura doble motor rz room + tapa MDF 36mm. Elegí medida, colores y listo."}
+            {tipo === "completo" &&
+              isSimple &&
+              "Standing desk accesible con motor simple + tapa MDF 36mm. 2 medidas, 6 colores, 80 kg de capacidad."}
             {tipo === "estructura" &&
+              !isSimple &&
               "Estructura regulable con doble motor silencioso. Controlador con 3 memorias, sensor anticolisión y bandeja pasacables."}
+            {tipo === "estructura" &&
+              isSimple &&
+              "Estructura regulable con motor simple y silencioso. Controlador con 3 memorias y bloqueo de seguridad."}
             {tipo === "tabla" &&
               "Tapa MDF alta densidad 36mm con melamina y tapacanto profesional en los 4 bordes."}
           </p>
@@ -185,6 +293,9 @@ function ProductsContent() {
           <div className="mt-6">
             <ProductConfigurator
               defaultType={tipo}
+              defaultMotor={motorType}
+              onTypeChange={setTipo}
+              onMotorChange={setMotorType}
               onStructureColorChange={setStructureColor}
               onTableColorChange={setTableColor}
             />
@@ -198,11 +309,13 @@ function ProductsContent() {
           Especificaciones técnicas
         </h2>
         <p className="mt-1 text-base text-zinc-500 dark:text-zinc-400">
-          Estructura eléctrica doble motor rz room — Especificaciones completas
+          {isSimple
+            ? "Estructura eléctrica motor simple rz room — Especificaciones completas"
+            : "Estructura eléctrica doble motor rz room — Especificaciones completas"}
         </p>
 
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {DERSITE_SPECS.map((spec) => {
+          {activeSpecs.map((spec) => {
             const Icon = spec.icon;
             return (
               <div
@@ -226,15 +339,11 @@ function ProductsContent() {
 
       {/* ─── Características ─────────────────────────────────────────── */}
       <section className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div>
-          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-zinc-900 dark:text-white">
-            <Cable size={24} className="text-brand-600 dark:text-brand-400" />
-            Nuestra estructura
-          </h3>
+        <FeatureAccordion icon={Cable} title="Nuestra estructura">
           <ul className="mt-4 space-y-2">
-            {DERSITE_FEATURES.map((feat, i) => (
+            {activeFeatures.map((feat) => (
               <li
-                key={i}
+                key={feat}
                 className="flex items-start gap-2.5 text-base text-zinc-600 dark:text-zinc-400"
               >
                 <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-green-500" />
@@ -242,17 +351,13 @@ function ProductsContent() {
               </li>
             ))}
           </ul>
-        </div>
+        </FeatureAccordion>
 
-        <div>
-          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-zinc-900 dark:text-white">
-            <Package size={24} className="text-brand-600 dark:text-brand-400" />
-            Tapa MDF Premium
-          </h3>
+        <FeatureAccordion icon={Package} title="Tapa MDF Premium">
           <ul className="mt-4 space-y-2">
-            {TABLE_FEATURES.map((feat, i) => (
+            {activeTableFeatures.map((feat) => (
               <li
-                key={i}
+                key={feat}
                 className="flex items-start gap-2.5 text-base text-zinc-600 dark:text-zinc-400"
               >
                 <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-green-500" />
@@ -266,14 +371,22 @@ function ProductsContent() {
               ¿Qué incluye el paquete?
             </h4>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              {[
-                { icon: Zap, text: "Estructura doble motor" },
-                { icon: Settings, text: "Controlador con display" },
-                { icon: Cable, text: "Bandeja pasacables" },
-                { icon: Headphones, text: "Gancho para auriculares" },
-                { icon: Wrench, text: "Tornillería + llave Allen" },
-                { icon: Package, text: "Manual de instalación" },
-              ].map((item) => {
+              {(isSimple
+                ? [
+                    { icon: Zap, text: "Estructura motor simple" },
+                    { icon: Settings, text: "Controlador con display" },
+                    { icon: Wrench, text: "Tornillería + llave Allen" },
+                    { icon: Package, text: "Manual de instalación" },
+                  ]
+                : [
+                    { icon: Zap, text: "Estructura doble motor" },
+                    { icon: Settings, text: "Controlador con display" },
+                    { icon: Cable, text: "Bandeja pasacables" },
+                    { icon: Headphones, text: "Gancho para auriculares" },
+                    { icon: Wrench, text: "Tornillería + llave Allen" },
+                    { icon: Package, text: "Manual de instalación" },
+                  ]
+              ).map((item) => {
                 const Icon = item.icon;
                 return (
                   <div
@@ -287,8 +400,11 @@ function ProductsContent() {
               })}
             </div>
           </div>
-        </div>
+        </FeatureAccordion>
       </section>
+
+      {/* ─── Preguntas frecuentes ──────────────────────────────────── */}
+      <FAQ />
     </div>
   );
 }

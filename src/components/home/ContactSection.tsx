@@ -26,8 +26,8 @@ export function ContactSection() {
             {
               icon: Mail,
               label: "Email",
-              value: "hola@rzroom.com.ar",
-              href: "mailto:hola@rzroom.com.ar",
+              value: "ecomerce.rzhome@gmail.com",
+              href: "mailto:ecomerce.rzhome@gmail.com",
               description: "Respondemos en 24 hs",
             },
             {
