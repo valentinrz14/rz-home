@@ -30,17 +30,17 @@ function TierEditor({
 }) {
   function updateStructure(value: string) {
     const num = Number(value);
-    if (!isNaN(num)) onChange({ ...tier, structure: num });
+    if (!Number.isNaN(num)) onChange({ ...tier, structure: num });
   }
 
   function updateTable(size: string, value: string) {
     const num = Number(value);
-    if (!isNaN(num)) onChange({ ...tier, tables: { ...tier.tables, [size]: num } });
+    if (!Number.isNaN(num)) onChange({ ...tier, tables: { ...tier.tables, [size]: num } });
   }
 
   function updateBundle(size: string, value: string) {
     const num = Number(value);
-    if (!isNaN(num)) onChange({ ...tier, bundles: { ...tier.bundles, [size]: num } });
+    if (!Number.isNaN(num)) onChange({ ...tier, bundles: { ...tier.bundles, [size]: num } });
   }
 
   return (
@@ -152,6 +152,7 @@ export function PriceEditor({ initialPrices }: Props) {
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-display text-xl font-semibold text-white">Editar precios</h2>
         <button
+          type="button"
           onClick={handleSave}
           disabled={status === "saving"}
           className="flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50"

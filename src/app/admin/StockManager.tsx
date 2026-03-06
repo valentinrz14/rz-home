@@ -1,8 +1,9 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2, HelpCircle, RefreshCw, RotateCcw } from "lucide-react";
+import { AlertTriangle, CheckCircle2, HelpCircle, RefreshCw, RotateCcw, Zap } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import type { StockOverrides } from "@/lib/amazon-stock";
+import type { StockStatus } from "@/lib/stock-utils";
 
 interface VariantDef {
   key: keyof StockOverrides;
@@ -32,6 +33,8 @@ export function StockManager() {
   const [overrides, setOverrides] = useState<StockOverrides | null>(null);
   const [saving, setSaving] = useState<keyof StockOverrides | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastScraped, setLastScraped] = useState<StockStatus | null>(null);
 
   const fetchOverrides = useCallback(async () => {
     try {
@@ -46,6 +49,21 @@ export function StockManager() {
   useEffect(() => {
     fetchOverrides();
   }, [fetchOverrides]);
+
+  async function triggerRefresh() {
+    setRefreshing(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/stock", { method: "POST" });
+      if (!res.ok) throw new Error();
+      const data = (await res.json()) as { ok: boolean; status: StockStatus };
+      setLastScraped(data.status);
+    } catch {
+      setError("Error al actualizar stock desde Amazon.");
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   async function setOverride(variant: keyof StockOverrides, value: boolean | null) {
     setSaving(variant);
@@ -69,13 +87,23 @@ export function StockManager() {
     <section className="mb-8">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-display text-xl font-semibold text-white">Stock de estructuras</h2>
-        <button
-          onClick={fetchOverrides}
-          className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-400 transition hover:text-white"
-        >
-          <RefreshCw size={13} />
-          Actualizar
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={triggerRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-300 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <Zap size={13} className={refreshing ? "animate-pulse" : ""} />
+            {refreshing ? "Scrapeando…" : "Actualizar ahora"}
+          </button>
+          <button
+            onClick={fetchOverrides}
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-400 transition hover:text-white"
+          >
+            <RefreshCw size={13} />
+            Recargar
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -112,6 +140,7 @@ export function StockManager() {
 
                 {/* Auto (scraper) */}
                 <button
+                  type="button"
                   onClick={() => setOverride(key, null)}
                   disabled={isSaving || current === null}
                   title="Usar valor del scraper"
@@ -127,6 +156,7 @@ export function StockManager() {
 
                 {/* En stock */}
                 <button
+                  type="button"
                   onClick={() => setOverride(key, true)}
                   disabled={isSaving || current === true}
                   title="Forzar en stock"
@@ -142,6 +172,7 @@ export function StockManager() {
 
                 {/* Sin stock */}
                 <button
+                  type="button"
                   onClick={() => setOverride(key, false)}
                   disabled={isSaving || current === false}
                   title="Forzar sin stock"
@@ -159,6 +190,35 @@ export function StockManager() {
           );
         })}
       </div>
+
+      {lastScraped && (
+        <div className="mt-3 rounded-xl border border-zinc-700 bg-zinc-800/50 p-4">
+          <p className="mb-2 text-xs font-medium text-zinc-400">
+            Resultado del scraper —{" "}
+            {lastScraped.lastChecked
+              ? new Date(lastScraped.lastChecked).toLocaleString("es-AR")
+              : "—"}
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { label: "Doble — Negro", val: lastScraped.doble.negro },
+              { label: "Doble — Blanco", val: lastScraped.doble.blanco },
+              { label: "Simple — Negro", val: lastScraped.simple.negro },
+            ].map(({ label, val }) => (
+              <div
+                key={label}
+                className="flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-900 px-2.5 py-2"
+              >
+                <StatusIcon value={val} />
+                <div>
+                  <p className="text-xs text-zinc-300">{label}</p>
+                  <p className="text-xs text-zinc-500">{statusLabel(val)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <p className="mt-2 text-xs text-zinc-600">
         <span className="text-brand-500">Auto</span> usa el valor detectado por el cron (Amazon).

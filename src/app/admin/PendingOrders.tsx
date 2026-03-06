@@ -159,6 +159,7 @@ export function PendingOrders({ whatsapp }: { whatsapp: string }) {
           )}
         </div>
         <button
+          type="button"
           onClick={fetchOrders}
           className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-400 transition hover:text-white"
         >
@@ -180,6 +181,7 @@ export function PendingOrders({ whatsapp }: { whatsapp: string }) {
           {/* Accesos rápidos */}
           <div className="flex gap-1.5">
             <button
+              type="button"
               onClick={setToday}
               className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
                 filterDate === toLocalDateValue(new Date()) && !filterFrom && !filterTo
@@ -239,6 +241,7 @@ export function PendingOrders({ whatsapp }: { whatsapp: string }) {
           {/* Limpiar */}
           {hasFilter && (
             <button
+              type="button"
               onClick={clearFilters}
               className="flex h-8 items-center gap-1.5 rounded-lg border border-zinc-700 px-3 text-xs text-zinc-400 transition hover:border-zinc-600 hover:text-zinc-200"
             >
@@ -345,6 +348,7 @@ export function PendingOrders({ whatsapp }: { whatsapp: string }) {
                     )}
                     {isPending && (
                       <button
+                        type="button"
                         onClick={() => confirmOrder(order.id)}
                         disabled={confirming === order.id}
                         className="flex items-center gap-1.5 rounded-lg bg-green-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-green-600 disabled:opacity-50"

@@ -1,6 +1,11 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { getStockOverrides, type StockOverrides, setStockOverride } from "@/lib/amazon-stock";
+import {
+  getStockOverrides,
+  refreshStock,
+  type StockOverrides,
+  setStockOverride,
+} from "@/lib/amazon-stock";
 
 export const runtime = "nodejs";
 
@@ -37,4 +42,15 @@ export async function PUT(request: Request) {
 
   await setStockOverride(body.variant, body.value);
   return NextResponse.json({ ok: true });
+}
+
+/** POST /api/admin/stock — trigger a manual stock refresh (calls ScraperAPI) */
+export async function POST() {
+  const cookieStore = await cookies();
+  if (!cookieStore.get("admin_session")?.value) {
+    return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  }
+
+  const status = await refreshStock();
+  return NextResponse.json({ ok: true, status });
 }
