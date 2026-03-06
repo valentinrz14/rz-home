@@ -36,7 +36,6 @@ export default function CarritoPage() {
       <h1 className="mb-6 font-display text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
         Tu carrito ({items.length} {items.length === 1 ? "producto" : "productos"})
       </h1>
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <ul className="space-y-3">
@@ -56,6 +55,7 @@ export default function CarritoPage() {
                   <div className="mt-2 flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <button
+                        type="button"
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-400"
                       >
@@ -65,6 +65,7 @@ export default function CarritoPage() {
                         {item.quantity}
                       </span>
                       <button
+                        type="button"
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-400"
                       >
@@ -78,6 +79,7 @@ export default function CarritoPage() {
                       </span>
                     </span>
                     <button
+                      type="button"
                       onClick={() => removeItem(item.id)}
                       className="ml-auto text-zinc-400 transition-colors hover:text-red-500"
                       aria-label="Eliminar"

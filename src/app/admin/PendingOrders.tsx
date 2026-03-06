@@ -192,6 +192,7 @@ export function PendingOrders({ whatsapp }: { whatsapp: string }) {
               Hoy
             </button>
             <button
+              type="button"
               onClick={setYesterday}
               className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
                 filterDate === toLocalDateValue(new Date(Date.now() - 86_400_000)) &&

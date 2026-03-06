@@ -89,6 +89,7 @@ export function StockManager() {
         <h2 className="font-display text-xl font-semibold text-white">Stock de estructuras</h2>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={triggerRefresh}
             disabled={refreshing}
             className="flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-300 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
@@ -97,6 +98,7 @@ export function StockManager() {
             {refreshing ? "Scrapeando…" : "Actualizar ahora"}
           </button>
           <button
+            type="button"
             onClick={fetchOverrides}
             className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-400 transition hover:text-white"
           >
