@@ -77,7 +77,7 @@ export function ProductConfigurator({
     tableColor: productType !== "estructura" ? tableColor : undefined,
   };
 
-  const price = getProductPrice(config, prices.transfer);
+  const price = getProductPrice(config, prices.transfer, prices.simple_transfer);
 
   // Reset shipping estimate when product config changes
   useEffect(() => {
@@ -180,6 +180,7 @@ export function ProductConfigurator({
             ] as { id: ProductType; label: string }[]
           ).map((opt) => (
             <button
+              type="button"
               key={opt.id}
               onClick={() => {
                 setProductType(opt.id);
@@ -258,6 +259,7 @@ export function ProductConfigurator({
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {availableSizes.map((size) => (
               <button
+                type="button"
                 key={size.id}
                 onClick={() => setTableSize(size.id)}
                 className={`flex flex-col items-center rounded-lg border px-3 py-3 text-sm transition-all ${

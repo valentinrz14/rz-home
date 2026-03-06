@@ -19,7 +19,12 @@ export async function PUT(request: Request) {
 
   const body = (await request.json()) as PricesConfig;
 
-  if (!isValidTier(body.transfer) || !isValidTier(body.mp_one) || !isValidTier(body.mp_cuotas)) {
+  if (
+    !isValidTier(body.transfer) ||
+    !isValidTier(body.mp_one) ||
+    !isValidTier(body.simple_transfer) ||
+    !isValidTier(body.simple_mp)
+  ) {
     return NextResponse.json({ error: "Datos inválidos." }, { status: 400 });
   }
 

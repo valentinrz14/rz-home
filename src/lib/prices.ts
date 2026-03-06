@@ -1,11 +1,16 @@
 import "server-only";
 import { Redis } from "@upstash/redis";
 import type { TableSize } from "@/types";
+import { TABLE_SIZE } from "@/types";
 import {
   BUNDLE_PRICES,
   BUNDLE_PRICES_MP,
+  BUNDLE_PRICES_SIMPLE,
+  BUNDLE_PRICES_SIMPLE_MP,
   STRUCTURE_PRICE,
   STRUCTURE_PRICE_MP,
+  STRUCTURE_PRICE_SIMPLE,
+  STRUCTURE_PRICE_SIMPLE_MP,
   TABLE_PRICES,
   TABLE_PRICES_MP,
 } from "./products";
@@ -18,11 +23,17 @@ export interface PriceTier {
   bundles: Record<TableSize, number>;
 }
 
+/** Motor simple: solo S y M (sin 160×80), sin tapa propia */
+export interface SimplePriceTier {
+  structure: number;
+  bundles: Record<typeof TABLE_SIZE.S | typeof TABLE_SIZE.M, number>;
+}
+
 export interface PricesConfig {
   transfer: PriceTier;
   mp_one: PriceTier;
-  mp_cuotas: PriceTier; // 3 cuotas
-  mp_6: PriceTier; // 6 cuotas
+  simple_transfer: SimplePriceTier;
+  simple_mp: SimplePriceTier;
 }
 
 // ─── Valores por defecto ──────────────────────────────────────────────────────
@@ -38,15 +49,19 @@ export const DEFAULT_PRICES: PricesConfig = {
     tables: { ...TABLE_PRICES_MP },
     bundles: { ...BUNDLE_PRICES_MP },
   },
-  mp_cuotas: {
-    structure: STRUCTURE_PRICE_MP,
-    tables: { ...TABLE_PRICES_MP },
-    bundles: { ...BUNDLE_PRICES_MP },
+  simple_transfer: {
+    structure: STRUCTURE_PRICE_SIMPLE,
+    bundles: {
+      [TABLE_SIZE.S]: BUNDLE_PRICES_SIMPLE[TABLE_SIZE.S],
+      [TABLE_SIZE.M]: BUNDLE_PRICES_SIMPLE[TABLE_SIZE.M],
+    },
   },
-  mp_6: {
-    structure: STRUCTURE_PRICE_MP,
-    tables: { ...TABLE_PRICES_MP },
-    bundles: { ...BUNDLE_PRICES_MP },
+  simple_mp: {
+    structure: STRUCTURE_PRICE_SIMPLE_MP,
+    bundles: {
+      [TABLE_SIZE.S]: BUNDLE_PRICES_SIMPLE_MP[TABLE_SIZE.S],
+      [TABLE_SIZE.M]: BUNDLE_PRICES_SIMPLE_MP[TABLE_SIZE.M],
+    },
   },
 };
 
@@ -61,7 +76,6 @@ function getKv() {
 export async function getPrices(): Promise<PricesConfig> {
   try {
     const stored = await getKv().get<PricesConfig>(KV_KEY);
-    // Spread DEFAULT_PRICES first so any new tier (e.g. mp_6) added later has a fallback
     if (stored) return { ...DEFAULT_PRICES, ...stored };
   } catch {
     // KV no disponible (ej: entorno local sin credenciales)

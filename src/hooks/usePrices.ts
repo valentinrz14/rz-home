@@ -5,11 +5,16 @@ import type { PricesConfig } from "@/lib/prices";
 import {
   BUNDLE_PRICES,
   BUNDLE_PRICES_MP,
+  BUNDLE_PRICES_SIMPLE,
+  BUNDLE_PRICES_SIMPLE_MP,
   STRUCTURE_PRICE,
   STRUCTURE_PRICE_MP,
+  STRUCTURE_PRICE_SIMPLE,
+  STRUCTURE_PRICE_SIMPLE_MP,
   TABLE_PRICES,
   TABLE_PRICES_MP,
 } from "@/lib/products";
+import { TABLE_SIZE } from "@/types";
 
 const DEFAULT_PRICES: PricesConfig = {
   transfer: {
@@ -22,15 +27,19 @@ const DEFAULT_PRICES: PricesConfig = {
     tables: { ...TABLE_PRICES_MP },
     bundles: { ...BUNDLE_PRICES_MP },
   },
-  mp_cuotas: {
-    structure: STRUCTURE_PRICE_MP,
-    tables: { ...TABLE_PRICES_MP },
-    bundles: { ...BUNDLE_PRICES_MP },
+  simple_transfer: {
+    structure: STRUCTURE_PRICE_SIMPLE,
+    bundles: {
+      [TABLE_SIZE.S]: BUNDLE_PRICES_SIMPLE[TABLE_SIZE.S],
+      [TABLE_SIZE.M]: BUNDLE_PRICES_SIMPLE[TABLE_SIZE.M],
+    },
   },
-  mp_6: {
-    structure: STRUCTURE_PRICE_MP,
-    tables: { ...TABLE_PRICES_MP },
-    bundles: { ...BUNDLE_PRICES_MP },
+  simple_mp: {
+    structure: STRUCTURE_PRICE_SIMPLE_MP,
+    bundles: {
+      [TABLE_SIZE.S]: BUNDLE_PRICES_SIMPLE_MP[TABLE_SIZE.S],
+      [TABLE_SIZE.M]: BUNDLE_PRICES_SIMPLE_MP[TABLE_SIZE.M],
+    },
   },
 };
 

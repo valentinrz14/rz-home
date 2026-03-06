@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { CartItem, CartItemConfig, TABLE_SIZE } from "@/types";
-import type { PriceTier } from "./prices";
+import type { PriceTier, SimplePriceTier } from "./prices";
 import {
   BUNDLE_PRICES,
   BUNDLE_PRICES_SIMPLE,
@@ -25,11 +25,15 @@ export function formatPrice(price: number): string {
   }).format(price);
 }
 
-export function getProductPrice(config: CartItemConfig, tier?: PriceTier): number {
+export function getProductPrice(
+  config: CartItemConfig,
+  tier?: PriceTier,
+  simpleTier?: SimplePriceTier
+): number {
   if ((config.motorType ?? "doble") === "simple") {
     const isMP = tier ? tier.structure > STRUCTURE_PRICE : false;
     if (config.type === "estructura") {
-      return isMP ? STRUCTURE_PRICE_SIMPLE_MP : STRUCTURE_PRICE_SIMPLE;
+      return simpleTier?.structure ?? (isMP ? STRUCTURE_PRICE_SIMPLE_MP : STRUCTURE_PRICE_SIMPLE);
     }
     if (config.type === "tabla" && config.tableSize) {
       const tables = tier?.tables ?? TABLE_PRICES;
@@ -37,6 +41,8 @@ export function getProductPrice(config: CartItemConfig, tier?: PriceTier): numbe
     }
     if (config.type === "completo" && config.tableSize) {
       const s = config.tableSize as typeof TABLE_SIZE.S | typeof TABLE_SIZE.M;
+      const bundlePrice = simpleTier?.bundles[s];
+      if (bundlePrice !== undefined) return bundlePrice;
       return isMP ? (BUNDLE_PRICES_SIMPLE_MP[s] ?? 0) : (BUNDLE_PRICES_SIMPLE[s] ?? 0);
     }
     return 0;

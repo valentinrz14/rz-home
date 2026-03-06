@@ -1,135 +1,223 @@
 "use client";
 
-import { Save } from "lucide-react";
+import { ChevronDown, Save } from "lucide-react";
 import { useState } from "react";
-import type { PricesConfig, PriceTier } from "@/lib/prices";
+import type { PricesConfig, PriceTier, SimplePriceTier } from "@/lib/prices";
 import { TABLE_SIZES } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
+import { TABLE_SIZE } from "@/types";
 
 interface Props {
   initialPrices: PricesConfig;
 }
 
-type TierKey = keyof PricesConfig;
+const SIMPLE_SIZES = TABLE_SIZES.filter((s) => s.id === TABLE_SIZE.S || s.id === TABLE_SIZE.M);
 
-const TIER_LABELS: Record<TierKey, string> = {
-  transfer: "Transferencia / Cripto",
-  mp_one: "MercadoPago 1 pago",
-  mp_cuotas: "MercadoPago 3 cuotas",
-  mp_6: "MercadoPago 6 cuotas",
-};
+// ─── Inputs ────────────────────────────────────────────────────────────────────
 
-function TierEditor({
+function PriceInput({
   label,
-  tier,
+  value,
   onChange,
 }: {
   label: string;
-  tier: PriceTier;
-  onChange: (next: PriceTier) => void;
+  value: number;
+  onChange: (v: number) => void;
 }) {
-  function updateStructure(value: string) {
-    const num = Number(value);
-    if (!Number.isNaN(num)) onChange({ ...tier, structure: num });
-  }
-
-  function updateTable(size: string, value: string) {
-    const num = Number(value);
-    if (!Number.isNaN(num)) onChange({ ...tier, tables: { ...tier.tables, [size]: num } });
-  }
-
-  function updateBundle(size: string, value: string) {
-    const num = Number(value);
-    if (!Number.isNaN(num)) onChange({ ...tier, bundles: { ...tier.bundles, [size]: num } });
-  }
-
   return (
-    <div className="space-y-5 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-      <h3 className="font-display text-base font-semibold text-white">{label}</h3>
-
-      {/* Estructura */}
-      <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-400">
-          Estructura sola
-        </p>
-        <div className="flex items-center gap-3">
-          <label className="w-40 text-sm text-zinc-300">Doble motor</label>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">
-              $
-            </span>
-            <input
-              type="number"
-              value={tier.structure}
-              onChange={(e) => updateStructure(e.target.value)}
-              className="w-44 rounded-lg border border-zinc-700 bg-zinc-800 py-2 pl-7 pr-3 text-sm text-white focus:border-zinc-500 focus:outline-none"
-            />
-          </div>
-          <span className="text-sm text-zinc-500">{formatPrice(tier.structure)}</span>
-        </div>
+    <div className="flex items-center gap-3">
+      <label className="w-40 text-sm text-zinc-300">{label}</label>
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">$</span>
+        <input
+          type="number"
+          value={value}
+          onChange={(e) => {
+            const n = Number(e.target.value);
+            if (!Number.isNaN(n)) onChange(n);
+          }}
+          className="w-44 rounded-lg border border-zinc-700 bg-zinc-800 py-2 pl-7 pr-3 text-sm text-white focus:border-zinc-500 focus:outline-none"
+        />
       </div>
-
-      {/* Tapas */}
-      <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-400">
-          Solo tapa (por medida)
-        </p>
-        <div className="space-y-2">
-          {TABLE_SIZES.map((size) => (
-            <div key={size.id} className="flex items-center gap-3">
-              <label className="w-40 font-mono text-sm text-zinc-300">{size.label}</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">
-                  $
-                </span>
-                <input
-                  type="number"
-                  value={tier.tables[size.id]}
-                  onChange={(e) => updateTable(size.id, e.target.value)}
-                  className="w-44 rounded-lg border border-zinc-700 bg-zinc-800 py-2 pl-7 pr-3 text-sm text-white focus:border-zinc-500 focus:outline-none"
-                />
-              </div>
-              <span className="text-sm text-zinc-500">{formatPrice(tier.tables[size.id])}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Bundles */}
-      <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-400">
-          Escritorio completo (estructura + tapa)
-        </p>
-        <div className="space-y-2">
-          {TABLE_SIZES.map((size) => (
-            <div key={size.id} className="flex items-center gap-3">
-              <label className="w-40 font-mono text-sm text-zinc-300">{size.label}</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">
-                  $
-                </span>
-                <input
-                  type="number"
-                  value={tier.bundles[size.id]}
-                  onChange={(e) => updateBundle(size.id, e.target.value)}
-                  className="w-44 rounded-lg border border-zinc-700 bg-zinc-800 py-2 pl-7 pr-3 text-sm text-white focus:border-zinc-500 focus:outline-none"
-                />
-              </div>
-              <span className="text-sm text-zinc-500">{formatPrice(tier.bundles[size.id])}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <span className="text-sm text-zinc-500">{formatPrice(value)}</span>
     </div>
   );
 }
 
+// ─── Doble motor tier ──────────────────────────────────────────────────────────
+
+function DoubleTierColumns({
+  transfer,
+  mpOne,
+  onChangeTransfer,
+  onChangeMpOne,
+}: {
+  transfer: PriceTier;
+  mpOne: PriceTier;
+  onChangeTransfer: (t: PriceTier) => void;
+  onChangeMpOne: (t: PriceTier) => void;
+}) {
+  return (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {(
+        [
+          { label: "Transferencia / Cripto", tier: transfer, onChange: onChangeTransfer },
+          { label: "MercadoPago 1 pago", tier: mpOne, onChange: onChangeMpOne },
+        ] as const
+      ).map(({ label, tier, onChange }) => (
+        <div key={label} className="space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">{label}</p>
+
+          <div>
+            <p className="mb-2 text-xs text-zinc-500">Estructura sola</p>
+            <PriceInput
+              label="Doble motor"
+              value={tier.structure}
+              onChange={(v) => onChange({ ...tier, structure: v })}
+            />
+          </div>
+
+          <div>
+            <p className="mb-2 text-xs text-zinc-500">Solo tapa</p>
+            <div className="space-y-2">
+              {TABLE_SIZES.map((size) => (
+                <PriceInput
+                  key={size.id}
+                  label={size.label}
+                  value={tier.tables[size.id]}
+                  onChange={(v) => onChange({ ...tier, tables: { ...tier.tables, [size.id]: v } })}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 text-xs text-zinc-500">Escritorio completo</p>
+            <div className="space-y-2">
+              {TABLE_SIZES.map((size) => (
+                <PriceInput
+                  key={size.id}
+                  label={size.label}
+                  value={tier.bundles[size.id]}
+                  onChange={(v) =>
+                    onChange({ ...tier, bundles: { ...tier.bundles, [size.id]: v } })
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Motor simple tier ─────────────────────────────────────────────────────────
+
+function SimpleTierColumns({
+  transfer,
+  mpOne,
+  onChangeTransfer,
+  onChangeMpOne,
+}: {
+  transfer: SimplePriceTier;
+  mpOne: SimplePriceTier;
+  onChangeTransfer: (t: SimplePriceTier) => void;
+  onChangeMpOne: (t: SimplePriceTier) => void;
+}) {
+  return (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {(
+        [
+          { label: "Transferencia / Cripto", tier: transfer, onChange: onChangeTransfer },
+          { label: "MercadoPago 1 pago", tier: mpOne, onChange: onChangeMpOne },
+        ] as const
+      ).map(({ label, tier, onChange }) => (
+        <div key={label} className="space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">{label}</p>
+
+          <div>
+            <p className="mb-2 text-xs text-zinc-500">Estructura sola</p>
+            <PriceInput
+              label="Motor simple"
+              value={tier.structure}
+              onChange={(v) => onChange({ ...tier, structure: v })}
+            />
+          </div>
+
+          <div>
+            <p className="mb-2 text-xs text-zinc-500">
+              Escritorio completo{" "}
+              <span className="text-zinc-600">(tapas compartidas con doble)</span>
+            </p>
+            <div className="space-y-2">
+              {SIMPLE_SIZES.map((size) => (
+                <PriceInput
+                  key={size.id}
+                  label={size.label}
+                  value={tier.bundles[size.id as typeof TABLE_SIZE.S | typeof TABLE_SIZE.M]}
+                  onChange={(v) =>
+                    onChange({ ...tier, bundles: { ...tier.bundles, [size.id]: v } })
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Acordeón ──────────────────────────────────────────────────────────────────
+
+function AccordionSection({
+  title,
+  badge,
+  open,
+  onToggle,
+  children,
+}: {
+  title: string;
+  badge?: string;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center justify-between px-6 py-4 text-left transition hover:bg-zinc-800/50"
+      >
+        <div className="flex items-center gap-2">
+          <span className="font-display text-base font-semibold text-white">{title}</span>
+          {badge && (
+            <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
+              {badge}
+            </span>
+          )}
+        </div>
+        <ChevronDown
+          size={16}
+          className={`shrink-0 text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && <div className="border-t border-zinc-800 px-6 py-5">{children}</div>}
+    </div>
+  );
+}
+
+// ─── Editor principal ──────────────────────────────────────────────────────────
+
 export function PriceEditor({ initialPrices }: Props) {
   const [prices, setPrices] = useState<PricesConfig>(initialPrices);
   const [status, setStatus] = useState<"idle" | "saving" | "ok" | "error">("idle");
+  const [openSection, setOpenSection] = useState<"doble" | "simple" | null>("doble");
 
-  function updateTier(key: TierKey, tier: PriceTier) {
-    setPrices((p) => ({ ...p, [key]: tier }));
+  function toggle(section: "doble" | "simple") {
+    setOpenSection((prev) => (prev === section ? null : section));
   }
 
   async function handleSave() {
@@ -150,7 +238,7 @@ export function PriceEditor({ initialPrices }: Props) {
   return (
     <section className="mb-8">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-display text-xl font-semibold text-white">Editar precios</h2>
+        <h2 className="font-display text-xl font-semibold text-white">Precios</h2>
         <button
           type="button"
           onClick={handleSave}
@@ -173,15 +261,34 @@ export function PriceEditor({ initialPrices }: Props) {
         </p>
       )}
 
-      <div className="space-y-4">
-        {(Object.keys(TIER_LABELS) as TierKey[]).map((key) => (
-          <TierEditor
-            key={key}
-            label={TIER_LABELS[key]}
-            tier={prices[key]}
-            onChange={(next) => updateTier(key, next)}
+      <div className="space-y-3">
+        <AccordionSection
+          title="Doble motor"
+          badge="3 medidas"
+          open={openSection === "doble"}
+          onToggle={() => toggle("doble")}
+        >
+          <DoubleTierColumns
+            transfer={prices.transfer}
+            mpOne={prices.mp_one}
+            onChangeTransfer={(t) => setPrices((p) => ({ ...p, transfer: t }))}
+            onChangeMpOne={(t) => setPrices((p) => ({ ...p, mp_one: t }))}
           />
-        ))}
+        </AccordionSection>
+
+        <AccordionSection
+          title="Motor simple"
+          badge="2 medidas"
+          open={openSection === "simple"}
+          onToggle={() => toggle("simple")}
+        >
+          <SimpleTierColumns
+            transfer={prices.simple_transfer}
+            mpOne={prices.simple_mp}
+            onChangeTransfer={(t) => setPrices((p) => ({ ...p, simple_transfer: t }))}
+            onChangeMpOne={(t) => setPrices((p) => ({ ...p, simple_mp: t }))}
+          />
+        </AccordionSection>
       </div>
     </section>
   );

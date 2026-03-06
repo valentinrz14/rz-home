@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { usePrices } from "@/hooks/usePrices";
-import type { PriceTier } from "@/lib/prices";
+import type { PriceTier, SimplePriceTier } from "@/lib/prices";
 import { formatPrice, getCartTotal, getProductPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import type { CartItem, CheckoutFormData, ShippingQuote } from "@/types";
@@ -564,14 +564,16 @@ function PaymentStep({
 
   const grandTotal = total + shipping.costo;
 
-  function tierTotal(tier: PriceTier): number {
+  function tierTotal(tier: PriceTier, simpleTier: SimplePriceTier): number {
     return (
-      items.reduce((sum, item) => sum + getProductPrice(item.config, tier) * item.quantity, 0) +
-      shipping.costo
+      items.reduce(
+        (sum, item) => sum + getProductPrice(item.config, tier, simpleTier) * item.quantity,
+        0
+      ) + shipping.costo
     );
   }
 
-  const mpOneTotal = tierTotal(prices.mp_one);
+  const mpOneTotal = tierTotal(prices.mp_one, prices.simple_mp);
 
   const [selectedMethod, setSelectedMethod] = useState<SelectedMethod>("transfer");
   const [form, setForm] = useState<CheckoutFormData>({
@@ -640,7 +642,7 @@ function PaymentStep({
         id: item.id,
         title: item.name,
         quantity: item.quantity,
-        unit_price: getProductPrice(item.config, tier),
+        unit_price: getProductPrice(item.config, tier, prices.simple_mp),
         currency_id: "ARS",
       })),
       ...(shipping.costo > 0
