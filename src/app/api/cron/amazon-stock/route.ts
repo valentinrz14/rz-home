@@ -9,7 +9,7 @@ export const maxDuration = 30;
 /**
  * GET /api/cron/amazon-stock
  *
- * Called automatically by Vercel Cron every hour (vercel.json).
+ * Called automatically by Vercel Cron once a day at midnight UTC (vercel.json).
  * Protected by the CRON_SECRET that Vercel sends as Authorization header.
  * Can also be triggered manually from the admin panel.
  */
