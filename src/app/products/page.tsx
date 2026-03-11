@@ -262,7 +262,7 @@ function ProductsContent() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* Columna izquierda: visualizador interactivo */}
-        <div className="sticky top-16 z-10 self-start lg:top-20">
+        <div className="lg:sticky lg:top-20 lg:z-10 lg:self-start">
           <ProductViewer tipo={tipo} structureColor={structureColor} tableColor={tableColor} />
         </div>
 
