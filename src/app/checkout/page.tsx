@@ -88,8 +88,7 @@ function ShippingStep({
 
   const deliveryQuote: ShippingQuote = { costo: SHIPPING_FLAT_RATE, plazo: null };
 
-  const grandTotal =
-    shippingType === "delivery" && canDeliver ? total + SHIPPING_FLAT_RATE : null;
+  const grandTotal = shippingType === "delivery" && canDeliver ? total + SHIPPING_FLAT_RATE : null;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -171,7 +170,9 @@ function ShippingStep({
               <p
                 className={`mt-0.5 text-xs ${shippingType === "delivery" && canDeliver ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-400"}`}
               >
-                {canDeliver || !province ? `${formatPrice(SHIPPING_FLAT_RATE)} · AMBA` : "No disponible en tu provincia"}
+                {canDeliver || !province
+                  ? `${formatPrice(SHIPPING_FLAT_RATE)} · AMBA`
+                  : "No disponible en tu provincia"}
               </p>
             </button>
             <button
@@ -284,7 +285,7 @@ function ShippingStep({
               Resumen del pedido
             </h2>
             <ul className="space-y-2">
-              {items.map((item) => (
+              {_items.map((item: CartItem) => (
                 <li key={item.id} className="flex justify-between gap-2 text-base">
                   <span className="text-zinc-600 dark:text-zinc-400">
                     {item.name}
@@ -622,7 +623,10 @@ function PaymentStep({
     const { checkoutUrl } = await res.json();
     // Guardar estado para restaurar si el usuario hace "Reintentar"
     try {
-      localStorage.setItem("checkout_retry", JSON.stringify({ postalCode, shipping, province: initialProvince }));
+      localStorage.setItem(
+        "checkout_retry",
+        JSON.stringify({ postalCode, shipping, province: initialProvince })
+      );
     } catch {
       /* localStorage no disponible */
     }
@@ -637,7 +641,13 @@ function PaymentStep({
         unit_price: item.unitPrice,
       })),
       ...(shipping.costo > 0
-        ? [{ title: `Envío a domicilio${postalCode ? ` a CP ${postalCode}` : ""}`, quantity: 1, unit_price: shipping.costo }]
+        ? [
+            {
+              title: `Envío a domicilio${postalCode ? ` a CP ${postalCode}` : ""}`,
+              quantity: 1,
+              unit_price: shipping.costo,
+            },
+          ]
         : []),
     ];
 
@@ -1015,7 +1025,11 @@ export default function CheckoutPage() {
       const saved = localStorage.getItem("checkout_retry");
       if (saved) {
         localStorage.removeItem("checkout_retry");
-        const { postalCode: savedPC, shipping: savedShipping, province: savedProvince } = JSON.parse(saved);
+        const {
+          postalCode: savedPC,
+          shipping: savedShipping,
+          province: savedProvince,
+        } = JSON.parse(saved);
         setPostalCode(savedPC);
         setShipping(savedShipping);
         setProvince(savedProvince ?? "");

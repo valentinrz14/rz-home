@@ -22,14 +22,18 @@ function optional(name: string, fallback = ""): string {
 
 // ── Exportaciones ─────────────────────────────────────────────────────────────
 
-/** API Key de Talo — solo servidor */
-export function getTaloApiKey() {
-  return requireServer("TALO_API_KEY");
+/** Credenciales de Talo Pay — solo servidor */
+export function getTaloCredentials() {
+  return {
+    clientId: requireServer("TALO_CLIENT_ID"),
+    clientSecret: requireServer("TALO_CLIENT_SECRET"),
+    userId: requireServer("TALO_USER_ID"),
+  };
 }
 
-/** Secreto para verificar la firma de los webhooks de Talo */
-export function getTaloWebhookSecret() {
-  return optional("TALO_WEBHOOK_SECRET");
+/** Entorno de Talo: "production" | "sandbox" */
+export function getTaloEnvironment(): "production" | "sandbox" {
+  return optional("TALO_ENVIRONMENT", "production") as "production" | "sandbox";
 }
 
 /** URL base del sitio (sin barra final) */
@@ -39,7 +43,6 @@ export const SITE_URL = optional("NEXT_PUBLIC_SITE_URL", "http://localhost:3000"
 export function getAdminPassword() {
   return requireServer("ADMIN_PASSWORD");
 }
-
 
 /** API key de SendGrid para envío de emails transaccionales */
 export function getSendGridApiKey() {
