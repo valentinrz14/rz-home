@@ -13,12 +13,12 @@ export function HowItWorks() {
     {
       number: "03",
       title: "Elegí cómo pagar",
-      description: "Transferencia bancaria o MercadoPago.",
+      description: "Transferencia bancaria, Talo o criptomonedas.",
     },
     {
       number: "04",
       title: "Recibís en casa",
-      description: "Envío Andreani a todo el país en 10 a 15 días. Llega probado y con manual.",
+      description: "Envío a domicilio en AMBA o retiro en local. Llega probado y con manual.",
     },
   ];
 

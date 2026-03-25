@@ -173,9 +173,9 @@ export default async function AdminPage() {
             <div className="space-y-2">
               {[
                 {
-                  label: "Dashboard MercadoPago",
+                  label: "Dashboard Talo",
                   desc: "Ver ventas, cobros y movimientos",
-                  href: "https://www.mercadopago.com.ar/activities",
+                  href: "https://app.talo.com.ar/",
                 },
                 {
                   label: "Monitor de Trafico",

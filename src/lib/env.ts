@@ -22,18 +22,15 @@ function optional(name: string, fallback = ""): string {
 
 // ── Exportaciones ─────────────────────────────────────────────────────────────
 
-/** Access token privado de MercadoPago — solo servidor */
-export function getMpAccessToken() {
-  return requireServer("MERCADOPAGO_ACCESS_TOKEN");
+/** API Key de Talo — solo servidor */
+export function getTaloApiKey() {
+  return requireServer("TALO_API_KEY");
 }
 
-/** Secreto para verificar la firma de los webhooks de MP */
-export function getMpWebhookSecret() {
-  return optional("MERCADOPAGO_WEBHOOK_SECRET");
+/** Secreto para verificar la firma de los webhooks de Talo */
+export function getTaloWebhookSecret() {
+  return optional("TALO_WEBHOOK_SECRET");
 }
-
-/** Clave pública de MP — disponible en cliente y servidor */
-export const MP_PUBLIC_KEY = optional("MERCADOPAGO_PUBLIC_KEY");
 
 /** URL base del sitio (sin barra final) */
 export const SITE_URL = optional("NEXT_PUBLIC_SITE_URL", "http://localhost:3000");
@@ -43,18 +40,6 @@ export function getAdminPassword() {
   return requireServer("ADMIN_PASSWORD");
 }
 
-/** Credenciales de Andreani para cotización de envío */
-export function getAndreaniCredentials() {
-  return {
-    usuario: requireServer("ANDREANI_USUARIO"),
-    clave: requireServer("ANDREANI_CLAVE"),
-    contrato: requireServer("ANDREANI_CONTRATO"),
-    cliente: requireServer("ANDREANI_CLIENTE"),
-  };
-}
-
-/** Usar entorno QA de Andreani (apisqa.andreani.com) */
-export const ANDREANI_QA = optional("ANDREANI_QA", "false");
 
 /** API key de SendGrid para envío de emails transaccionales */
 export function getSendGridApiKey() {

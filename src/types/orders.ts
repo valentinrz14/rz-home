@@ -1,4 +1,4 @@
-export type PaymentMethod = "transfer" | "crypto_usdt_trc20" | "crypto_usdt_polygon" | "crypto_ltc";
+export type PaymentMethod = "transfer" | "talo" | "crypto_usdt_trc20" | "crypto_usdt_polygon" | "crypto_ltc";
 
 export type OrderStatus = "pending" | "confirmed";
 
