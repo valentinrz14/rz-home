@@ -25,7 +25,7 @@ function methodLabel(m: PaymentMethod) {
     case "crypto_ltc":
       return "Litecoin (LTC)";
     case "talo":
-      return "Talo";
+      return "Pago virtual";
   }
 }
 

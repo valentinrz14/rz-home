@@ -18,21 +18,20 @@ export const BUNDLE_PRICES: Record<TableSize, number> = {
   [TABLE_SIZE.L]: 790_000,
 };
 
-// ─── Precios MercadoPago 1 pago ────────────────────────────────────────────────
-export const STRUCTURE_PRICE_MP = 722_000;
-
+// ─── Precios pago virtual (Talo: 1% + IVA ≈ 1.21% sobre base) ──────────────
 // Redondeado para arriba al próximo múltiplo de $5.000
+export const STRUCTURE_PRICE_MP = 660_000; // 650k * 1.0121 ≈ 657.9k → 660k
+
 export const TABLE_PRICES_MP: Record<TableSize, number> = {
-  [TABLE_SIZE.S]: 110_000,
-  [TABLE_SIZE.M]: 130_000,
-  [TABLE_SIZE.L]: 155_000,
+  [TABLE_SIZE.S]: 105_000, // 100k * 1.0121 ≈ 101.2k → 105k
+  [TABLE_SIZE.M]: 125_000, // 120k * 1.0121 ≈ 121.5k → 125k
+  [TABLE_SIZE.L]: 145_000, // 140k * 1.0121 ≈ 141.7k → 145k
 };
 
-// Redondeado para arriba al próximo múltiplo de $5.000
 export const BUNDLE_PRICES_MP: Record<TableSize, number> = {
-  [TABLE_SIZE.S]: 835_000,
-  [TABLE_SIZE.M]: 855_000,
-  [TABLE_SIZE.L]: 880_000,
+  [TABLE_SIZE.S]: 760_000, // 750k * 1.0121 ≈ 759.1k → 760k
+  [TABLE_SIZE.M]: 780_000, // 770k * 1.0121 ≈ 779.3k → 780k
+  [TABLE_SIZE.L]: 800_000, // 790k * 1.0121 ≈ 799.6k → 800k
 };
 
 // ─── Precios motor simple (transferencia / cripto) ────────────────────────────
@@ -42,11 +41,11 @@ export const BUNDLE_PRICES_SIMPLE: Record<typeof TABLE_SIZE.S | typeof TABLE_SIZ
   [TABLE_SIZE.M]: 459_000,
 };
 
-// ─── Precios motor simple MercadoPago 1 pago ──────────────────────────────────
-export const STRUCTURE_PRICE_SIMPLE_MP = 326_400; // 320k * 1.02
+// ─── Precios motor simple pago virtual (Talo: 1% + IVA ≈ 1.21%) ────────────
+export const STRUCTURE_PRICE_SIMPLE_MP = 325_000; // 320k * 1.0121 ≈ 323.9k → 325k
 export const BUNDLE_PRICES_SIMPLE_MP: Record<typeof TABLE_SIZE.S | typeof TABLE_SIZE.M, number> = {
-  [TABLE_SIZE.S]: 428_400, // 420k * 1.02
-  [TABLE_SIZE.M]: 468_180, // 459k * 1.02
+  [TABLE_SIZE.S]: 430_000, // 420k * 1.0121 ≈ 425.1k → 430k
+  [TABLE_SIZE.M]: 465_000, // 459k * 1.0121 ≈ 464.6k → 465k
 };
 
 // ─── Precios de referencia de competencia ──────────────────────────────────────
@@ -190,9 +189,9 @@ export const PRODUCT_FEATURES = [
   },
   {
     icon: "truck",
-    title: "Envío Andreani a todo el país",
+    title: "Envío a domicilio",
     description:
-      "Enviamos a cualquier punto de Argentina a través de Andreani. El costo de envío queda a cargo del comprador.",
+      "Enviamos a Buenos Aires y CABA con envío a domicilio. También podés retirar en nuestro local.",
   },
   {
     icon: "package",

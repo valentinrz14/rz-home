@@ -13,7 +13,7 @@ export function HowItWorks() {
     {
       number: "03",
       title: "Elegí cómo pagar",
-      description: "Transferencia bancaria, Talo o criptomonedas.",
+      description: "Transferencia bancaria, pago virtual o criptomonedas.",
     },
     {
       number: "04",

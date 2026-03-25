@@ -26,7 +26,7 @@ const faqs = [
   },
   {
     q: "¿Qué métodos de pago aceptan?",
-    a: "Aceptamos transferencia bancaria, Talo (tarjeta de crédito o débito) y criptomonedas (USDT, LTC).",
+    a: "Aceptamos transferencia bancaria, pago virtual (transferencia online) y criptomonedas (USDT, LTC).",
   },
   {
     q: "¿Qué garantía tiene?",

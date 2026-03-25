@@ -386,7 +386,7 @@ function PaymentMethodSelector({
           <p className="shrink-0 font-display text-base font-bold">{formatPrice(transferTotal)}</p>
         </button>
 
-        {/* Talo */}
+        {/* Pago virtual */}
         <button
           type="button"
           onClick={() => onSelect("talo")}
@@ -401,11 +401,11 @@ function PaymentMethodSelector({
             className={`shrink-0 ${selected === "talo" ? "text-white dark:text-zinc-900" : "text-zinc-500"}`}
           />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">Talo</p>
+            <p className="text-sm font-semibold">Pago virtual</p>
             <p
               className={`text-xs ${selected === "talo" ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-500"}`}
             >
-              Tarjeta de crédito / débito
+              Transferencia bancaria online
             </p>
           </div>
           <p className="shrink-0 font-display text-base font-bold">{formatPrice(mpOneTotal)}</p>
@@ -617,7 +617,7 @@ function PaymentStep({
 
     if (!res.ok) {
       const data = await res.json();
-      throw new Error(data.error ?? "Error al procesar el pago con Talo.");
+      throw new Error(data.error ?? "Error al procesar el pago virtual.");
     }
 
     const { checkoutUrl } = await res.json();
@@ -884,7 +884,7 @@ function PaymentStep({
                 </>
               ) : isTalo ? (
                 <>
-                  <CreditCard size={20} /> Pagar {formatPrice(adjustedTotal)} con Talo
+                  <CreditCard size={20} /> Pagar {formatPrice(adjustedTotal)}
                 </>
               ) : (
                 <>
@@ -896,7 +896,7 @@ function PaymentStep({
 
             {isTalo && (
               <div className="flex items-center justify-center gap-2 text-sm text-zinc-400">
-                <Lock size={14} /> Pago seguro con Talo · SSL encriptado
+                <Lock size={14} /> Pago seguro · SSL encriptado
               </div>
             )}
 

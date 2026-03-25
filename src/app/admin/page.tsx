@@ -173,7 +173,7 @@ export default async function AdminPage() {
             <div className="space-y-2">
               {[
                 {
-                  label: "Dashboard Talo",
+                  label: "Dashboard pagos",
                   desc: "Ver ventas, cobros y movimientos",
                   href: "https://app.talo.com.ar/",
                 },

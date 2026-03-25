@@ -76,13 +76,13 @@ export async function POST(req: NextRequest) {
 
     if (message.includes("Variable de entorno faltante")) {
       return NextResponse.json(
-        { error: "El servicio de pago con Talo no está configurado." },
+        { error: "El servicio de pago virtual no está configurado." },
         { status: 501 }
       );
     }
 
     return NextResponse.json(
-      { error: "No se pudo crear el pago con Talo. Intentá nuevamente." },
+      { error: "No se pudo crear el pago virtual. Intentá nuevamente." },
       { status: 502 }
     );
   }

@@ -139,23 +139,26 @@ describe("single motor prices vs dual motor", () => {
   });
 });
 
-// ─── Single motor: MercadoPago prices (+2%) ───────────────────────────────────
-describe("MercadoPago prices for single motor", () => {
-  it("STRUCTURE_PRICE_SIMPLE_MP is exactly 2% more than STRUCTURE_PRICE_SIMPLE", () => {
-    const expected = Math.round(STRUCTURE_PRICE_SIMPLE * 1.02);
-    expect(STRUCTURE_PRICE_SIMPLE_MP).toBe(expected);
+// ─── Single motor: Pago virtual prices (Talo ~1.21% + rounding) ─────────────
+describe("Pago virtual prices for single motor", () => {
+  it("STRUCTURE_PRICE_SIMPLE_MP is greater than STRUCTURE_PRICE_SIMPLE", () => {
+    expect(STRUCTURE_PRICE_SIMPLE_MP).toBeGreaterThan(STRUCTURE_PRICE_SIMPLE);
   });
 
-  it("BUNDLE_PRICES_SIMPLE_MP[120x60] is approx. 2% more than transfer price", () => {
+  it("STRUCTURE_PRICE_SIMPLE_MP markup is at most 5% over transfer", () => {
+    expect(STRUCTURE_PRICE_SIMPLE_MP).toBeLessThanOrEqual(Math.ceil(STRUCTURE_PRICE_SIMPLE * 1.05));
+  });
+
+  it("BUNDLE_PRICES_SIMPLE_MP[120x60] is between transfer and transfer+5%", () => {
     const transfer = BUNDLE_PRICES_SIMPLE["120x60"];
     expect(BUNDLE_PRICES_SIMPLE_MP["120x60"]).toBeGreaterThan(transfer);
-    expect(BUNDLE_PRICES_SIMPLE_MP["120x60"]).toBeLessThanOrEqual(Math.ceil(transfer * 1.02) + 1);
+    expect(BUNDLE_PRICES_SIMPLE_MP["120x60"]).toBeLessThanOrEqual(Math.ceil(transfer * 1.05));
   });
 
-  it("BUNDLE_PRICES_SIMPLE_MP[140x70] is approx. 2% more than transfer price", () => {
+  it("BUNDLE_PRICES_SIMPLE_MP[140x70] is between transfer and transfer+5%", () => {
     const transfer = BUNDLE_PRICES_SIMPLE["140x70"];
     expect(BUNDLE_PRICES_SIMPLE_MP["140x70"]).toBeGreaterThan(transfer);
-    expect(BUNDLE_PRICES_SIMPLE_MP["140x70"]).toBeLessThanOrEqual(Math.ceil(transfer * 1.02) + 1);
+    expect(BUNDLE_PRICES_SIMPLE_MP["140x70"]).toBeLessThanOrEqual(Math.ceil(transfer * 1.05));
   });
 
   it("all MP simple prices are positive integers", () => {
