@@ -930,16 +930,24 @@ function PaymentStep({
           <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">Resumen</h2>
             <ul className="space-y-2">
-              {items.map((item) => (
-                <li key={item.id} className="flex justify-between gap-2 text-base">
-                  <span className="text-zinc-600 dark:text-zinc-400">
-                    {item.name}
-                    {item.quantity > 1 && (
-                      <span className="ml-1 text-zinc-400"> x{item.quantity}</span>
-                    )}
-                  </span>
-                </li>
-              ))}
+              {items.map((item) => {
+                const unitPrice = isTalo
+                  ? getProductPrice(item.config, prices.mp_one, prices.simple_mp)
+                  : item.unitPrice;
+                return (
+                  <li key={item.id} className="flex justify-between gap-2 text-base">
+                    <span className="text-zinc-600 dark:text-zinc-400">
+                      {item.name}
+                      {item.quantity > 1 && (
+                        <span className="ml-1 text-zinc-400"> x{item.quantity}</span>
+                      )}
+                    </span>
+                    <span className="shrink-0 font-medium text-zinc-900 dark:text-white">
+                      {formatPrice(unitPrice * item.quantity)}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
             <div className="my-3 border-t border-zinc-200 dark:border-zinc-700" />
             <div className="flex justify-between text-base">
