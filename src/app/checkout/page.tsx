@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Bitcoin,
-  Building2,
   CreditCard,
   Loader2,
   Lock,
@@ -338,15 +337,15 @@ const CRYPTO_OPTIONS: { value: PaymentMethod; label: string }[] = [
 ];
 
 function PaymentMethodSelector({
-  transferTotal,
   mpOneTotal,
+  cryptoTotal,
   selected,
   onSelect,
   cryptoConversion,
   cryptoLoading,
 }: {
-  transferTotal: number;
   mpOneTotal: number;
+  cryptoTotal: number;
   selected: SelectedMethod;
   onSelect: (method: SelectedMethod) => void;
   cryptoConversion: { amount: string; ticker: string } | null;
@@ -361,31 +360,6 @@ function PaymentMethodSelector({
     <div className="space-y-3">
       <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Método de pago</p>
       <div className="space-y-2">
-        {/* Transferencia — precio base */}
-        <button
-          type="button"
-          onClick={() => onSelect("transfer")}
-          className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${
-            selected === "transfer"
-              ? "border-green-600 bg-green-600 text-white"
-              : "border-zinc-200 bg-white hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-500"
-          }`}
-        >
-          <Building2
-            size={20}
-            className={`shrink-0 ${selected === "transfer" ? "text-white" : "text-zinc-500"}`}
-          />
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">Transferencia</p>
-            <p
-              className={`text-xs ${selected === "transfer" ? "text-green-100" : "text-green-600 dark:text-green-400"}`}
-            >
-              Precio base
-            </p>
-          </div>
-          <p className="shrink-0 font-display text-base font-bold">{formatPrice(transferTotal)}</p>
-        </button>
-
         {/* Pago virtual */}
         <button
           type="button"
@@ -430,7 +404,7 @@ function PaymentMethodSelector({
               USDT / LTC
             </p>
           </div>
-          <p className="shrink-0 font-display text-base font-bold">{formatPrice(transferTotal)}</p>
+          <p className="shrink-0 font-display text-base font-bold">{formatPrice(cryptoTotal)}</p>
         </button>
       </div>
 
@@ -516,7 +490,7 @@ function PaymentStep({
 
   const mpOneTotal = tierTotal(prices.mp_one, prices.simple_mp);
 
-  const [selectedMethod, setSelectedMethod] = useState<SelectedMethod>("transfer");
+  const [selectedMethod, setSelectedMethod] = useState<SelectedMethod>("talo");
   const [form, setForm] = useState<CheckoutFormData>({
     firstName: "",
     lastName: "",
@@ -537,13 +511,12 @@ function PaymentStep({
   const [cryptoLoading, setCryptoLoading] = useState(false);
 
   const isTalo = selectedMethod === "talo";
-  const isTransfer = selectedMethod === "transfer";
   const isCrypto =
     selectedMethod === "crypto_usdt_trc20" ||
     selectedMethod === "crypto_usdt_polygon" ||
     selectedMethod === "crypto_ltc";
 
-  const adjustedTotal = isTalo ? mpOneTotal : grandTotal; // transfer o cripto = mismo precio
+  const adjustedTotal = isTalo ? mpOneTotal : grandTotal;
 
   // Cotización cripto en tiempo real desde Ripio
   useEffect(() => {
@@ -900,12 +873,6 @@ function PaymentStep({
               </div>
             )}
 
-            {isTransfer && (
-              <p className="text-center text-xs text-zinc-400">
-                Recibirás los datos bancarios en la siguiente pantalla.
-              </p>
-            )}
-
             {isCrypto && (
               <p className="text-center text-xs text-zinc-400">
                 Recibirás la dirección de wallet en la siguiente pantalla.
@@ -919,8 +886,8 @@ function PaymentStep({
           {/* Selector de método de pago */}
           <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <PaymentMethodSelector
-              transferTotal={grandTotal}
               mpOneTotal={mpOneTotal}
+              cryptoTotal={grandTotal}
               selected={selectedMethod}
               onSelect={setSelectedMethod}
               cryptoConversion={cryptoConversion}

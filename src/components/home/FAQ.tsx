@@ -26,7 +26,7 @@ const faqs = [
   },
   {
     q: "¿Qué métodos de pago aceptan?",
-    a: "Aceptamos transferencia bancaria, pago virtual (transferencia online) y criptomonedas (USDT, LTC).",
+    a: "Aceptamos pago virtual (transferencia bancaria online) y criptomonedas (USDT, LTC).",
   },
   {
     q: "¿Qué garantía tiene?",
