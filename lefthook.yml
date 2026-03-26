@@ -12,7 +12,7 @@ pre-commit:
     lint:
       name: Biome lint
       glob: "*.{js,ts,jsx,tsx,json}"
-      run: npx biome check --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      run: npx biome check --diagnostic-level=error --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
       fail_text: "Biome: errores de linting. Corregí o ejecutá `npx biome check --write .`"
 
     test:

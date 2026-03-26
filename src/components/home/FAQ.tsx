@@ -22,11 +22,11 @@ const faqs = [
   },
   {
     q: "¿Cómo es el envío?",
-    a: "Enviamos a todo el país por Andreani. El costo se cotiza en el checkout según tu código postal. Tiempo estimado: 10 a 15 días hábiles.",
+    a: "Enviamos a domicilio dentro de AMBA y Buenos Aires con tarifa fija. Para otras provincias coordinamos el envío por WhatsApp o podés retirar en local.",
   },
   {
     q: "¿Qué métodos de pago aceptan?",
-    a: "Aceptamos transferencia bancaria, MercadoPago (tarjeta de crédito o débito) y criptomonedas (USDT, LTC).",
+    a: "Aceptamos pago virtual (transferencia bancaria online) y criptomonedas (USDT, LTC).",
   },
   {
     q: "¿Qué garantía tiene?",

@@ -70,7 +70,7 @@ export interface ShippingQuote {
   pickup?: boolean;
 }
 
-export interface MercadoPagoItem {
+export interface TaloItem {
   id: string;
   title: string;
   quantity: number;

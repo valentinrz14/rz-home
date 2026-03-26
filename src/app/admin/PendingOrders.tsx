@@ -24,6 +24,8 @@ function methodLabel(m: PaymentMethod) {
       return "USDT Polygon";
     case "crypto_ltc":
       return "Litecoin (LTC)";
+    case "talo":
+      return "Pago virtual";
   }
 }
 

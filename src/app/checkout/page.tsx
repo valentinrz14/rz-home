@@ -4,13 +4,13 @@ import {
   ArrowLeft,
   ArrowRight,
   Bitcoin,
-  Building2,
   CreditCard,
   Loader2,
   Lock,
   MapPin,
   Package,
   Truck,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -23,7 +23,11 @@ import { useCartStore } from "@/store/cartStore";
 import type { CartItem, CheckoutFormData, ShippingQuote } from "@/types";
 import type { PaymentMethod } from "@/types/orders";
 
-const ANDREANI_ENABLED = process.env.NEXT_PUBLIC_ANDREANI_ENABLED === "true";
+/** Provincias donde se ofrece envío a domicilio (tarifa fija) */
+const SHIPPING_PROVINCES = new Set(["Buenos Aires", "CABA"]);
+
+/** Tarifa fija de envío para Buenos Aires / CABA */
+const SHIPPING_FLAT_RATE = 40_000;
 
 const PROVINCES = [
   "Buenos Aires",
@@ -58,58 +62,32 @@ const INPUT_CLASS =
 // ── Paso 1: Calculador de envío ───────────────────────────────────────────────
 
 function ShippingStep({
-  items,
+  items: _items,
   total,
   onContinue,
 }: {
   items: CartItem[];
   total: number;
-  onContinue: (postalCode: string, quote: ShippingQuote) => void;
+  onContinue: (postalCode: string, quote: ShippingQuote, province: string) => void;
 }) {
+  const [province, setProvince] = useState("");
   const [shippingType, setShippingType] = useState<"delivery" | "pickup">("delivery");
   const [postalCode, setPostalCode] = useState("");
-  const [quote, setQuote] = useState<ShippingQuote | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const PICKUP_ZONA = process.env.NEXT_PUBLIC_PICKUP_ZONA ?? "";
 
-  async function handleCalculate(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setQuote(null);
-    setLoading(true);
+  const canDeliver = SHIPPING_PROVINCES.has(province);
 
-    try {
-      const cartItems = items.map((item) => ({
-        type: item.config.type,
-        motorType: item.config.motorType,
-        size: item.config.tableSize,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-      }));
-
-      const res = await fetch("/api/andreani/cotizar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ codigoPostal: postalCode, items: cartItems }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error ?? "No se pudo calcular el envío.");
-      }
-
-      setQuote(data as ShippingQuote);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Ocurrió un error inesperado.");
-    } finally {
-      setLoading(false);
+  // Si la provincia no tiene envío y el usuario tenía delivery seleccionado, forzar pickup
+  useEffect(() => {
+    if (province && !canDeliver) {
+      setShippingType("pickup");
     }
-  }
+  }, [province, canDeliver]);
 
-  const grandTotal = quote ? total + quote.costo : null;
+  const deliveryQuote: ShippingQuote = { costo: SHIPPING_FLAT_RATE, plazo: null };
+
+  const grandTotal = shippingType === "delivery" && canDeliver ? total + SHIPPING_FLAT_RATE : null;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -149,37 +127,56 @@ function ShippingStep({
             ¿Cómo querés recibir tu pedido?
           </p>
 
+          {/* Selector de provincia */}
+          <div className="mb-5">
+            <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              Provincia *
+            </label>
+            <select
+              value={province}
+              onChange={(e) => setProvince(e.target.value)}
+              required
+              className={INPUT_CLASS}
+            >
+              <option value="">Seleccioná tu provincia</option>
+              {PROVINCES.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Selector de tipo de entrega */}
           <div className="mb-6 grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => {
-                setShippingType("delivery");
-                setQuote(null);
-              }}
+              disabled={!province || !canDeliver}
+              onClick={() => setShippingType("delivery")}
               className={`rounded-xl border p-4 text-left transition ${
-                shippingType === "delivery"
-                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
-                  : "border-zinc-200 bg-white hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600"
+                !province || !canDeliver
+                  ? "cursor-not-allowed border-zinc-100 bg-zinc-50 opacity-50 dark:border-zinc-800 dark:bg-zinc-900"
+                  : shippingType === "delivery"
+                    ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                    : "border-zinc-200 bg-white hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600"
               }`}
             >
               <Truck
                 size={20}
-                className={`mb-2 ${shippingType === "delivery" ? "text-white dark:text-zinc-900" : "text-zinc-500"}`}
+                className={`mb-2 ${shippingType === "delivery" && canDeliver ? "text-white dark:text-zinc-900" : "text-zinc-500"}`}
               />
               <p className="text-sm font-semibold">Envío a domicilio</p>
               <p
-                className={`mt-0.5 text-xs ${shippingType === "delivery" ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-400"}`}
+                className={`mt-0.5 text-xs ${shippingType === "delivery" && canDeliver ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-400"}`}
               >
-                Andreani · Todo el país
+                {canDeliver || !province
+                  ? `${formatPrice(SHIPPING_FLAT_RATE)} · AMBA`
+                  : "No disponible en tu provincia"}
               </p>
             </button>
             <button
               type="button"
-              onClick={() => {
-                setShippingType("pickup");
-                setQuote(null);
-              }}
+              onClick={() => setShippingType("pickup")}
               className={`rounded-xl border p-4 text-left transition ${
                 shippingType === "pickup"
                   ? "border-green-600 bg-green-600 text-white"
@@ -199,6 +196,17 @@ function ShippingStep({
             </button>
           </div>
 
+          {/* Info de provincia sin envío */}
+          {province && !canDeliver && (
+            <div className="mb-5 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/40 dark:bg-amber-950/30">
+              <XCircle size={18} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+              <p className="text-sm text-amber-800 dark:text-amber-300">
+                El envío a domicilio solo está disponible para <strong>Buenos Aires y CABA</strong>.
+                Para otras provincias, podés retirar en local o coordinamos el envío por WhatsApp.
+              </p>
+            </div>
+          )}
+
           {shippingType === "pickup" ? (
             <>
               <div className="rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-900/40 dark:bg-green-950/30">
@@ -213,103 +221,16 @@ function ShippingStep({
               <Button
                 size="xl"
                 className="mt-6 w-full gap-2 text-lg"
-                onClick={() => onContinue("", { costo: 0, plazo: null, pickup: true })}
+                disabled={!province}
+                onClick={() => onContinue("", { costo: 0, plazo: null, pickup: true }, province)}
               >
                 Continuar al pago <ArrowRight size={18} />
               </Button>
             </>
-          ) : ANDREANI_ENABLED ? (
-            <>
-              <form onSubmit={handleCalculate} className="space-y-4">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    Código postal
-                  </label>
-                  <div className="flex gap-3">
-                    <input
-                      value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                      placeholder="Ej: 1043"
-                      maxLength={4}
-                      pattern="\d{4}"
-                      required
-                      className={INPUT_CLASS}
-                    />
-                    <Button
-                      type="submit"
-                      disabled={loading || postalCode.length !== 4}
-                      className="shrink-0 gap-2"
-                    >
-                      {loading ? (
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                      ) : (
-                        <Truck size={16} />
-                      )}
-                      {loading ? "Calculando..." : "Calcular"}
-                    </Button>
-                  </div>
-                </div>
-
-                {error && (
-                  <div className="rounded-lg bg-red-50 p-3 text-base text-red-600 dark:bg-red-900/20 dark:text-red-400">
-                    {error}
-                  </div>
-                )}
-              </form>
-
-              {quote && (
-                <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-5 dark:border-green-900/40 dark:bg-green-950/30">
-                  <div className="flex items-start gap-3">
-                    <Package
-                      size={22}
-                      className="mt-0.5 shrink-0 text-green-600 dark:text-green-400"
-                    />
-                    <div className="flex-1">
-                      <p className="font-semibold text-green-800 dark:text-green-300">
-                        Envío disponible a CP {postalCode}
-                      </p>
-                      <div className="mt-2 flex flex-col gap-1 text-base">
-                        <div className="flex justify-between">
-                          <span className="text-green-700 dark:text-green-400">Costo de envío</span>
-                          <span className="font-bold text-green-800 dark:text-green-300">
-                            {formatPrice(quote.costo)}
-                          </span>
-                        </div>
-                        {quote.plazo !== null && (
-                          <div className="flex justify-between">
-                            <span className="text-green-700 dark:text-green-400">
-                              Plazo estimado
-                            </span>
-                            <span className="text-green-800 dark:text-green-300">
-                              {quote.plazo} día{quote.plazo !== 1 ? "s" : ""} hábil
-                              {quote.plazo !== 1 ? "es" : ""}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex items-center gap-2 text-sm text-green-600 dark:text-green-500">
-                    <MapPin size={13} />
-                    Andreani · Entrega a domicilio
-                  </div>
-                </div>
-              )}
-
-              {quote && (
-                <Button
-                  size="xl"
-                  className="mt-6 w-full gap-2 text-lg"
-                  onClick={() => onContinue(postalCode, quote)}
-                >
-                  Continuar al pago <ArrowRight size={18} />
-                </Button>
-              )}
-            </>
           ) : (
             <>
-              <div>
+              {/* Campo de código postal para delivery */}
+              <div className="mb-5">
                 <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Código postal
                 </label>
@@ -321,15 +242,34 @@ function ShippingStep({
                   className={INPUT_CLASS}
                 />
               </div>
-              <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-                El costo de envío queda a cargo del comprador. Lo coordinamos con Andreani al
-                confirmar el pedido.
-              </p>
+
+              {/* Info del costo */}
+              <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-700 dark:bg-zinc-900">
+                <div className="flex items-start gap-3">
+                  <Package size={22} className="mt-0.5 shrink-0 text-zinc-500" />
+                  <div className="flex-1">
+                    <p className="font-semibold text-zinc-900 dark:text-white">
+                      Envío a domicilio — {province}
+                    </p>
+                    <div className="mt-2 flex justify-between text-base">
+                      <span className="text-zinc-600 dark:text-zinc-400">Costo de envío</span>
+                      <span className="font-bold text-zinc-900 dark:text-white">
+                        {formatPrice(SHIPPING_FLAT_RATE)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+                  <Truck size={13} />
+                  Envío coordinado · Entrega a domicilio
+                </div>
+              </div>
+
               <Button
                 size="xl"
                 className="mt-6 w-full gap-2 text-lg"
-                disabled={postalCode.length !== 4}
-                onClick={() => onContinue(postalCode, { costo: 0, plazo: null })}
+                disabled={!province}
+                onClick={() => onContinue(postalCode, deliveryQuote, province)}
               >
                 Continuar al pago <ArrowRight size={18} />
               </Button>
@@ -344,7 +284,7 @@ function ShippingStep({
               Resumen del pedido
             </h2>
             <ul className="space-y-2">
-              {items.map((item) => (
+              {_items.map((item: CartItem) => (
                 <li key={item.id} className="flex justify-between gap-2 text-base">
                   <span className="text-zinc-600 dark:text-zinc-400">
                     {item.name}
@@ -360,15 +300,13 @@ function ShippingStep({
             </ul>
             <div className="my-3 border-t border-zinc-200 dark:border-zinc-700" />
             <div className="flex justify-between text-base">
-              <span className="text-zinc-600 dark:text-zinc-400">Envío (Andreani)</span>
-              <span
-                className={quote ? "font-medium text-zinc-900 dark:text-white" : "text-zinc-500"}
-              >
-                {ANDREANI_ENABLED
-                  ? quote
-                    ? formatPrice(quote.costo)
-                    : "Ingresá tu CP"
-                  : "A coordinar"}
+              <span className="text-zinc-600 dark:text-zinc-400">Envío</span>
+              <span className="text-zinc-500">
+                {shippingType === "delivery" && canDeliver
+                  ? formatPrice(SHIPPING_FLAT_RATE)
+                  : shippingType === "pickup"
+                    ? "Sin costo"
+                    : "—"}
               </span>
             </div>
             <div className="my-3 border-t border-zinc-200 dark:border-zinc-700" />
@@ -378,7 +316,7 @@ function ShippingStep({
                 {grandTotal !== null ? formatPrice(grandTotal) : formatPrice(total)}
               </span>
             </div>
-            {grandTotal !== null && (
+            {shippingType === "delivery" && canDeliver && (
               <p className="mt-1 text-right text-xs text-zinc-400">productos + envío incluidos</p>
             )}
           </div>
@@ -390,7 +328,7 @@ function ShippingStep({
 
 // ── Selector de método de pago ─────────────────────────────────────────────────
 
-type SelectedMethod = "mercadopago" | PaymentMethod;
+type SelectedMethod = "talo" | PaymentMethod;
 
 const CRYPTO_OPTIONS: { value: PaymentMethod; label: string }[] = [
   { value: "crypto_usdt_trc20", label: "USDT TRC-20" },
@@ -399,15 +337,15 @@ const CRYPTO_OPTIONS: { value: PaymentMethod; label: string }[] = [
 ];
 
 function PaymentMethodSelector({
-  transferTotal,
   mpOneTotal,
+  cryptoTotal,
   selected,
   onSelect,
   cryptoConversion,
   cryptoLoading,
 }: {
-  transferTotal: number;
   mpOneTotal: number;
+  cryptoTotal: number;
   selected: SelectedMethod;
   onSelect: (method: SelectedMethod) => void;
   cryptoConversion: { amount: string; ticker: string } | null;
@@ -422,51 +360,26 @@ function PaymentMethodSelector({
     <div className="space-y-3">
       <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Método de pago</p>
       <div className="space-y-2">
-        {/* Transferencia — precio base */}
+        {/* Pago virtual */}
         <button
           type="button"
-          onClick={() => onSelect("transfer")}
+          onClick={() => onSelect("talo")}
           className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${
-            selected === "transfer"
-              ? "border-green-600 bg-green-600 text-white"
-              : "border-zinc-200 bg-white hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-500"
-          }`}
-        >
-          <Building2
-            size={20}
-            className={`shrink-0 ${selected === "transfer" ? "text-white" : "text-zinc-500"}`}
-          />
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">Transferencia</p>
-            <p
-              className={`text-xs ${selected === "transfer" ? "text-green-100" : "text-green-600 dark:text-green-400"}`}
-            >
-              Precio base
-            </p>
-          </div>
-          <p className="shrink-0 font-display text-base font-bold">{formatPrice(transferTotal)}</p>
-        </button>
-
-        {/* MercadoPago */}
-        <button
-          type="button"
-          onClick={() => onSelect("mercadopago")}
-          className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${
-            selected === "mercadopago"
+            selected === "talo"
               ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
               : "border-zinc-200 bg-white hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-500"
           }`}
         >
           <CreditCard
             size={20}
-            className={`shrink-0 ${selected === "mercadopago" ? "text-white dark:text-zinc-900" : "text-zinc-500"}`}
+            className={`shrink-0 ${selected === "talo" ? "text-white dark:text-zinc-900" : "text-zinc-500"}`}
           />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">MercadoPago</p>
+            <p className="text-sm font-semibold">Pago virtual</p>
             <p
-              className={`text-xs ${selected === "mercadopago" ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-500"}`}
+              className={`text-xs ${selected === "talo" ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-500"}`}
             >
-              Tarjeta de crédito / débito
+              Transferencia bancaria online
             </p>
           </div>
           <p className="shrink-0 font-display text-base font-bold">{formatPrice(mpOneTotal)}</p>
@@ -491,7 +404,7 @@ function PaymentMethodSelector({
               USDT / LTC
             </p>
           </div>
-          <p className="shrink-0 font-display text-base font-bold">{formatPrice(transferTotal)}</p>
+          <p className="shrink-0 font-display text-base font-bold">{formatPrice(cryptoTotal)}</p>
         </button>
       </div>
 
@@ -550,12 +463,14 @@ function PaymentStep({
   total,
   shipping,
   postalCode,
+  province: initialProvince,
   onBack,
 }: {
   items: CartItem[];
   total: number;
   shipping: ShippingQuote;
   postalCode: string;
+  province: string;
   onBack: () => void;
 }) {
   const router = useRouter();
@@ -575,13 +490,13 @@ function PaymentStep({
 
   const mpOneTotal = tierTotal(prices.mp_one, prices.simple_mp);
 
-  const [selectedMethod, setSelectedMethod] = useState<SelectedMethod>("transfer");
+  const [selectedMethod, setSelectedMethod] = useState<SelectedMethod>("talo");
   const [form, setForm] = useState<CheckoutFormData>({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
-    province: "",
+    province: initialProvince,
     city: "",
     address: "",
     postalCode,
@@ -595,14 +510,13 @@ function PaymentStep({
   } | null>(null);
   const [cryptoLoading, setCryptoLoading] = useState(false);
 
-  const isMercadoPago = selectedMethod === "mercadopago";
-  const isTransfer = selectedMethod === "transfer";
+  const isTalo = selectedMethod === "talo";
   const isCrypto =
     selectedMethod === "crypto_usdt_trc20" ||
     selectedMethod === "crypto_usdt_polygon" ||
     selectedMethod === "crypto_ltc";
 
-  const adjustedTotal = isMercadoPago ? mpOneTotal : grandTotal; // transfer o cripto = mismo precio
+  const adjustedTotal = isTalo ? mpOneTotal : grandTotal;
 
   // Cotización cripto en tiempo real desde Ripio
   useEffect(() => {
@@ -635,9 +549,9 @@ function PaymentStep({
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   }
 
-  async function handleMercadoPago() {
+  async function handleTalo() {
     const tier = prices.mp_one;
-    const mpItems = [
+    const taloItems = [
       ...items.map((item) => ({
         id: item.id,
         title: item.name,
@@ -648,8 +562,8 @@ function PaymentStep({
       ...(shipping.costo > 0
         ? [
             {
-              id: "envio-andreani",
-              title: `Envío Andreani a CP ${postalCode}`,
+              id: "envio-domicilio",
+              title: `Envío a domicilio${postalCode ? ` a CP ${postalCode}` : ""}`,
               quantity: 1,
               unit_price: shipping.costo,
               currency_id: "ARS",
@@ -658,38 +572,38 @@ function PaymentStep({
         : []),
     ];
 
-    const res = await fetch("/api/mercadopago/preference", {
+    const res = await fetch("/api/talo/payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: mpItems,
-        installments: 1,
-        payer: {
-          name: form.firstName,
-          surname: form.lastName,
+        items: taloItems,
+        buyer: {
+          firstName: form.firstName,
+          lastName: form.lastName,
           email: form.email,
-          phone: {
-            area_code: form.phone.replace(/\D/g, "").slice(0, 2),
-            number: form.phone.replace(/\D/g, "").slice(2),
-          },
-          address: { street_name: form.address, street_number: "0", zip_code: form.postalCode },
+          phone: form.phone,
         },
+        totalAmount: adjustedTotal,
+        externalReference: `rz-room-${Date.now()}`,
       }),
     });
 
     if (!res.ok) {
       const data = await res.json();
-      throw new Error(data.error ?? "Error al procesar el pago.");
+      throw new Error(data.error ?? "Error al procesar el pago virtual.");
     }
 
-    const { initPoint } = await res.json();
-    // Guardar estado para restaurar si el usuario hace "Reintentar" desde la página de fallo
+    const { checkoutUrl } = await res.json();
+    // Guardar estado para restaurar si el usuario hace "Reintentar"
     try {
-      localStorage.setItem("checkout_retry", JSON.stringify({ postalCode, shipping }));
+      localStorage.setItem(
+        "checkout_retry",
+        JSON.stringify({ postalCode, shipping, province: initialProvince })
+      );
     } catch {
       /* localStorage no disponible */
     }
-    window.location.href = initPoint;
+    window.location.href = checkoutUrl;
   }
 
   async function handleAlternativePayment() {
@@ -700,7 +614,13 @@ function PaymentStep({
         unit_price: item.unitPrice,
       })),
       ...(shipping.costo > 0
-        ? [{ title: `Envío Andreani a CP ${postalCode}`, quantity: 1, unit_price: shipping.costo }]
+        ? [
+            {
+              title: `Envío a domicilio${postalCode ? ` a CP ${postalCode}` : ""}`,
+              quantity: 1,
+              unit_price: shipping.costo,
+            },
+          ]
         : []),
     ];
 
@@ -738,8 +658,8 @@ function PaymentStep({
     setLoading(true);
 
     try {
-      if (isMercadoPago) {
-        await handleMercadoPago();
+      if (isTalo) {
+        await handleTalo();
       } else {
         await handleAlternativePayment();
       }
@@ -935,9 +855,9 @@ function PaymentStep({
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                   Procesando...
                 </>
-              ) : isMercadoPago ? (
+              ) : isTalo ? (
                 <>
-                  <CreditCard size={20} /> Pagar {formatPrice(adjustedTotal)} con MercadoPago
+                  <CreditCard size={20} /> Pagar {formatPrice(adjustedTotal)}
                 </>
               ) : (
                 <>
@@ -947,16 +867,10 @@ function PaymentStep({
               )}
             </Button>
 
-            {isMercadoPago && (
+            {isTalo && (
               <div className="flex items-center justify-center gap-2 text-sm text-zinc-400">
-                <Lock size={14} /> Pago seguro con MercadoPago · SSL encriptado
+                <Lock size={14} /> Pago seguro · SSL encriptado
               </div>
-            )}
-
-            {isTransfer && (
-              <p className="text-center text-xs text-zinc-400">
-                Recibirás los datos bancarios en la siguiente pantalla.
-              </p>
             )}
 
             {isCrypto && (
@@ -972,8 +886,8 @@ function PaymentStep({
           {/* Selector de método de pago */}
           <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <PaymentMethodSelector
-              transferTotal={grandTotal}
               mpOneTotal={mpOneTotal}
+              cryptoTotal={grandTotal}
               selected={selectedMethod}
               onSelect={setSelectedMethod}
               cryptoConversion={cryptoConversion}
@@ -983,16 +897,24 @@ function PaymentStep({
           <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">Resumen</h2>
             <ul className="space-y-2">
-              {items.map((item) => (
-                <li key={item.id} className="flex justify-between gap-2 text-base">
-                  <span className="text-zinc-600 dark:text-zinc-400">
-                    {item.name}
-                    {item.quantity > 1 && (
-                      <span className="ml-1 text-zinc-400"> x{item.quantity}</span>
-                    )}
-                  </span>
-                </li>
-              ))}
+              {items.map((item) => {
+                const unitPrice = isTalo
+                  ? getProductPrice(item.config, prices.mp_one, prices.simple_mp)
+                  : item.unitPrice;
+                return (
+                  <li key={item.id} className="flex justify-between gap-2 text-base">
+                    <span className="text-zinc-600 dark:text-zinc-400">
+                      {item.name}
+                      {item.quantity > 1 && (
+                        <span className="ml-1 text-zinc-400"> x{item.quantity}</span>
+                      )}
+                    </span>
+                    <span className="shrink-0 font-medium text-zinc-900 dark:text-white">
+                      {formatPrice(unitPrice * item.quantity)}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
             <div className="my-3 border-t border-zinc-200 dark:border-zinc-700" />
             <div className="flex justify-between text-base">
@@ -1001,7 +923,7 @@ function PaymentStep({
                   "Retiro en local"
                 ) : shipping.costo > 0 ? (
                   <>
-                    Envío Andreani · CP {postalCode}
+                    Envío a domicilio{postalCode ? ` · CP ${postalCode}` : ""}
                     {shipping.plazo !== null && (
                       <span className="ml-1 text-xs text-zinc-400">
                         ({shipping.plazo} día{shipping.plazo !== 1 ? "s" : ""})
@@ -1069,6 +991,7 @@ export default function CheckoutPage() {
 
   const [step, setStep] = useState<1 | 2>(1);
   const [postalCode, setPostalCode] = useState("");
+  const [province, setProvince] = useState("");
   const [shipping, setShipping] = useState<ShippingQuote | null>(null);
 
   // Restaurar estado si el usuario vuelve desde MP (failure → Reintentar)
@@ -1077,9 +1000,14 @@ export default function CheckoutPage() {
       const saved = localStorage.getItem("checkout_retry");
       if (saved) {
         localStorage.removeItem("checkout_retry");
-        const { postalCode: savedPC, shipping: savedShipping } = JSON.parse(saved);
+        const {
+          postalCode: savedPC,
+          shipping: savedShipping,
+          province: savedProvince,
+        } = JSON.parse(saved);
         setPostalCode(savedPC);
         setShipping(savedShipping);
+        setProvince(savedProvince ?? "");
         setStep(2);
       }
     } catch {
@@ -1107,6 +1035,7 @@ export default function CheckoutPage() {
         total={total}
         shipping={shipping}
         postalCode={postalCode}
+        province={province}
         onBack={() => setStep(1)}
       />
     );
@@ -1116,9 +1045,10 @@ export default function CheckoutPage() {
     <ShippingStep
       items={items}
       total={total}
-      onContinue={(cp, quote) => {
+      onContinue={(cp, quote, prov) => {
         setPostalCode(cp);
         setShipping(quote);
+        setProvince(prov);
         setStep(2);
       }}
     />

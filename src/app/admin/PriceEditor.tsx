@@ -62,7 +62,7 @@ function DoubleTierColumns({
       {(
         [
           { label: "Transferencia / Cripto", tier: transfer, onChange: onChangeTransfer },
-          { label: "MercadoPago 1 pago", tier: mpOne, onChange: onChangeMpOne },
+          { label: "Pago virtual", tier: mpOne, onChange: onChangeMpOne },
         ] as const
       ).map(({ label, tier, onChange }) => (
         <div key={label} className="space-y-4">
@@ -130,7 +130,7 @@ function SimpleTierColumns({
       {(
         [
           { label: "Transferencia / Cripto", tier: transfer, onChange: onChangeTransfer },
-          { label: "MercadoPago 1 pago", tier: mpOne, onChange: onChangeMpOne },
+          { label: "Pago virtual", tier: mpOne, onChange: onChangeMpOne },
         ] as const
       ).map(({ label, tier, onChange }) => (
         <div key={label} className="space-y-4">

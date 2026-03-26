@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Check, Loader2, ShoppingCart } from "lucide-react";
+import { AlertTriangle, Check, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { usePrices } from "@/hooks/usePrices";
@@ -35,10 +35,6 @@ export function ProductConfigurator({
   const [tableColor, setTableColor] = useState<TableColor>("hickory");
   const [structureColor, setStructureColor] = useState<StructureColor>("negro");
   const [added, setAdded] = useState(false);
-  const [postalCode, setPostalCode] = useState("");
-  const [shipping, setShipping] = useState<{ costo: number; plazo: number | null } | null>(null);
-  const [shippingLoading, setShippingLoading] = useState(false);
-  const [shippingError, setShippingError] = useState<string | null>(null);
 
   // Reset L size when switching to simple motor (only S and M available)
   useEffect(() => {
@@ -79,54 +75,12 @@ export function ProductConfigurator({
 
   const price = getProductPrice(config, prices.transfer, prices.simple_transfer);
 
-  // Reset shipping estimate when product config changes
-  useEffect(() => {
-    setShipping(null);
-    setShippingError(null);
-  }, [productType, motorType, tableSize]);
-
   function handleAdd() {
     addItem(config, price);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
 
-  async function handleCalculateShipping() {
-    if (!/^\d{4}$/.test(postalCode)) {
-      setShippingError("El código postal debe tener 4 dígitos.");
-      return;
-    }
-    setShippingLoading(true);
-    setShippingError(null);
-    try {
-      const res = await fetch("/api/andreani/cotizar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          codigoPostal: postalCode,
-          items: [
-            {
-              type: productType,
-              motorType,
-              size: productType !== "estructura" ? tableSize : undefined,
-              quantity: 1,
-              unitPrice: price,
-            },
-          ],
-        }),
-      });
-      const data = (await res.json()) as { costo?: number; plazo?: number | null; error?: string };
-      if (!res.ok) {
-        setShippingError(data.error ?? "No se pudo calcular el costo de envío.");
-      } else {
-        setShipping({ costo: data.costo!, plazo: data.plazo ?? null });
-      }
-    } catch {
-      setShippingError("No se pudo calcular el costo de envío.");
-    } finally {
-      setShippingLoading(false);
-    }
-  }
 
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
@@ -333,53 +287,21 @@ export function ProductConfigurator({
           {formatPrice(price)}
         </p>
 
-        {/* Shipping estimator */}
+        {/* Info de envío */}
         <div className="mt-3 border-t border-zinc-200 pt-3 dark:border-zinc-700">
           <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-            Envío Andreani
+            Envío
           </p>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              inputMode="numeric"
-              value={postalCode}
-              onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, "").slice(0, 4);
-                setPostalCode(val);
-                if (shipping ?? shippingError) {
-                  setShipping(null);
-                  setShippingError(null);
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") void handleCalculateShipping();
-              }}
-              placeholder="Código postal"
-              maxLength={4}
-              className="h-9 w-36 rounded-lg border border-zinc-300 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-900 dark:text-white dark:focus:ring-zinc-400"
-            />
-            <button
-              type="button"
-              onClick={() => void handleCalculateShipping()}
-              disabled={shippingLoading || postalCode.length !== 4}
-              className="flex h-9 items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-            >
-              {shippingLoading ? <Loader2 size={14} className="animate-spin" /> : "Calcular"}
-            </button>
-          </div>
-          {shipping && (
-            <p className="mt-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              + {formatPrice(shipping.costo)}
-              {shipping.plazo !== null && (
-                <span className="ml-1 font-normal text-zinc-500 dark:text-zinc-400">
-                  · {shipping.plazo} días hábiles
-                </span>
-              )}
+          <div className="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <p>
+              <span className="font-medium text-zinc-900 dark:text-white">AMBA / Buenos Aires:</span>{" "}
+              {formatPrice(40_000)} a domicilio
             </p>
-          )}
-          {shippingError && (
-            <p className="mt-1.5 text-sm text-red-500 dark:text-red-400">{shippingError}</p>
-          )}
+            <p>
+              <span className="font-medium text-zinc-900 dark:text-white">Otras provincias:</span>{" "}
+              Retiro en local o cotizamos por WhatsApp
+            </p>
+          </div>
         </div>
 
         {currentConfigOOS && (

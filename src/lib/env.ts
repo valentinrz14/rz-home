@@ -22,18 +22,19 @@ function optional(name: string, fallback = ""): string {
 
 // ── Exportaciones ─────────────────────────────────────────────────────────────
 
-/** Access token privado de MercadoPago — solo servidor */
-export function getMpAccessToken() {
-  return requireServer("MERCADOPAGO_ACCESS_TOKEN");
+/** Credenciales de Talo Pay — solo servidor */
+export function getTaloCredentials() {
+  return {
+    clientId: requireServer("TALO_CLIENT_ID"),
+    clientSecret: requireServer("TALO_CLIENT_SECRET"),
+    userId: requireServer("TALO_USER_ID"),
+  };
 }
 
-/** Secreto para verificar la firma de los webhooks de MP */
-export function getMpWebhookSecret() {
-  return optional("MERCADOPAGO_WEBHOOK_SECRET");
+/** Entorno de Talo: "production" | "sandbox" */
+export function getTaloEnvironment(): "production" | "sandbox" {
+  return optional("TALO_ENVIRONMENT", "production") as "production" | "sandbox";
 }
-
-/** Clave pública de MP — disponible en cliente y servidor */
-export const MP_PUBLIC_KEY = optional("MERCADOPAGO_PUBLIC_KEY");
 
 /** URL base del sitio (sin barra final) */
 export const SITE_URL = optional("NEXT_PUBLIC_SITE_URL", "http://localhost:3000");
@@ -42,19 +43,6 @@ export const SITE_URL = optional("NEXT_PUBLIC_SITE_URL", "http://localhost:3000"
 export function getAdminPassword() {
   return requireServer("ADMIN_PASSWORD");
 }
-
-/** Credenciales de Andreani para cotización de envío */
-export function getAndreaniCredentials() {
-  return {
-    usuario: requireServer("ANDREANI_USUARIO"),
-    clave: requireServer("ANDREANI_CLAVE"),
-    contrato: requireServer("ANDREANI_CONTRATO"),
-    cliente: requireServer("ANDREANI_CLIENTE"),
-  };
-}
-
-/** Usar entorno QA de Andreani (apisqa.andreani.com) */
-export const ANDREANI_QA = optional("ANDREANI_QA", "false");
 
 /** API key de SendGrid para envío de emails transaccionales */
 export function getSendGridApiKey() {
